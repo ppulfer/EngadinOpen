@@ -1259,6 +1259,14 @@ function initTabs() {
       const tabsWrap = document.querySelector('.tabs-wrap');
       const tabsTop = tabsWrap.offsetTop;
       window.scrollTo({ top: tabsTop, behavior: 'smooth' });
+      // Wetter bei Tab-Wechsel immer neu laden
+      if (btn.dataset.tab === 'weather') {
+        loadWeather(true);
+      }
+      // Trip-Stats neu berechnen wenn man auf Info kommt
+      if (btn.dataset.tab === 'info') {
+        updateTripStats();
+      }
     });
   });
 }
@@ -1996,12 +2004,18 @@ function playSound(type) {
   } catch(e) { console.warn('audio failed', e); }
 }
 
-async function loadWeather() {
+async function loadWeather(force) {
   const cache = localStorage.getItem('tt2026__weather');
   const cacheTime = parseInt(localStorage.getItem('tt2026__weatherTime') || '0',10);
   const fresh = (Date.now() - cacheTime) < 6 * 3600 * 1000;
   let data = null;
-  if (cache) {
+  // Wenn force = true, zeigen wir während dem Laden einen "Lade..."-Indikator
+  if (force) {
+    const wrap = document.getElementById('weatherContent');
+    if (wrap && cache) {
+      try { data = JSON.parse(cache); renderWeather(data, true); } catch(e) {}
+    }
+  } else if (cache) {
     try { data = JSON.parse(cache); renderWeather(data, !fresh); } catch(e) {}
   }
   try {
@@ -2063,9 +2077,18 @@ function renderWeather(data, cached) {
       '</div>';
   });
   html += '</div>';
+  const cacheTime = parseInt(localStorage.getItem('tt2026__weatherTime') || '0',10);
+  const minutes = Math.floor((Date.now() - cacheTime) / 60000);
+  let timeText = '';
+  if (cacheTime > 0) {
+    if (minutes < 1) timeText = 'jetzt';
+    else if (minutes < 60) timeText = 'vor ' + minutes + ' Min';
+    else if (minutes < 1440) timeText = 'vor ' + Math.floor(minutes / 60) + ' h';
+    else timeText = 'vor ' + Math.floor(minutes / 1440) + ' Tag(en)';
+  }
   html += cached
-    ? '<p class="small" style="text-align:center; margin-top:10px;">📦 Aus Cache</p>'
-    : '<p class="small" style="text-align:center; margin-top:10px;">✓ Aktuell</p>';
+    ? '<p class="small" style="text-align:center; margin-top:10px;">📦 Aus Cache · aktualisiert ' + timeText + '</p>'
+    : '<p class="small" style="text-align:center; margin-top:10px;">✓ Aktualisiert ' + timeText + '</p>';
   wrap.innerHTML = html;
 }
 
