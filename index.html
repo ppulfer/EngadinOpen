@@ -200,8 +200,15 @@ a { color: var(--gold); text-decoration: none; }
   border-radius: 8px;
   padding: 12px 14px;
   margin-bottom: 10px;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.sched-item.past {
+  opacity: 0.5;
+  border-left-color: var(--muted);
 }
 .sched-date { color: var(--gold); font-weight: 700; font-size: 12px; letter-spacing: 1px; }
+.sched-item.past .sched-date { color: var(--muted); }
+.sched-item.past .sched-title { color: var(--muted); }
 .sched-title { font-weight: 700; margin: 4px 0 2px; font-size: 15px; }
 .sched-meta { color: var(--muted); font-size: 13px; }
 
@@ -1761,7 +1768,7 @@ async function fetchCloudStats() {
 }
 
 function migrateOldFormat() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTrackingDate();
   const oldKeys = Object.keys(CLOUD_STATS).filter(k => !k.includes('__' + today) && k.match(/^[a-z]+__[a-z]+$/));
   for (const oldKey of oldKeys) {
     const val = CLOUD_STATS[oldKey];
@@ -1779,7 +1786,7 @@ async function trackCloud(field, delta) {
   const key = currentProfile + '__' + field;
 
   // Optimistic update — sofort lokal aktualisieren für instant feedback
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTrackingDate();
   const todayKey = currentProfile + '__' + field + '__' + today;
   const oldVal = parseInt(CLOUD_STATS[todayKey] || '0', 10);
   const newVal = Math.max(0, oldVal + delta);
@@ -1836,7 +1843,7 @@ async function flushPendingTracks() {
 }
 
 function getCloudValue(playerKey, field, date = null) {
-  if (!date) date = new Date().toISOString().split('T')[0];
+  if (!date) date = getTrackingDate();
   return parseInt(CLOUD_STATS[playerKey + '__' + field + '__' + date] || '0', 10);
 }
 
@@ -2191,11 +2198,77 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
+function getTrackingDate() {
+  const now = new Date();
+  const hour = now.getHours();
+  if (hour < 5) {
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString().split('T')[0];
+  }
+  return now.toISOString().split('T')[0];
+}
+
+function parseDate(dateStr) {
+  const match = dateStr.match(/(\d{1,2})\.(\d{1,2})\.?(\d{4})?/);
+  if (!match) return null;
+  const day = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  const year = match[3] ? parseInt(match[3], 10) : 2026;
+  return new Date(year, month - 1, day);
+}
+
+function markPastScheduleItems() {
+  const today = new Date();
+  const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+  document.querySelectorAll('.sched-item').forEach(item => {
+    const dateText = item.querySelector('.sched-date')?.textContent || '';
+    const dateMatch = dateText.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+
+    if (dateMatch) {
+      const day = parseInt(dateMatch[1], 10);
+      const month = parseInt(dateMatch[2], 10);
+      const year = parseInt(dateMatch[3], 10);
+
+      const itemDate = new Date(year, month - 1, day);
+
+      if (today >= endOfToday && itemDate < endOfToday) {
+        item.classList.add('past');
+      } else {
+        item.classList.remove('past');
+      }
+    }
+  });
+}
+
+function markPastInfoItems() {
+  const today = new Date();
+  const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+  const infoSection = document.getElementById('info');
+
+  if (!infoSection) return;
+
+  infoSection.querySelectorAll('.card, .row').forEach(item => {
+    const text = item.textContent || '';
+
+    const dateMatch = text.match(/(\d{1,2})\.(\d{1,2})\.?(\d{4})?/);
+    if (dateMatch) {
+      const dateToCheck = parseDate(text);
+      if (dateToCheck && dateToCheck < endOfToday) {
+        item.style.opacity = '0.5';
+      } else {
+        item.style.opacity = '';
+      }
+    }
+  });
+}
+
 function refreshAll() {
   initPacklist();
   initBingo();
   loadTrackers();
   renderBag();
+  markPastScheduleItems();
+  markPastInfoItems();
 }
 
 function resetData() {
@@ -2219,6 +2292,8 @@ renderTrophyTeams();
 loadTeamInput();
 attachTrackerListeners();
 refreshAll();
+markPastScheduleItems();
+markPastInfoItems();
 updateTripStats();
 updateCountdown();
 setInterval(updateCountdown, 60000);

@@ -41,7 +41,10 @@ export default async function handler(request) {
       });
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const hour = now.getHours();
+    const trackDate = hour < 5 ? new Date(now.getTime() - 86400000) : now;
+    const today = trackDate.toISOString().split('T')[0];
     const key = player + '__' + field + '__' + today;
     const newVal = await kv.hincrby('trip_stats', key, d);
     // Verhindere negative Werte
