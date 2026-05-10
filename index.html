@@ -1814,8 +1814,9 @@ async function flushPendingTracks() {
   }
 }
 
-function getCloudValue(playerKey, field) {
-  return parseInt(CLOUD_STATS[playerKey + '__' + field] || '0', 10);
+function getCloudValue(playerKey, field, date = null) {
+  if (!date) date = new Date().toISOString().split('T')[0];
+  return parseInt(CLOUD_STATS[playerKey + '__' + field + '__' + date] || '0', 10);
 }
 
 function refreshAllStatsUI() {
