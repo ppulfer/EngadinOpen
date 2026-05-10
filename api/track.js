@@ -52,6 +52,19 @@ export default async function handler(request) {
       await kv.hset('trip_stats', { [key]: 0 });
     }
 
+    // Publish notification for birdies and beers
+    if ((field === 'birdies' || field === 'beer') && d > 0) {
+      const finalValue = Math.max(0, newVal);
+      await kv.zadd('game_events', {
+        score: Date.now(),
+        member: JSON.stringify({ player, field, value: finalValue, timestamp: Date.now() })
+      });
+      // Keep only last 100 events
+      await kv.zremrangebyrank('game_events', 0, -101);
+      // Publish to channel for real-time subscribers
+      await kv.publish('game-channel', JSON.stringify({ player, field, value: finalValue, timestamp: Date.now() }));
+    }
+
     return new Response(JSON.stringify({ key, value: Math.max(0, newVal) }), {
       status: 200,
       headers: {
