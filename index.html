@@ -2383,6 +2383,8 @@ async function pollNotifications() {
     }
 
     const data = await res.json();
+    console.log('Poll result:', { since, eventCount: data.events?.length || 0, timestamp: data.timestamp });
+
     if (!data.events || data.events.length === 0) {
       return;
     }

@@ -55,14 +55,18 @@ export default async function handler(request) {
     // Publish notification for birdies and beers
     if ((field === 'birdies' || field === 'beer') && d > 0) {
       const finalValue = Math.max(0, newVal);
-      await kv.zadd('game_events', {
-        score: Date.now(),
-        member: JSON.stringify({ player, field, value: finalValue, timestamp: Date.now() })
-      });
-      // Keep only last 100 events
-      await kv.zremrangebyrank('game_events', 0, -101);
-      // Publish to channel for real-time subscribers
-      await kv.publish('game-channel', JSON.stringify({ player, field, value: finalValue, timestamp: Date.now() }));
+      const timestamp = Date.now();
+      const eventData = JSON.stringify({ player, field, value: finalValue, timestamp });
+      try {
+        await kv.zadd('game_events', timestamp, eventData);
+        // Keep only last 100 events by removing oldest
+        const count = await kv.zcard('game_events');
+        if (count > 100) {
+          await kv.zpopmin('game_events', count - 100);
+        }
+      } catch (e) {
+        console.error('KV zadd error:', e);
+      }
     }
 
     return new Response(JSON.stringify({ key, value: Math.max(0, newVal) }), {
