@@ -1263,9 +1263,9 @@ function initTabs() {
       if (btn.dataset.tab === 'weather') {
         loadWeather(true);
       }
-      // Trip-Stats neu berechnen wenn man auf Info kommt
-      if (btn.dataset.tab === 'info') {
-        updateTripStats();
+      // Trip-Stats und Tracker neu laden bei relevanten Tabs
+      if (btn.dataset.tab === 'info' || btn.dataset.tab === 'trackers') {
+        fetchCloudStats().then(() => refreshAllStatsUI());
       }
     });
   });
@@ -1730,59 +1730,129 @@ function updateCountdown() {
   });
 }
 
+// === CLOUD SYNC ===
+// State holds aggregated stats per player {playerKey__field: value}
+let CLOUD_STATS = {};
+let CLOUD_AVAILABLE = true;
+
+async function fetchCloudStats() {
+  try {
+    const res = await fetch('/api/stats', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    CLOUD_STATS = data || {};
+    CLOUD_AVAILABLE = true;
+    // Backup im localStorage
+    localStorage.setItem('tt2026__cloudCache', JSON.stringify(CLOUD_STATS));
+    localStorage.setItem('tt2026__cloudCacheTime', Date.now().toString());
+    return true;
+  } catch (e) {
+    CLOUD_AVAILABLE = false;
+    // Fallback aus Cache
+    const cached = localStorage.getItem('tt2026__cloudCache');
+    if (cached) {
+      try { CLOUD_STATS = JSON.parse(cached); } catch (_) {}
+    }
+    return false;
+  }
+}
+
+async function trackCloud(field, delta) {
+  if (!currentProfile) return;
+  const key = currentProfile + '__' + field;
+
+  // Optimistic update — sofort lokal aktualisieren für instant feedback
+  const oldVal = parseInt(CLOUD_STATS[key] || '0', 10);
+  const newVal = Math.max(0, oldVal + delta);
+  CLOUD_STATS[key] = newVal;
+  refreshAllStatsUI();
+
+  // Send to API
+  try {
+    const res = await fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ player: currentProfile, field, delta }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    // Server-Wert übernehmen (falls drift)
+    CLOUD_STATS[key] = data.value;
+    localStorage.setItem('tt2026__cloudCache', JSON.stringify(CLOUD_STATS));
+    CLOUD_AVAILABLE = true;
+    refreshAllStatsUI();
+  } catch (e) {
+    // Im Offline-Modus bleibt der optimistic update — wird beim nächsten fetch korrigiert
+    CLOUD_AVAILABLE = false;
+    // queue für späteres re-sync
+    const queue = JSON.parse(localStorage.getItem('tt2026__pendingTracks') || '[]');
+    queue.push({ player: currentProfile, field, delta, time: Date.now() });
+    localStorage.setItem('tt2026__pendingTracks', JSON.stringify(queue));
+  }
+}
+
+async function flushPendingTracks() {
+  const queue = JSON.parse(localStorage.getItem('tt2026__pendingTracks') || '[]');
+  if (queue.length === 0) return;
+  const remaining = [];
+  for (const item of queue) {
+    try {
+      const res = await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ player: item.player, field: item.field, delta: item.delta }),
+      });
+      if (!res.ok) throw new Error('failed');
+    } catch (e) {
+      remaining.push(item);
+    }
+  }
+  localStorage.setItem('tt2026__pendingTracks', JSON.stringify(remaining));
+  if (queue.length > remaining.length) {
+    await fetchCloudStats();
+    refreshAllStatsUI();
+  }
+}
+
+function getCloudValue(playerKey, field) {
+  return parseInt(CLOUD_STATS[playerKey + '__' + field] || '0', 10);
+}
+
+function refreshAllStatsUI() {
+  if (typeof updateBeer === 'function') updateBeer();
+  if (typeof updateBalls === 'function') updateBalls();
+  if (typeof updateBirdies === 'function') updateBirdies();
+  if (typeof updateTripStats === 'function') updateTripStats();
+}
+
 function adjust(type, delta) {
-  const today = new Date().toISOString().slice(0,10);
   if (type === 'beer') {
-    let count = parseInt(loadField('beer__' + today, '0'),10) + delta;
-    count = Math.max(0, count);
-    saveField('beer__' + today, count.toString());
-    updateBeer();
-    if (delta > 0) toast('🍺 Prost! ' + count + ' heute');
+    if (delta > 0) toast('🍺 Prost!');
+    trackCloud('beer', delta);
   } else if (type === 'balls') {
-    let count = parseInt(loadField('balls_total','0'),10) + delta;
-    count = Math.max(0, count);
-    saveField('balls_total', count.toString());
-    updateBalls();
     if (delta > 0) {
       const reason = document.getElementById('lossReason').value;
-      toast('🏌️ Schade, ' + count + ' Bälle weg' + (reason ? ' · ' + reason : ''));
+      toast('🏌️ Schade' + (reason ? ' · ' + reason : ''));
       document.getElementById('lossReason').value = '';
     }
+    trackCloud('balls', delta);
   } else if (type === 'birdies') {
-    let count = parseInt(loadField('birdies_total','0'),10) + delta;
-    count = Math.max(0, count);
-    saveField('birdies_total', count.toString());
-    updateBirdies();
-    if (delta > 0) toast('🐥 Birdie! Total: ' + count);
+    if (delta > 0) toast('🐥 Birdie!');
+    trackCloud('birdies', delta);
   }
 }
 
 function updateBeer() {
-  const today = new Date().toISOString().slice(0,10);
-  const todayCount = parseInt(loadField('beer__' + today,'0'),10);
+  const todayCount = currentProfile ? getCloudValue(currentProfile, 'beer') : 0;
   document.getElementById('beerToday').textContent = todayCount;
-  let total = 0, record = 0;
-  if (currentProfile) {
-    const prefix = 'tt2026__' + currentProfile + '__beer__';
-    for (let i=0;i<localStorage.length;i++) {
-      const k = localStorage.key(i);
-      if (k && k.indexOf(prefix) === 0) {
-        const v = parseInt(localStorage.getItem(k),10) || 0;
-        total += v;
-        if (v > record) record = v;
-      }
-    }
-  }
-  document.getElementById('beerTotal').textContent = total + ' 🍺';
-  document.getElementById('beerRecord').textContent = record;
-  if (total === 100) toast('🥚 EASTER EGG: 100-Bier-Marke! Legende!');
+  document.getElementById('beerTotal').textContent = todayCount + ' 🍺';
+  document.getElementById('beerRecord').textContent = todayCount;
+  if (todayCount === 100) toast('🥚 EASTER EGG: 100-Bier-Marke! Legende!');
   updatePromille();
-  updateTripStats();
 }
 
 function updatePromille() {
-  const today = new Date().toISOString().slice(0,10);
-  const beers = parseInt(loadField('beer__' + today,'0'),10);
+  const beers = currentProfile ? getCloudValue(currentProfile, 'beer') : 0;
   const wInput = document.getElementById('weightInput');
   let weight = parseFloat(wInput.value) || parseFloat(loadField('weight','80'));
   if (wInput.value) saveField('weight', wInput.value);
@@ -1811,7 +1881,7 @@ function updatePromille() {
 }
 
 function updateBalls() {
-  const total = parseInt(loadField('balls_total','0'),10);
+  const total = currentProfile ? getCloudValue(currentProfile, 'balls') : 0;
   document.getElementById('ballsLost').textContent = total;
   const est = document.getElementById('ballEstimate');
   if (total === 0) {
@@ -1834,13 +1904,12 @@ function updateBalls() {
 }
 
 function updateBirdies() {
-  const total = parseInt(loadField('birdies_total','0'),10);
+  const total = currentProfile ? getCloudValue(currentProfile, 'birdies') : 0;
   const el = document.getElementById('birdiesCount');
   if (el) el.textContent = total;
-  updateTripStats();
 }
 
-// === TRIP STATS (alle Spieler aggregiert) ===
+// === TRIP STATS (alle Spieler aggregiert aus Cloud) ===
 function updateTripStats() {
   let totalBeer = 0;
   let totalBalls = 0;
@@ -1850,38 +1919,18 @@ function updateTripStats() {
   let topBirdiesPlayer = null, topBirdiesCount = 0;
 
   PLAYERS.forEach(p => {
-    // Bier: alle Tage summieren
-    let beerSum = 0;
-    const beerPrefix = 'tt2026__' + p.key + '__beer__';
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.indexOf(beerPrefix) === 0) {
-        beerSum += parseInt(localStorage.getItem(k), 10) || 0;
-      }
-    }
-    totalBeer += beerSum;
-    if (beerSum > topBeerCount) {
-      topBeerCount = beerSum;
-      topBeerPlayer = p;
-    }
+    const beer = getCloudValue(p.key, 'beer');
+    const balls = getCloudValue(p.key, 'balls');
+    const birdies = getCloudValue(p.key, 'birdies');
 
-    // Bälle
-    const ballsKey = 'tt2026__' + p.key + '__balls_total';
-    const balls = parseInt(localStorage.getItem(ballsKey), 10) || 0;
+    totalBeer += beer;
+    if (beer > topBeerCount) { topBeerCount = beer; topBeerPlayer = p; }
+
     totalBalls += balls;
-    if (balls > topBallsCount) {
-      topBallsCount = balls;
-      topBallsPlayer = p;
-    }
+    if (balls > topBallsCount) { topBallsCount = balls; topBallsPlayer = p; }
 
-    // Birdies
-    const birdiesKey = 'tt2026__' + p.key + '__birdies_total';
-    const birdies = parseInt(localStorage.getItem(birdiesKey), 10) || 0;
     totalBirdies += birdies;
-    if (birdies > topBirdiesCount) {
-      topBirdiesCount = birdies;
-      topBirdiesPlayer = p;
-    }
+    if (birdies > topBirdiesCount) { topBirdiesCount = birdies; topBirdiesPlayer = p; }
   });
 
   const beerEl = document.getElementById('statTotalBeer');
@@ -2131,6 +2180,20 @@ updateTripStats();
 updateCountdown();
 setInterval(updateCountdown, 60000);
 loadWeather();
+
+// Cloud-Sync: Initial laden + alle 30 Sek. refreshen
+fetchCloudStats().then(() => refreshAllStatsUI());
+setInterval(() => {
+  fetchCloudStats().then(() => refreshAllStatsUI());
+  flushPendingTracks();
+}, 30000);
+// Bei Sichtbarkeitswechsel (Tab-Switch zurück zur App): sofort syncen
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    fetchCloudStats().then(() => refreshAllStatsUI());
+    flushPendingTracks();
+  }
+});
 </script>
 </body>
 </html>
