@@ -680,6 +680,280 @@ footer {
 }
 
 
+/* === RESULTS === */
+.results-flight-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.results-flight-name { font-weight: 700; color: var(--gold); font-size: 14px; margin-bottom: 8px; }
+.results-sides {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.results-side { flex: 1; }
+.results-side.a { text-align: left; }
+.results-side.b { text-align: right; }
+.results-vs { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+.results-match-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.results-match-pill.ongoing { background: rgba(212,177,74,0.15); color: var(--gold); border: 1px solid var(--gold); }
+.results-match-pill.concluded { background: rgba(100,200,100,0.15); color: #7ec87e; border: 1px solid #7ec87e; }
+.results-match-pill.none { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.results-detail-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  float: right;
+}
+.results-summary-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 4px;
+}
+.results-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+.results-summary-row:last-child { border-bottom: none; }
+.results-score-big {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* === FLIGHT DETAIL OVERLAY === */
+.flight-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.flight-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.flight-detail-close {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.flight-detail-title { font-weight: 700; font-size: 15px; }
+.flight-detail-players {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.flight-detail-players .side-a { flex: 1; font-weight: 600; }
+.flight-detail-players .side-b { flex: 1; text-align: right; font-weight: 600; }
+.flight-detail-players .vs-label { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+.flight-detail-status-bar {
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  min-height: 46px;
+}
+.flight-detail-holes {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.hole-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 1fr 1fr 56px;
+  align-items: center;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  gap: 6px;
+}
+.hole-row.concluded-marker { opacity: 0.4; }
+.hole-num {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+.hole-btn {
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+.hole-btn.active-a { background: rgba(197,99,77,0.25); border-color: #c5634d; color: #f4a18d; }
+.hole-btn.active-draw { background: rgba(212,177,74,0.2); border-color: var(--gold); color: var(--gold); }
+.hole-btn.active-b { background: rgba(74,144,194,0.25); border-color: #4a90c2; color: #92c4e6; }
+.hole-score {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+.hole-score.lead-a { color: #f4a18d; }
+.hole-score.lead-b { color: #92c4e6; }
+.hole-score.as { color: var(--muted); }
+.hole-score.done { color: #7ec87e; }
+
+.builder-flight {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.builder-flight.active {
+  border-color: var(--gold);
+  background: rgba(212,177,74,0.05);
+}
+.builder-flight-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.builder-flight-name {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  padding: 2px 0;
+}
+.builder-flight-name:focus { outline: none; border-bottom-color: var(--gold); }
+.builder-remove-flight {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 0 4px;
+  line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.builder-members { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; }
+.builder-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.builder-chip.assigned { background: rgba(212,177,74,0.15); border-color: var(--border); color: var(--text); }
+.builder-chip.unassigned { background: var(--bg-soft); border-color: var(--border); color: var(--text); }
+.builder-chip.pending { background: rgba(212,177,74,0.35); border-color: var(--gold); color: var(--gold); }
+.builder-chip.team-red { background: rgba(197,99,77,0.2); border-color: #c5634d; color: #f4a18d; }
+.builder-chip.team-blue { background: rgba(74,144,194,0.2); border-color: #4a90c2; color: #92c4e6; }
+.builder-chip.team-red.pending { background: rgba(197,99,77,0.45); }
+.builder-chip.team-blue.pending { background: rgba(74,144,194,0.45); }
+.builder-chip.blocked { opacity: 0.28; pointer-events: none; }
+.builder-flight-choice.blocked { opacity: 0.3; pointer-events: none; border-color: var(--border); color: var(--muted); }
+.builder-unassigned-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 14px 0 8px;
+}
+.builder-flight-chooser {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+  flex-wrap: wrap;
+}
+.builder-flight-choice {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.builder-add-flight {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .notification-center {
   position: fixed;
   top: 20px;
@@ -859,6 +1133,7 @@ footer {
   <button class="tab" data-tab="courses">Plätze</button>
   <button class="tab" data-tab="players">Spieler</button>
   <button class="tab" data-tab="teams">Teams</button>
+  <button class="tab" data-tab="results">Resultate</button>
   <button class="tab" data-tab="equipment">Bag</button>
   <button class="tab" data-tab="trackers">Tracker</button>
   <button class="tab" data-tab="bingo">Spass</button>
@@ -1068,7 +1343,6 @@ footer {
 
   <div class="card" style="margin-top:10px;">
     <h3 style="margin-top:0;">🔧 OK-Modus: Tages-Teams</h3>
-    <p class="small" style="margin-bottom:10px;">Format pro Zeile: <i>Teamname: Spieler1, Spieler2, …</i></p>
     <label>Tag wählen</label>
     <select id="teamDaySelect">
       <option value="2026-05-14">Do 14.05. · Praia D'El Rey · Fourball</option>
@@ -1077,11 +1351,34 @@ footer {
       <option value="2026-05-17">So 17.05. · West Cliffs · Fourball</option>
       <option value="2026-05-18">Mo 18.05. · Praia D'El Rey · Singles 🏆</option>
     </select>
-    <label>Teams (eine pro Zeile)</label>
-    <textarea id="teamInput" rows="5" placeholder="Flight 1: Schrafl, Pulfer, Wieser&#10;Flight 2: Parli, Hunter, Rütimann&#10;…"></textarea>
-    <button class="btn" style="margin-top:10px;" onclick="saveTeams()">Speichern</button>
+    <div id="okTeamsBuilder" style="margin-top:14px;"></div>
   </div>
 </section>
+
+<section id="results">
+  <h2>Match Play Resultate</h2>
+  <label>Tag wählen</label>
+  <select id="resultDaySelect">
+    <option value="2026-05-14">Do 14.05. · Praia D'El Rey · Fourball</option>
+    <option value="2026-05-15">Fr 15.05. · Royal Óbidos · Auswahl-Treibschlag</option>
+    <option value="2026-05-16">Sa 16.05. · West Cliffs · Chapman</option>
+    <option value="2026-05-17">So 17.05. · West Cliffs · Fourball</option>
+    <option value="2026-05-18">Mo 18.05. · Praia D'El Rey · Singles 🏆</option>
+  </select>
+  <div id="resultsFlights" style="margin-top:14px;"></div>
+  <div id="resultsSummary" style="margin-top:10px;"></div>
+</section>
+
+<!-- Flight detail overlay -->
+<div class="flight-detail-overlay" id="flightDetailOverlay" style="display:none;">
+  <div class="flight-detail-header">
+    <button class="flight-detail-close" id="flightDetailClose">×</button>
+    <div class="flight-detail-title" id="flightDetailTitle"></div>
+  </div>
+  <div class="flight-detail-players" id="flightDetailPlayers"></div>
+  <div class="flight-detail-status-bar" id="flightDetailStatus"></div>
+  <div class="flight-detail-holes" id="flightDetailHoles"></div>
+</div>
 
 <section id="equipment">
   <h2>Mein Bag</h2>
@@ -1859,33 +2156,47 @@ function updateClubSuggestion() {
 }
 
 // === TEAMS ===
+// === TEAMS (persisted to KV, shared across all devices) ===
+let teamsCache = {};
+let builderFlights = [];
+let builderActiveFlight = null;
+
+async function loadAllTeams() {
+  try {
+    const res = await fetch('/api/teams');
+    if (res.ok) {
+      const data = await res.json();
+      Object.entries(data).forEach(([date, teams]) => {
+        teamsCache[date] = Array.isArray(teams) ? teams : [];
+      });
+    }
+  } catch(e) {}
+  renderTeams();
+  renderResultsTab();
+}
+
 function renderTeams() {
   const wrap = document.getElementById('teamsContent');
   wrap.innerHTML = '';
   Object.keys(SCHEDULE).forEach(date => {
     const sched = SCHEDULE[date];
     const course = COURSES.find(c => c.id === sched.course);
-    const teamsRaw = loadShared('teams_' + date, '');
-
+    const teams = teamsCache[date] || [];
     const card = document.createElement('div');
     card.className = 'team-card';
     const dt = new Date(date);
     const dayName = ['So','Mo','Di','Mi','Do','Fr','Sa'][dt.getDay()];
 
     let teamsHtml = '';
-    if (teamsRaw.trim()) {
-      const lines = teamsRaw.split('\n').filter(l => l.trim());
-      lines.forEach(line => {
-        const parts = line.split(':');
-        if (parts.length < 2) {
-          teamsHtml += '<div class="team-members" style="margin-bottom:8px;">' + line + '</div>';
-        } else {
-          const tname = parts[0].trim();
-          const members = parts.slice(1).join(':').split(',').map(s => s.trim()).filter(Boolean);
-          teamsHtml += '<div style="margin-bottom:10px;"><div class="team-name" style="font-size:13px;">' + tname + '</div><div class="team-members">';
-          members.forEach(m => teamsHtml += '<span class="member">' + m + '</span>');
-          teamsHtml += '</div></div>';
-        }
+    if (teams.length > 0) {
+      teams.forEach(t => {
+        const memberNames = (t.members || []).map(key => {
+          const p = PLAYERS.find(p => p.key === key);
+          return PLAYER_NICKNAMES[key] || (p ? p.name.split(' ').pop() : key);
+        });
+        teamsHtml += '<div style="margin-bottom:10px;"><div class="team-name" style="font-size:13px;">' + t.name + '</div><div class="team-members">';
+        memberNames.forEach(m => teamsHtml += '<span class="member">' + m + '</span>');
+        teamsHtml += '</div></div>';
       });
     } else {
       teamsHtml = '<p class="small" style="margin:0;">Noch keine Auslosung eingetragen.</p>';
@@ -1899,35 +2210,203 @@ function renderTeams() {
   });
 }
 
-function saveTeams() {
+async function loadTeamInput() {
   const date = document.getElementById('teamDaySelect').value;
-  const text = document.getElementById('teamInput').value;
-  saveShared('teams_' + date, text);
-  renderTeams();
-  toast('Teams für ' + date + ' gespeichert');
+  if (teamsCache[date]) {
+    builderFlights = JSON.parse(JSON.stringify(teamsCache[date]));
+  } else {
+    try {
+      const res = await fetch('/api/teams?date=' + date);
+      const data = res.ok ? await res.json() : { teams: [] };
+      builderFlights = data.teams || [];
+      teamsCache[date] = builderFlights;
+    } catch(e) { builderFlights = []; }
+  }
+  builderActiveFlight = builderFlights.length > 0 ? 0 : null;
+  renderBuilder();
 }
 
-function loadTeamInput() {
+function playerTeamClass(key) {
+  const t = getPlayerTeam(key);
+  return t === 'red' ? 'team-red' : t === 'blue' ? 'team-blue' : '';
+}
+
+function flightTeamCount(members, team) {
+  return members.filter(k => getPlayerTeam(k) === team).length;
+}
+
+function canAddToFlight(key, members) {
+  const t = getPlayerTeam(key);
+  if (!t) return true;
+  return flightTeamCount(members, t) < 2;
+}
+
+function findNextOpenFlight(fromIdx, unassignedPlayers) {
+  for (let i = fromIdx + 1; i < builderFlights.length; i++) {
+    if (unassignedPlayers.some(p => canAddToFlight(p.key, builderFlights[i].members))) return i;
+  }
+  for (let i = 0; i < fromIdx; i++) {
+    if (unassignedPlayers.some(p => canAddToFlight(p.key, builderFlights[i].members))) return i;
+  }
+  return fromIdx;
+}
+
+function setActiveFlight(fi) {
+  builderActiveFlight = fi;
+  renderBuilder();
+}
+
+function renderBuilder() {
+  const container = document.getElementById('okTeamsBuilder');
+  if (!container) return;
+  const assignedKeys = new Set(builderFlights.flatMap(f => f.members));
+  const unassigned = PLAYERS.filter(p => !assignedKeys.has(p.key));
+  if (builderActiveFlight === null && builderFlights.length > 0) builderActiveFlight = 0;
+
+  let html = '';
+  builderFlights.forEach((flight, fi) => {
+    const isActive = fi === builderActiveFlight;
+    const rc = flightTeamCount(flight.members, 'red');
+    const bc = flightTeamCount(flight.members, 'blue');
+    const countBadge = [
+      rc ? `<span style="color:#f4a18d;font-size:11px;">🔴${rc}</span>` : '',
+      bc ? `<span style="color:#92c4e6;font-size:11px;">🔵${bc}</span>` : '',
+    ].filter(Boolean).join(' ');
+
+    html += `<div class="builder-flight${isActive ? ' active' : ''}" onclick="setActiveFlight(${fi})">
+      <div class="builder-flight-header">
+        <input class="builder-flight-name" value="${flight.name}"
+          onclick="event.stopPropagation()"
+          onchange="builderFlights[${fi}].name=this.value">
+        ${isActive ? '<span style="font-size:11px;color:var(--gold);margin-left:4px;">▶</span>' : ''}
+        <span style="margin-left:auto;display:flex;gap:6px;align-items:center;">${countBadge}</span>
+        <button class="builder-remove-flight" onclick="event.stopPropagation();builderRemoveFlight(${fi})">×</button>
+      </div>
+      <div class="builder-members">`;
+    if (flight.members.length === 0) html += `<span style="font-size:12px;color:var(--muted);">${isActive ? 'Spieler unten auswählen…' : 'Leer'}</span>`;
+    flight.members.forEach(key => {
+      const nick = PLAYER_NICKNAMES[key] || key;
+      const tc = playerTeamClass(key);
+      html += `<span class="builder-chip assigned ${tc}" onclick="event.stopPropagation();builderRemoveMember(${fi},'${key}')">${nick} ×</span>`;
+    });
+    html += '</div></div>';
+  });
+
+  html += `<button class="builder-add-flight" onclick="builderAddFlight()">+ Flight hinzufügen</button>`;
+
+  if (unassigned.length > 0) {
+    const activeLabel = builderActiveFlight !== null && builderFlights.length > 0
+      ? `<span style="color:var(--gold);">→ ${builderFlights[builderActiveFlight].name}</span>`
+      : '<span style="color:var(--muted);">Zuerst Flight antippen</span>';
+    html += `<div class="builder-unassigned-label">Nicht zugewiesen ${activeLabel}</div><div class="builder-members">`;
+    unassigned.forEach(p => {
+      const tc = playerTeamClass(p.key);
+      const canAdd = builderActiveFlight !== null && builderFlights.length > 0
+        && canAddToFlight(p.key, builderFlights[builderActiveFlight].members);
+      const fullyBlocked = builderFlights.length > 0 && !builderFlights.some(f => canAddToFlight(p.key, f.members));
+      const stateClass = fullyBlocked ? 'blocked' : 'unassigned';
+      html += `<span class="builder-chip ${tc} ${stateClass}" onclick="builderSelectPlayer('${p.key}')">${PLAYER_NICKNAMES[p.key] || p.key}</span>`;
+    });
+    html += '</div>';
+  }
+
+  html += `<button class="btn" style="margin-top:14px;width:100%;" onclick="saveTeams()">Speichern</button>`;
+  container.innerHTML = html;
+}
+
+function builderAddFlight() {
+  builderFlights.push({ name: 'Flight ' + (builderFlights.length + 1), members: [] });
+  builderActiveFlight = builderFlights.length - 1;
+  renderBuilder();
+}
+
+function builderRemoveFlight(fi) {
+  builderFlights.splice(fi, 1);
+  builderActiveFlight = builderFlights.length > 0
+    ? Math.min(fi, builderFlights.length - 1)
+    : null;
+  renderBuilder();
+}
+
+function builderRemoveMember(fi, key) {
+  builderFlights[fi].members = builderFlights[fi].members.filter(k => k !== key);
+  renderBuilder();
+}
+
+function builderSelectPlayer(key) {
+  if (builderActiveFlight === null || builderFlights.length === 0) {
+    toast('Zuerst einen Flight antippen');
+    return;
+  }
+  if (!canAddToFlight(key, builderFlights[builderActiveFlight].members)) {
+    toast('Max. 2 pro Team im Flight');
+    return;
+  }
+  builderFlights[builderActiveFlight].members.push(key);
+
+  // Auto-advance if current flight can no longer accept remaining players
+  const newAssigned = new Set(builderFlights.flatMap(f => f.members));
+  const remaining = PLAYERS.filter(p => !newAssigned.has(p.key));
+  if (remaining.length > 0 && !remaining.some(p => canAddToFlight(p.key, builderFlights[builderActiveFlight].members))) {
+    builderActiveFlight = findNextOpenFlight(builderActiveFlight, remaining);
+  }
+  renderBuilder();
+}
+
+function builderAssignMember(key, fi) {
+  if (!canAddToFlight(key, builderFlights[fi].members)) { toast('Max. 2 pro Team im Flight'); return; }
+  builderFlights[fi].members.push(key);
+  renderBuilder();
+}
+
+async function saveTeams() {
   const date = document.getElementById('teamDaySelect').value;
-  document.getElementById('teamInput').value = loadShared('teams_' + date, '');
+  try {
+    const res = await fetch('/api/teams', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date, teams: builderFlights }),
+    });
+    if (res.ok) {
+      teamsCache[date] = JSON.parse(JSON.stringify(builderFlights));
+      renderTeams();
+      toast('Teams gespeichert');
+    } else {
+      toast('Fehler beim Speichern');
+    }
+  } catch(e) { toast('Fehler beim Speichern'); }
 }
 
 // === TROPHY TEAMS (Parli rot, Consti blau) ===
-function getPlayerTeam(playerKey) {
-  return loadShared('trophyteam_' + playerKey, '');
-}
-function setPlayerTeam(playerKey, team) {
-  saveShared('trophyteam_' + playerKey, team);
+let trophyTeamCache = {};
+
+async function loadTrophyTeams() {
+  renderTrophyTeams();
+  try {
+    const res = await fetch('/api/trophy-teams');
+    if (res.ok) trophyTeamCache = await res.json();
+  } catch(e) {}
+  renderTrophyTeams();
+  renderBuilder();
 }
 
-function assignTeam(playerKey, team) {
+function getPlayerTeam(playerKey) {
+  return trophyTeamCache[playerKey] || '';
+}
+
+async function assignTeam(playerKey, team) {
   const current = getPlayerTeam(playerKey);
-  if (current === team) {
-    setPlayerTeam(playerKey, ''); // toggle off
-  } else {
-    setPlayerTeam(playerKey, team);
-  }
+  const next = current === team ? '' : team;
+  trophyTeamCache[playerKey] = next; // optimistic update
   renderTrophyTeams();
+  renderBuilder();
+  try {
+    await fetch('/api/trophy-teams', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerKey, team: next }),
+    });
+  } catch(e) { toast('Fehler beim Speichern'); }
 }
 
 function renderTrophyTeams() {
@@ -2548,13 +3027,255 @@ function resetData() {
   toast('Daten zurückgesetzt');
 }
 
+// === MATCH PLAY RESULTS ===
+let resultsCache = {};
+let detailDate = null;
+let detailFlightIdx = null;
+let detailHoles = new Array(18).fill(null);
+let saveResultTimer = null;
+
+function calculateMatch(holes) {
+  const n = holes.length;
+  let score = 0;
+  let lastPlayed = -1;
+  let concludedOn = -1;
+  const afterHole = new Array(n).fill(null);
+  for (let i = 0; i < n; i++) {
+    if (holes[i] == null) continue;
+    score += holes[i];
+    lastPlayed = i;
+    afterHole[i] = score;
+    const remaining = n - 1 - i;
+    if (concludedOn < 0 && Math.abs(score) > remaining) concludedOn = i;
+  }
+  let result = null;
+  if (concludedOn >= 0) {
+    const s = afterHole[concludedOn];
+    const rem = n - 1 - concludedOn;
+    result = { winner: s > 0 ? 'a' : 'b', margin: rem === 0 ? Math.abs(s) + 'up' : Math.abs(s) + '&' + rem };
+  } else if (lastPlayed === n - 1) {
+    result = score === 0
+      ? { winner: 'halved', margin: 'AS' }
+      : { winner: score > 0 ? 'a' : 'b', margin: Math.abs(score) + 'up' };
+  }
+  return { afterHole, score, lastPlayed, concludedOn, result };
+}
+
+function matchScoreLabel(score) {
+  if (score === 0) return '<span class="hole-score as">AS</span>';
+  const lead = Math.abs(score);
+  const cls = score > 0 ? 'lead-a' : 'lead-b';
+  const side = score > 0 ? 'A' : 'B';
+  return `<span class="hole-score ${cls}">${side} ${lead}UP</span>`;
+}
+
+async function loadAllResults() {
+  try {
+    const res = await fetch('/api/results');
+    if (res.ok) {
+      const data = await res.json();
+      Object.entries(data).forEach(([k, v]) => { resultsCache[k] = v; });
+    }
+  } catch(e) {}
+  renderResultsTab();
+}
+
+function getFlightSides(date, fi) {
+  const flights = teamsCache[date] || [];
+  const members = (flights[fi] || {}).members || [];
+  const half = Math.ceil(members.length / 2);
+  return { sideA: members.slice(0, half), sideB: members.slice(half) };
+}
+
+function sideNames(keys) {
+  return keys.map(k => PLAYER_NICKNAMES[k] || k).join(' · ') || '—';
+}
+
+function renderResultsTab() {
+  const date = document.getElementById('resultDaySelect')?.value;
+  if (!date) return;
+  const flights = teamsCache[date] || [];
+  const container = document.getElementById('resultsFlights');
+  if (!container) return;
+
+  if (flights.length === 0) {
+    container.innerHTML = '<p class="small" style="margin:10px 0;">Für diesen Tag noch keine Flights erfasst.</p>';
+    document.getElementById('resultsSummary').innerHTML = '';
+    return;
+  }
+
+  let totalA = 0, totalB = 0;
+  container.innerHTML = flights.map((flight, fi) => {
+    const { sideA, sideB } = getFlightSides(date, fi);
+    const cached = resultsCache[`${date}__${fi}`];
+    const holes = cached?.holes || new Array(18).fill(null);
+    const { result, lastPlayed } = calculateMatch(holes);
+    let pillHtml, pillClass;
+    if (result) {
+      pillClass = 'concluded';
+      const winnerName = result.winner === 'a' ? sideNames(sideA) : result.winner === 'b' ? sideNames(sideB) : '';
+      pillHtml = result.winner === 'halved' ? 'AS ½ Punkt' : `${winnerName} · ${result.margin}`;
+      if (result.winner === 'a') { totalA += 1; } else if (result.winner === 'b') { totalB += 1; } else { totalA += 0.5; totalB += 0.5; }
+    } else if (lastPlayed >= 0) {
+      const { score } = calculateMatch(holes);
+      const side = score > 0 ? 'A' : score < 0 ? 'B' : '';
+      pillHtml = score === 0 ? 'AS (Loch ' + (lastPlayed+1) + ')' : `${side} ${Math.abs(score)}UP (Loch ${lastPlayed+1})`;
+      pillClass = 'ongoing';
+    } else {
+      pillHtml = 'Noch kein Resultat';
+      pillClass = 'none';
+    }
+    return `<div class="results-flight-card">
+      <div class="results-flight-name">${flight.name} <button class="results-detail-btn" onclick="openFlightDetail('${date}',${fi})">Detail →</button></div>
+      <div class="results-sides">
+        <div class="results-side a">${sideNames(sideA)}</div>
+        <div class="results-vs">vs</div>
+        <div class="results-side b">${sideNames(sideB)}</div>
+      </div>
+      <span class="results-match-pill ${pillClass}">${pillHtml}</span>
+    </div>`;
+  }).join('');
+
+  renderResultsSummary(date, totalA, totalB);
+}
+
+function renderResultsSummary(date, dayA, dayB) {
+  // Aggregate all days
+  let allA = 0, allB = 0;
+  const flights_by_date = {};
+  Object.keys(teamsCache).forEach(d => {
+    flights_by_date[d] = teamsCache[d] || [];
+  });
+  Object.keys(flights_by_date).forEach(d => {
+    const flights = flights_by_date[d];
+    flights.forEach((_, fi) => {
+      const cached = resultsCache[`${d}__${fi}`];
+      if (!cached?.holes) return;
+      const { result } = calculateMatch(cached.holes);
+      if (!result) return;
+      if (result.winner === 'a') allA += 1;
+      else if (result.winner === 'b') allB += 1;
+      else { allA += 0.5; allB += 0.5; }
+    });
+  });
+
+  document.getElementById('resultsSummary').innerHTML = `
+    <div class="results-summary-card">
+      <div class="results-summary-row">
+        <span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Tagesstand</span>
+        <span><b>${dayA}</b> · Seite A &nbsp;–&nbsp; Seite B · <b>${dayB}</b></span>
+      </div>
+      <div class="results-summary-row">
+        <span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Gesamtstand</span>
+        <span><b>${allA}</b> · Seite A &nbsp;–&nbsp; Seite B · <b>${allB}</b></span>
+      </div>
+    </div>`;
+}
+
+function openFlightDetail(date, fi) {
+  detailDate = date;
+  detailFlightIdx = fi;
+  const cached = resultsCache[`${date}__${fi}`];
+  detailHoles = cached?.holes ? [...cached.holes] : new Array(18).fill(null);
+  const flights = teamsCache[date] || [];
+  const flight = flights[fi] || {};
+  const { sideA, sideB } = getFlightSides(date, fi);
+  const sched = SCHEDULE[date] || {};
+  document.getElementById('flightDetailTitle').textContent = `${flight.name || 'Flight'} · ${date.slice(8,10)}.${date.slice(5,7)}.`;
+  document.getElementById('flightDetailPlayers').innerHTML = `
+    <span class="side-a">${sideNames(sideA)}</span>
+    <span class="vs-label">vs</span>
+    <span class="side-b">${sideNames(sideB)}</span>`;
+  document.getElementById('flightDetailOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  renderHoleList();
+}
+
+function closeFlightDetail() {
+  document.getElementById('flightDetailOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+  renderResultsTab();
+}
+
+function renderHoleList() {
+  const { afterHole, concludedOn, result } = calculateMatch(detailHoles);
+
+  // Status bar
+  const statusEl = document.getElementById('flightDetailStatus');
+  if (result) {
+    const { sideA, sideB } = getFlightSides(detailDate, detailFlightIdx);
+    if (result.winner === 'halved') {
+      statusEl.innerHTML = `<span style="color:var(--gold);">½ AS – Unentschieden</span>`;
+    } else {
+      const winnerNames = result.winner === 'a' ? sideNames(sideA) : sideNames(sideB);
+      const cls = result.winner === 'a' ? '#f4a18d' : '#92c4e6';
+      statusEl.innerHTML = `<span style="color:${cls};">${winnerNames} · ${result.margin} ✓</span>`;
+    }
+  } else {
+    const lastScore = afterHole.filter(s => s !== null).pop();
+    if (lastScore != null) {
+      statusEl.innerHTML = matchScoreLabel(lastScore);
+    } else {
+      statusEl.innerHTML = '<span style="color:var(--muted);font-size:14px;">Noch kein Resultat</span>';
+    }
+  }
+
+  // Hole list
+  let html = '';
+  for (let i = 0; i < 18; i++) {
+    const val = detailHoles[i];
+    const score = afterHole[i];
+    const isAfterConclusion = concludedOn >= 0 && i > concludedOn;
+    const scoreHtml = score !== null
+      ? (concludedOn === i ? `<span class="hole-score done">${result?.margin || ''} ✓</span>` : matchScoreLabel(score))
+      : '';
+    html += `<div class="hole-row${isAfterConclusion ? ' concluded-marker' : ''}">
+      <span class="hole-num">${i+1}</span>
+      <button class="hole-btn${val === 1 ? ' active-a' : ''}" onclick="setHole(${i},1)">A</button>
+      <button class="hole-btn${val === 0 ? ' active-draw' : ''}" onclick="setHole(${i},0)">=</button>
+      <button class="hole-btn${val === -1 ? ' active-b' : ''}" onclick="setHole(${i},-1)">B</button>
+      <div>${scoreHtml}</div>
+    </div>`;
+  }
+  document.getElementById('flightDetailHoles').innerHTML = html;
+
+  // Scroll to first unplayed hole
+  const firstEmpty = detailHoles.indexOf(null);
+  if (firstEmpty > 0) {
+    const rows = document.querySelectorAll('.hole-row');
+    if (rows[firstEmpty]) rows[firstEmpty].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
+
+function setHole(holeIdx, val) {
+  detailHoles[holeIdx] = detailHoles[holeIdx] === val ? null : val;
+  renderHoleList();
+  clearTimeout(saveResultTimer);
+  saveResultTimer = setTimeout(saveFlightResult, 800);
+}
+
+async function saveFlightResult() {
+  try {
+    await fetch('/api/results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: detailDate, flightIdx: detailFlightIdx, holes: detailHoles }),
+    });
+    resultsCache[`${detailDate}__${detailFlightIdx}`] = { holes: [...detailHoles] };
+  } catch(e) { console.warn('Save result failed', e); }
+}
+
+document.getElementById('flightDetailClose').addEventListener('click', closeFlightDetail);
+document.getElementById('resultDaySelect').addEventListener('change', renderResultsTab);
+
 // === START ===
 initProfile();
 initTabs();
 initPlayerCards();
 initCourses();
-renderTeams();
-renderTrophyTeams();
+loadAllTeams();
+loadAllResults();
+loadTrophyTeams();
 loadTeamInput();
 attachTrackerListeners();
 refreshAll();
