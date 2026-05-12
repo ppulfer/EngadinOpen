@@ -27,12 +27,11 @@ export default async function handler(request) {
       const eventStrings = await kv.lrange('game_events_list', 0, -1);
       console.log('LRANGE_RESULT', { count: eventStrings?.length || 0, sample: eventStrings?.[0] });
 
-      // Parse JSON strings and filter by timestamp
+      // Parse JSON strings (don't filter by since - client will handle it)
       events = (eventStrings || [])
         .map(str => {
           try {
-            const parsed = JSON.parse(str);
-            return parsed.timestamp >= since ? parsed : null;
+            return JSON.parse(str);
           } catch (e) {
             console.error('PARSE_ERROR', { error: e.message, str });
             return null;
