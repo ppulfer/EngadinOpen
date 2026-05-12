@@ -2622,12 +2622,16 @@ function loadEventCache() {
     }
 
     const validEvents = parsed.events.filter(isValidEvent);
-    if (validEvents.length !== parsed.events.length) {
-      console.warn(`Event cache: dropped ${parsed.events.length - validEvents.length} corrupt entries`);
-    }
+    const seen = new Set();
+    const dedupedEvents = validEvents.filter(e => {
+      const key = e.player + '__' + e.field + '__' + e.timestamp;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 
     return {
-      events: validEvents,
+      events: dedupedEvents,
       lastTimestamp: typeof parsed.lastTimestamp === 'number' ? parsed.lastTimestamp : Date.now() - 600000
     };
   } catch (e) {
@@ -2801,16 +2805,15 @@ async function pollNotifications() {
         }, 100);
       }
 
-      // Save to cache (only count as unread if not already in cache)
       const eventExists = eventCache.events.some(e => e.timestamp === event.timestamp && e.player === event.player && e.field === event.field);
-      eventCache.events.push(event);
-      eventCache.lastTimestamp = event.timestamp;
-      saveEventCache(eventCache);
       if (!eventExists) {
+        eventCache.events.push(event);
+        eventCache.lastTimestamp = event.timestamp;
+        saveEventCache(eventCache);
         unreadEventCount++;
         localStorage.setItem('tt2026__unreadCount', unreadEventCount);
+        updateNotificationCenter();
       }
-      updateNotificationCenter();
     }
   } catch (e) {
     console.error('Poll notification error:', e);
