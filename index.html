@@ -2348,13 +2348,55 @@ updateCountdown();
 setInterval(updateCountdown, 60000);
 loadWeather();
 
-// === Real-time Notifications ===
+// === Real-time Notifications with Local Cache ===
 let lastNotificationTime = Date.now() - 30000;
 const notificationQueue = new Set();
 const anthemAudio = new Audio('/uefa_anthem.m4a');
 anthemAudio.volume = 0.7;
 
-function showNotification(message, type = 'default') {
+// Event cache
+const EVENT_CACHE_KEY = 'tt2026__eventCache';
+const MAX_CACHED_EVENTS = 50;
+
+function loadEventCache() {
+  try {
+    const cached = localStorage.getItem(EVENT_CACHE_KEY);
+    return cached ? JSON.parse(cached) : { events: [], lastTimestamp: Date.now() - 86400000 };
+  } catch {
+    return { events: [], lastTimestamp: Date.now() - 86400000 };
+  }
+}
+
+function saveEventCache(cache) {
+  try {
+    // Keep only last N events
+    cache.events = cache.events.slice(-MAX_CACHED_EVENTS);
+    localStorage.setItem(EVENT_CACHE_KEY, JSON.stringify(cache));
+  } catch (e) {
+    console.warn('Cache save failed:', e);
+  }
+}
+
+// Initialize cache and load old events on startup
+const eventCache = loadEventCache();
+lastNotificationTime = eventCache.lastTimestamp;
+
+// Show cached events on app start (only show old ones, silent)
+function showCachedEvents() {
+  const now = Date.now();
+  const oldEvents = eventCache.events.filter(e => (now - e.timestamp) > 60000); // Older than 1 min
+
+  oldEvents.slice(-5).forEach(event => {
+    const timeAgo = Math.round((now - event.timestamp) / 1000);
+    const timeLabel = timeAgo < 60 ? `vor ${timeAgo}s` : `vor ${Math.round(timeAgo / 60)}m`;
+    const emoji = event.field === 'birdies' ? '🏌️' : '🍺';
+    const label = event.field === 'birdies' ? 'Birdie' : 'Beer';
+    const message = `${event.player} hat einen ${label} gemacht (${timeLabel}) ${emoji}`;
+    showNotification(message, event.field === 'birdies' ? 'birdie' : 'beer', false);
+  });
+}
+
+function showNotification(message, type = 'default', playAudio = true) {
   const container = document.getElementById('toastContainer');
   const notif = document.createElement('div');
   notif.className = 'toast ' + type;
@@ -2401,15 +2443,16 @@ async function pollNotifications() {
       const label = event.field === 'birdies' ? 'Birdie' : 'Beer';
       const message = `${event.player} hat einen ${label} gemacht! ${emoji}`;
       const isBirdie = event.field === 'birdies';
-      showNotification(message, isBirdie ? 'birdie' : 'beer');
+      const isNewEvent = Date.now() - event.timestamp < 60000;
 
-      if (isBirdie) {
+      showNotification(message, isBirdie ? 'birdie' : 'beer', isNewEvent);
+
+      if (isBirdie && isNewEvent) {
         console.log('Playing anthem...');
         setTimeout(() => {
           anthemAudio.currentTime = 0;
           anthemAudio.play().catch(err => {
-            console.warn('Autoplay blocked, waiting for user gesture...');
-            // If autoplay is blocked, make the notification clickable to play
+            console.warn('Autoplay blocked');
             const notif = document.querySelector('.toast.birdie:last-child');
             if (notif) {
               notif.style.cursor = 'pointer';
@@ -2422,6 +2465,11 @@ async function pollNotifications() {
           });
         }, 100);
       }
+
+      // Save to cache
+      eventCache.events.push(event);
+      eventCache.lastTimestamp = event.timestamp;
+      saveEventCache(eventCache);
     }
   } catch (e) {
     console.error('Poll notification error:', e);
@@ -2430,6 +2478,8 @@ async function pollNotifications() {
 
 // Start polling for notifications every 30 seconds
 console.log('Starting notification polling...');
+// Show cached events from previous sessions first
+setTimeout(() => showCachedEvents(), 500);
 pollNotifications(); // Initial check
 setInterval(pollNotifications, 30000);
 
