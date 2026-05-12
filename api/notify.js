@@ -13,7 +13,7 @@ export default async function handler(request) {
   try {
     const url = new URL(request.url);
     const sinceParam = url.searchParams.get('since');
-    const since = sinceParam ? parseInt(sinceParam, 10) : Date.now() - 30000;
+    const since = sinceParam ? parseInt(sinceParam, 10) : Date.now() - 600000; // 10 minutes
 
     let events = [];
     try {

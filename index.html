@@ -2361,9 +2361,9 @@ const MAX_CACHED_EVENTS = 50;
 function loadEventCache() {
   try {
     const cached = localStorage.getItem(EVENT_CACHE_KEY);
-    return cached ? JSON.parse(cached) : { events: [], lastTimestamp: Date.now() - 86400000 };
+    return cached ? JSON.parse(cached) : { events: [], lastTimestamp: Date.now() - 600000 }; // 10 min fallback
   } catch {
-    return { events: [], lastTimestamp: Date.now() - 86400000 };
+    return { events: [], lastTimestamp: Date.now() - 600000 };
   }
 }
 
