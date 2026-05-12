@@ -662,16 +662,74 @@ footer {
   background: var(--bg);
   color: var(--gold);
   border: none;
-  padding: 4px 10px;
+  padding: 8px 16px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   font-family: inherit;
+  min-height: 36px;
+  min-width: 60px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .now-playing-stop:active {
   transform: scale(0.95);
+  background: #333;
+}
+
+.sound-unlock-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sound-unlock-box {
+  background: #1a1a1a;
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  max-width: 300px;
+  width: 90%;
+}
+.sound-unlock-icon { font-size: 48px; margin-bottom: 12px; }
+.sound-unlock-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.sound-unlock-desc {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.sound-unlock-btn {
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  padding: 14px 32px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  active: transform scale(0.97);
+}
+.sound-unlock-btn:active { transform: scale(0.97); }
+.sound-unlock-skip {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .notification-center {
@@ -801,6 +859,16 @@ footer {
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- Now Playing Anthem -->
+<div class="sound-unlock-overlay" id="soundUnlockOverlay" style="display:none;">
+  <div class="sound-unlock-box">
+    <div class="sound-unlock-icon">🔊</div>
+    <div class="sound-unlock-title">Ton aktivieren</div>
+    <div class="sound-unlock-desc">Tippe einmal um Birdie-Hymnen und Benachrichtigungen zu hören — auch wenn der Bildschirm gesperrt ist.</div>
+    <button class="sound-unlock-btn" id="soundUnlockBtn">Ton aktivieren</button>
+    <div class="sound-unlock-skip" id="soundUnlockSkip">Ohne Ton fortfahren</div>
+  </div>
+</div>
+
 <div class="now-playing" id="nowPlaying" style="display: none;">
   <div class="now-playing-content">
     <span class="now-playing-text">🎵 Hymne läuft...</span>
@@ -810,9 +878,6 @@ footer {
 
 <!-- Notification Center -->
 <div class="notification-center">
-  <button class="notification-button" id="soundToggleBtn" title="Sound an/aus">
-    🔊
-  </button>
   <button class="notification-button" id="notificationBtn" title="Letzte Ereignisse">
     🔔 <span class="notification-badge" id="notificationBadge">0</span>
   </button>
@@ -2572,6 +2637,57 @@ anthemAudio.addEventListener('ended', () => {
   document.getElementById('nowPlaying').style.display = 'none';
 });
 
+// MediaSession: allows audio to continue on locked screen
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: 'Tschopp Trophy 2026',
+    artist: 'Birdie-Alarm 🏌️',
+    album: 'Amoreira · Óbidos · Portugal',
+  });
+  navigator.mediaSession.setActionHandler('stop', () => {
+    anthemAudio.pause();
+    anthemAudio.currentTime = 0;
+    document.getElementById('nowPlaying').style.display = 'none';
+  });
+}
+
+// Audio unlock via user gesture (required on iOS, helps on Android first visit)
+const AUDIO_UNLOCKED_KEY = 'tt2026__audioUnlocked';
+let audioUnlocked = localStorage.getItem(AUDIO_UNLOCKED_KEY) === '1';
+
+function unlockAudio() {
+  // Play a silent buffer — this gesture-unlocks audio for the whole session
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const buf = ctx.createBuffer(1, 1, 22050);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.connect(ctx.destination);
+  src.start(0);
+  ctx.resume();
+  audioUnlocked = true;
+  localStorage.setItem(AUDIO_UNLOCKED_KEY, '1');
+}
+
+(function() {
+  const overlay = document.getElementById('soundUnlockOverlay');
+  const unlockBtn = document.getElementById('soundUnlockBtn');
+  const skipBtn = document.getElementById('soundUnlockSkip');
+
+  if (!audioUnlocked) {
+    overlay.style.display = 'flex';
+  }
+
+  unlockBtn.addEventListener('click', () => {
+    unlockAudio();
+    overlay.style.display = 'none';
+  });
+
+  skipBtn.addEventListener('click', () => {
+    overlay.style.display = 'none';
+    localStorage.setItem(AUDIO_UNLOCKED_KEY, 'skip');
+  });
+})();
+
 // Event cache
 const EVENT_CACHE_KEY = 'tt2026__eventCache';
 const MAX_CACHED_EVENTS = 50;
@@ -2694,18 +2810,9 @@ function updateNotificationCenter() {
   }).join('');
 }
 
-// Toggle sound
-document.getElementById('soundToggleBtn').addEventListener('click', () => {
-  soundMuted = !soundMuted;
-  localStorage.setItem('tt2026__soundMuted', soundMuted);
-  document.getElementById('soundToggleBtn').textContent = soundMuted ? '🔇' : '🔊';
-});
-document.getElementById('soundToggleBtn').textContent = soundMuted ? '🔇' : '🔊';
-
 // Stop anthem button
 document.getElementById('stopAnthemBtn').addEventListener('click', () => {
-  anthemAudio.pause();
-  anthemAudio.currentTime = 0;
+  try { anthemAudio.pause(); anthemAudio.currentTime = 0; } catch(e) {}
   document.getElementById('nowPlaying').style.display = 'none';
 });
 
@@ -2780,15 +2887,13 @@ async function pollNotifications() {
       const isBirdie = event.field === 'birdies';
       const isNewEvent = Date.now() - event.timestamp < 60000;
 
-      if (isBirdie && isNewEvent && !soundMuted && event.player !== currentProfile) {
+      if (isBirdie && isNewEvent && !soundMuted && audioUnlocked && event.player !== currentProfile) {
         console.log('Playing anthem...');
         setTimeout(() => {
           anthemAudio.currentTime = 0;
           document.querySelector('.now-playing-text').textContent = `🎵 ${getPlayerDisplay(event.player)} hat einen Birdie gemacht!`;
           document.getElementById('nowPlaying').style.display = 'block';
-          anthemAudio.play().catch(err => {
-            console.warn('Autoplay blocked');
-          });
+          anthemAudio.play().catch(err => console.warn('Audio play failed:', err));
         }, 100);
       }
 

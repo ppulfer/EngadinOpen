@@ -233,8 +233,10 @@ function renderStats() {
           </select>
         </div>
         <div class="field">
-          <label>Date (YYYY-MM-DD)</label>
-          <input type="text" id="addDate" value="${new Date().toISOString().split('T')[0]}" style="width:140px">
+          <label>Datum</label>
+          <input type="date" id="addDate" min="2026-05-10" max="2026-05-19"
+            value="${(() => { const t = new Date().toISOString().split('T')[0]; return t >= '2026-05-10' && t <= '2026-05-19' ? t : '2026-05-14'; })()}"
+            style="width:155px">
         </div>
         <div class="field">
           <label>Value</label>
@@ -297,7 +299,7 @@ async function addStat() {
   const date = document.getElementById('addDate').value.trim();
   const value = parseInt(document.getElementById('addValue').value, 10);
 
-  if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) { showStatus('Invalid date format', 'error'); return; }
+  if (!date) { showStatus('Bitte Datum auswählen', 'error'); return; }
   if (isNaN(value) || value < 0) { showStatus('Invalid value', 'error'); return; }
 
   const key = `${player}__${field}__${date}`;
