@@ -1061,7 +1061,8 @@ footer {
   font-family: inherit;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
-.notification-center.scrolled {
+.notification-center.scrolled,
+body.detail-open .notification-center {
   opacity: 0;
   transform: translateY(-12px);
   pointer-events: none;
@@ -4122,6 +4123,7 @@ function openFlightDetail(date, fi, mi) {
   document.getElementById('flightDetailHoles').scrollTop = 0;
   document.getElementById('flightDetailOverlay').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  document.body.classList.add('detail-open');
   renderHoleList();
   setDetailMode(existingResult ? 'quick' : 'detail');
 }
@@ -4129,6 +4131,7 @@ function openFlightDetail(date, fi, mi) {
 function closeFlightDetail() {
   document.getElementById('flightDetailOverlay').style.display = 'none';
   document.body.style.overflow = '';
+  document.body.classList.remove('detail-open');
   renderResultsTab();
 }
 
