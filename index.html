@@ -897,13 +897,17 @@ footer {
   border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.1s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 .hole-btn.active-a { background: rgba(197,99,77,0.25); border-color: #c5634d; color: #f4a18d; }
 .hole-btn.active-draw { background: rgba(212,177,74,0.2); border-color: var(--gold); color: var(--gold); }
@@ -1059,6 +1063,13 @@ footer {
   right: 20px;
   z-index: 9999;
   font-family: inherit;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.notification-center.scrolled,
+body.detail-open .notification-center {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
 }
 
 .notification-button {
@@ -1330,7 +1341,7 @@ footer {
       </div>
       <span class="hero-ts-name ts-blue">Team Consti</span>
     </div>
-    <div id="heroLiveSection" style="display:none;margin-top:12px;padding:0 2px;">
+    <div id="heroLiveSection" style="display:none;margin-top:12px;padding:0 56px;">
       <div id="heroLiveFlights" class="hero-match-table"></div>
     </div>
   </div>
@@ -4098,24 +4109,23 @@ function openFlightDetail(date, fi, mi) {
       const pB = PLAYER_NICKNAMES[sideB[i]] || sideB[i] || `B${i+1}`;
       return `<button class="match-tab${i === detailMatchIdx ? ' active' : ''}" onclick="openFlightDetail('${date}',${fi},${i})">${pA} vs ${pB}</button>`;
     }).join('');
-    const pA = PLAYER_NICKNAMES[sideA[detailMatchIdx]] || sideA[detailMatchIdx] || '—';
-    const pB = PLAYER_NICKNAMES[sideB[detailMatchIdx]] || sideB[detailMatchIdx] || '—';
     document.getElementById('flightDetailPlayers').innerHTML = `
-      <span class="side-a">${pA}</span>
+      <span class="side-a">${styledName(sideA[detailMatchIdx])}</span>
       <span class="vs-label">vs</span>
-      <span class="side-b">${pB}</span>`;
+      <span class="side-b">${styledName(sideB[detailMatchIdx])}</span>`;
   } else {
     tabsEl.style.display = 'none';
     tabsEl.innerHTML = '';
     document.getElementById('flightDetailPlayers').innerHTML = `
-      <span class="side-a">${sideNames(sideA)}</span>
+      <span class="side-a">${styledNames(sideA)}</span>
       <span class="vs-label">vs</span>
-      <span class="side-b">${sideNames(sideB)}</span>`;
+      <span class="side-b">${styledNames(sideB)}</span>`;
   }
 
   document.getElementById('flightDetailHoles').scrollTop = 0;
   document.getElementById('flightDetailOverlay').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  document.body.classList.add('detail-open');
   renderHoleList();
   setDetailMode(existingResult ? 'quick' : 'detail');
 }
@@ -4123,16 +4133,17 @@ function openFlightDetail(date, fi, mi) {
 function closeFlightDetail() {
   document.getElementById('flightDetailOverlay').style.display = 'none';
   document.body.style.overflow = '';
+  document.body.classList.remove('detail-open');
   renderResultsTab();
 }
 
 function renderHoleList() {
   const { afterHole, concludedOn, result } = calculateMatch(detailHoles);
+  const { sideA, sideB } = getFlightSides(detailDate, detailFlightIdx);
 
   // Status bar
   const statusEl = document.getElementById('flightDetailStatus');
   if (result) {
-    const { sideA, sideB } = getFlightSides(detailDate, detailFlightIdx);
     if (result.winner === 'halved') {
       statusEl.innerHTML = `<span style="color:var(--gold);">½ AS – Unentschieden</span>`;
     } else {
@@ -4388,6 +4399,25 @@ document.getElementById('stopAnthemBtn').addEventListener('click', () => {
   document.getElementById('nowPlaying').style.display = 'none';
 });
 
+// Fade notification bell once user scrolls past the hero
+(function setupNotificationScrollFade() {
+  const center = document.querySelector('.notification-center');
+  const hero = document.querySelector('.hero');
+  if (!center) return;
+  function update() {
+    const heroBottom = hero ? hero.offsetTop + hero.offsetHeight : 120;
+    const scrolled = window.scrollY > heroBottom - 30;
+    center.classList.toggle('scrolled', scrolled);
+    if (scrolled) {
+      const panel = document.getElementById('notificationPanel');
+      if (panel && panel.classList.contains('open')) panel.classList.remove('open');
+    }
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+})();
+
 // Toggle notification panel
 document.getElementById('notificationBtn').addEventListener('click', (e) => {
   e.stopPropagation();
@@ -4563,6 +4593,7 @@ startAutoSync();
 
   document.addEventListener('touchstart', (e) => {
     if (refreshing) return;
+    if (document.body.classList.contains('detail-open')) { startY = null; return; }
     if (window.scrollY > 0) { startY = null; return; }
     startY = e.touches[0].clientY;
     pulled = 0;
@@ -4570,6 +4601,7 @@ startAutoSync();
 
   document.addEventListener('touchmove', (e) => {
     if (refreshing || startY === null) return;
+    if (document.body.classList.contains('detail-open')) { startY = null; return; }
     pulled = e.touches[0].clientY - startY;
     if (pulled <= 0) {
       indicator.style.transform = '';
