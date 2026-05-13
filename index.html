@@ -2317,6 +2317,14 @@ function playerTeamClass(key) {
   return t === 'red' ? 'team-red' : t === 'blue' ? 'team-blue' : '';
 }
 
+function sortByTrophyTeam(members) {
+  const rank = k => {
+    const t = trophyTeamCache[k];
+    return t === 'red' ? 0 : t === 'blue' ? 2 : 1;
+  };
+  return members.slice().sort((a, b) => rank(a) - rank(b));
+}
+
 function flightTeamCount(members, team) {
   return members.filter(k => getPlayerTeam(k) === team).length;
 }
@@ -2502,8 +2510,11 @@ function builderSelectPlayer(key) {
     return;
   }
   builderFlights[builderActiveFlight].members.push(key);
+  const date = document.getElementById('teamDaySelect')?.value;
+  if (!isSingles(date)) {
+    builderFlights[builderActiveFlight].members = sortByTrophyTeam(builderFlights[builderActiveFlight].members);
+  }
 
-  // Auto-advance if current flight can no longer accept remaining players
   const newAssigned = new Set(builderFlights.flatMap(f => f.members));
   const remaining = PLAYERS.filter(p => !newAssigned.has(p.key));
   if (remaining.length > 0 && !remaining.some(p => canAddToFlight(p.key, builderFlights[builderActiveFlight].members))) {
@@ -2515,6 +2526,10 @@ function builderSelectPlayer(key) {
 function builderAssignMember(key, fi) {
   if (!canAddToFlight(key, builderFlights[fi].members)) { toast('Max. 2 pro Team im Flight'); return; }
   builderFlights[fi].members.push(key);
+  const date = document.getElementById('teamDaySelect')?.value;
+  if (!isSingles(date)) {
+    builderFlights[fi].members = sortByTrophyTeam(builderFlights[fi].members);
+  }
   renderBuilder();
 }
 
