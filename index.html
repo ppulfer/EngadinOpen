@@ -27,8 +27,84 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 16px; line-height: 1.5;
   min-height: 100vh;
+  overscroll-behavior-y: contain;
 }
 body { padding-bottom: 80px; }
+
+/* Pull-to-refresh */
+.pull-refresh {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(180deg, var(--bg) 70%, transparent);
+  z-index: 999;
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.pull-refresh.visible { opacity: 1; }
+.pull-refresh.refreshing {
+  transform: translateY(0) !important;
+  opacity: 1;
+  transition: transform 0.25s ease, opacity 0.25s;
+}
+.pull-refresh-spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(212,177,74,0.25);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  transition: transform 0.1s linear;
+}
+.pull-refresh.refreshing .pull-refresh-spinner {
+  animation: ptr-spin 0.8s linear infinite;
+}
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
+
+/* Notification panel settings */
+.notification-settings {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 15px;
+}
+.notification-settings .toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.notification-settings .toggle-row + .toggle-row { margin-top: 8px; }
+.notification-settings .toggle-row input[type="checkbox"] {
+  width: 36px; height: 20px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 0;
+}
+.notification-settings .toggle-row input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left 0.2s;
+}
+.notification-settings .toggle-row input[type="checkbox"]:checked { background: var(--gold); }
+.notification-settings .toggle-row input[type="checkbox"]:checked::before { left: 18px; }
 
 .hero {
   text-align: center;
@@ -1132,6 +1208,10 @@ footer {
 </style>
 </head>
 <body>
+<div class="pull-refresh" id="pullRefresh">
+  <div class="pull-refresh-spinner"></div>
+  <span class="pull-refresh-text">Loslassen zum Aktualisieren</span>
+</div>
 
 <div class="toast-container" id="toastContainer"></div>
 
@@ -1151,6 +1231,12 @@ footer {
   </button>
   <div class="notification-panel" id="notificationPanel">
     <div class="notification-header">Letzte Ereignisse</div>
+    <div class="notification-settings">
+      <label class="toggle-row">
+        <span>🔄 Auto-Sync (30s)</span>
+        <input type="checkbox" id="autoSyncToggle">
+      </label>
+    </div>
     <div class="notification-list" id="notificationList">
       <div class="empty-state">Keine Ereignisse</div>
     </div>
@@ -2838,6 +2924,7 @@ function buildHeroRow(namesA, namesB, hA, hB, score, lastPlayed, onclick, state,
 
 function startHeroLivePoll() {
   if (heroLiveInterval) return;
+  if (localStorage.getItem('tt2026__autoSync') !== 'true') return;
   heroLiveInterval = setInterval(() => loadAllResults(), 600000);
 }
 
@@ -4254,22 +4341,131 @@ async function pollNotifications() {
   }
 }
 
-// Start polling for notifications every 30 seconds
-console.log('Starting notification polling...');
-// Show cached events from previous sessions first
+// === AUTO-SYNC TOGGLE & PULL-TO-REFRESH ===
+let autoSyncEnabled = localStorage.getItem('tt2026__autoSync') === 'true';
+const syncIntervals = { notify: null, stats: null };
+
+function startAutoSync() {
+  stopAutoSync();
+  if (!autoSyncEnabled) return;
+  syncIntervals.notify = setInterval(pollNotifications, 30000);
+  syncIntervals.stats = setInterval(() => {
+    fetchCloudStats().then(() => refreshAllStatsUI());
+    flushPendingTracks();
+  }, 30000);
+}
+
+function stopAutoSync() {
+  if (syncIntervals.notify) { clearInterval(syncIntervals.notify); syncIntervals.notify = null; }
+  if (syncIntervals.stats) { clearInterval(syncIntervals.stats); syncIntervals.stats = null; }
+  stopHeroLivePoll();
+}
+
+async function manualRefresh() {
+  await Promise.allSettled([
+    fetchCloudStats().then(() => refreshAllStatsUI()),
+    flushPendingTracks(),
+    loadTrophyTeams(),
+    loadAllResults(),
+    loadAllTeams(),
+    loadTrackersCloud().then(() => { loadTrackers(); renderResultsTab(); renderHeroTeamScore(); }),
+    pollNotifications(),
+  ]);
+}
+
+// Initial check + cached events
 setTimeout(() => {
   showCachedEvents();
   updateNotificationCenter();
 }, 500);
-pollNotifications(); // Initial check
-setInterval(pollNotifications, 30000);
-
-// Cloud-Sync: Initial laden + alle 30 Sek. refreshen
+pollNotifications();
 fetchCloudStats().then(() => refreshAllStatsUI());
-setInterval(() => {
-  fetchCloudStats().then(() => refreshAllStatsUI());
-  flushPendingTracks();
-}, 30000);
+
+// Wire toggle
+const autoSyncToggle = document.getElementById('autoSyncToggle');
+if (autoSyncToggle) {
+  autoSyncToggle.checked = autoSyncEnabled;
+  autoSyncToggle.addEventListener('change', () => {
+    autoSyncEnabled = autoSyncToggle.checked;
+    localStorage.setItem('tt2026__autoSync', autoSyncEnabled ? 'true' : 'false');
+    if (autoSyncEnabled) {
+      startAutoSync();
+      renderHeroTeamScore();
+      toast('Auto-Sync aktiviert');
+    } else {
+      stopAutoSync();
+      toast('Auto-Sync deaktiviert · Pull-to-Refresh');
+    }
+  });
+}
+
+startAutoSync();
+
+// Pull-to-refresh
+(function setupPullToRefresh() {
+  const indicator = document.getElementById('pullRefresh');
+  if (!indicator) return;
+  const THRESHOLD = 70;
+  const MAX_PULL = 100;
+  let startY = null;
+  let pulled = 0;
+  let refreshing = false;
+
+  function reset() {
+    indicator.style.transform = '';
+    indicator.style.opacity = '';
+    indicator.classList.remove('visible', 'refreshing');
+    indicator.querySelector('.pull-refresh-text').textContent = 'Loslassen zum Aktualisieren';
+    startY = null;
+    pulled = 0;
+  }
+
+  document.addEventListener('touchstart', (e) => {
+    if (refreshing) return;
+    if (window.scrollY > 0) { startY = null; return; }
+    startY = e.touches[0].clientY;
+    pulled = 0;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (refreshing || startY === null) return;
+    pulled = e.touches[0].clientY - startY;
+    if (pulled <= 0) {
+      indicator.style.transform = '';
+      indicator.style.opacity = '';
+      indicator.classList.remove('visible');
+      return;
+    }
+    if (window.scrollY > 0) return;
+    const damped = Math.min(pulled * 0.5, MAX_PULL);
+    indicator.style.transform = 'translateY(' + (damped - 60) + 'px)';
+    indicator.style.opacity = Math.min(damped / THRESHOLD, 1);
+    indicator.classList.add('visible');
+    indicator.querySelector('.pull-refresh-text').textContent =
+      damped >= THRESHOLD ? 'Loslassen zum Aktualisieren' : 'Weiter ziehen…';
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchend', async () => {
+    if (refreshing || startY === null) { startY = null; return; }
+    const damped = Math.min(pulled * 0.5, MAX_PULL);
+    if (damped >= THRESHOLD) {
+      refreshing = true;
+      indicator.classList.add('refreshing');
+      indicator.querySelector('.pull-refresh-text').textContent = 'Lade…';
+      try { await manualRefresh(); } catch(e) {}
+      setTimeout(() => {
+        indicator.classList.remove('refreshing');
+        reset();
+        refreshing = false;
+      }, 400);
+    } else {
+      reset();
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', () => { if (!refreshing) reset(); }, { passive: true });
+})();
 // Bei Sichtbarkeitswechsel (Tab-Switch zurück zur App): sofort syncen
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
