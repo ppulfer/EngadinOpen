@@ -1107,6 +1107,59 @@ footer {
   flex-direction: column;
 }
 
+.tracker-history-wrap summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 0;
+  list-style: none;
+  user-select: none;
+}
+.tracker-history-wrap summary::-webkit-details-marker { display: none; }
+.tracker-history-wrap summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.15s;
+  color: var(--gold);
+}
+.tracker-history-wrap[open] summary::before { transform: rotate(90deg); }
+.history-row {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) 1fr 1fr 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(212,177,74,0.08);
+}
+.history-row:last-child { border-bottom: none; }
+.history-date {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.history-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+.history-cell input {
+  width: 48px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 13px;
+  text-align: center;
+  font-family: inherit;
+}
+.history-cell input:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
+.history-empty { color: var(--muted); font-size: 12px; margin: 0; padding: 4px 0; }
+
 .notification-header {
   border-bottom: 1px solid var(--border);
   color: var(--gold);
@@ -1642,6 +1695,14 @@ footer {
     <label>Nearest to Pin (Meter)</label>
     <input type="number" id="nearestPin" step="0.1" placeholder="z.B. 2.4">
   </div>
+
+  <details class="tracker-history-wrap" style="margin-top:16px;">
+    <summary>📅 Verlauf bearbeiten</summary>
+    <div class="card" style="margin-top:8px;padding:10px 12px;">
+      <p class="small" style="margin:0 0 8px;">Korrektur deiner Tageswerte — auch nachträglich.</p>
+      <div id="trackerHistory"></div>
+    </div>
+  </details>
 </section>
 
 <section id="bingo">
@@ -3093,6 +3154,74 @@ function refreshAllStatsUI() {
   if (typeof updateBalls === 'function') updateBalls();
   if (typeof updateBirdies === 'function') updateBirdies();
   if (typeof updateTripStats === 'function') updateTripStats();
+  if (typeof renderTrackerHistory === 'function') renderTrackerHistory();
+}
+
+function renderTrackerHistory() {
+  if (!currentProfile) return;
+  const container = document.getElementById('trackerHistory');
+  if (!container) return;
+
+  const datesSet = new Set();
+  const prefix = currentProfile + '__';
+  Object.keys(CLOUD_STATS).forEach(key => {
+    if (!key.startsWith(prefix)) return;
+    const parts = key.split('__');
+    if (parts.length !== 3) return;
+    datesSet.add(parts[2]);
+  });
+  datesSet.add(getTrackingDate());
+
+  const dates = Array.from(datesSet).sort().reverse();
+  if (dates.length === 0) {
+    container.innerHTML = '<p class="history-empty">Noch keine Daten.</p>';
+    return;
+  }
+
+  const dayNames = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  container.innerHTML = dates.map(date => {
+    const d = new Date(date + 'T12:00:00');
+    const label = dayNames[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
+    const beer = parseInt(CLOUD_STATS[currentProfile + '__beer__' + date] || 0, 10);
+    const balls = parseInt(CLOUD_STATS[currentProfile + '__balls__' + date] || 0, 10);
+    const birdies = parseInt(CLOUD_STATS[currentProfile + '__birdies__' + date] || 0, 10);
+    return '<div class="history-row">'
+      + '<span class="history-date">' + label + '</span>'
+      + '<label class="history-cell"><span>🍺</span><input type="number" min="0" value="' + beer + '" data-date="' + date + '" data-field="beer"></label>'
+      + '<label class="history-cell"><span>⚪</span><input type="number" min="0" value="' + balls + '" data-date="' + date + '" data-field="balls"></label>'
+      + '<label class="history-cell"><span>🏌️</span><input type="number" min="0" value="' + birdies + '" data-date="' + date + '" data-field="birdies"></label>'
+      + '</div>';
+  }).join('');
+
+  container.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('change', () => saveHistoryValue(input));
+  });
+}
+
+async function saveHistoryValue(input) {
+  const date = input.dataset.date;
+  const field = input.dataset.field;
+  const value = parseInt(input.value, 10);
+  if (isNaN(value) || value < 0) { input.value = 0; return; }
+  const player = currentProfile;
+  const key = player + '__' + field + '__' + date;
+  try {
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set', key, value }),
+    });
+    if (!res.ok) throw new Error('save failed');
+    CLOUD_STATS[key] = value;
+    invalidateTotalCache(player, field);
+    if (typeof updateBeer === 'function') updateBeer();
+    if (typeof updateBalls === 'function') updateBalls();
+    if (typeof updateBirdies === 'function') updateBirdies();
+    if (typeof updateTripStats === 'function') updateTripStats();
+    toast('✓ Gespeichert');
+  } catch (e) {
+    toast('Fehler beim Speichern');
+  }
 }
 
 function adjust(type, delta) {
