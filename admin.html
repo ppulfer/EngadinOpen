@@ -119,6 +119,12 @@ td { padding: 8px 10px; }
   </div>
 
   <div id="statusMsg"></div>
+
+  <h2>🔒 Trophy Teams</h2>
+  <div id="lockStatus" class="status info" style="display:inline-block;margin-bottom:10px;">Checking lock status…</div><br>
+  <button class="ghost" onclick="unlockTrophyTeams()">🔓 Teams entsperren</button>
+
+  <h2>📊 Stats</h2>
   <div id="statsContent"></div>
 </div>
 
@@ -318,6 +324,42 @@ async function addStat() {
   }
 }
 
+async function checkLockStatus() {
+  try {
+    const res = await fetch('/api/trophy-teams');
+    const data = await res.json();
+    const locked = data['__locked'] === 'true';
+    const el = document.getElementById('lockStatus');
+    if (locked) {
+      el.textContent = '🔒 Teams sind fixiert';
+      el.className = 'status error';
+    } else {
+      el.textContent = '🔓 Teams sind offen (nicht fixiert)';
+      el.className = 'status success';
+    }
+  } catch(e) {
+    document.getElementById('lockStatus').textContent = 'Fehler beim Laden';
+  }
+}
+
+async function unlockTrophyTeams() {
+  if (!confirm('Teams wirklich entsperren?')) return;
+  try {
+    const res = await fetch('/api/trophy-teams', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerKey: '__locked', team: '' }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    localStorage.setItem('tt2026__locked', 'false');
+    showStatus('Teams erfolgreich entsperrt', 'success');
+    checkLockStatus();
+  } catch(e) {
+    showStatus(`Fehler: ${e.message}`, 'error');
+  }
+}
+
+checkLockStatus();
 loadStats();
 </script>
 </body>

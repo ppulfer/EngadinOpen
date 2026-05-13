@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0e2920">
+<link rel="icon" href="data:,">
 <title>Tschopp Trophy 2026 · Companion</title>
 <style>
 :root {
@@ -81,6 +82,34 @@ body { padding-bottom: 80px; }
 }
 .cd-num { font-size: 18px; font-weight: 700; color: var(--gold); font-family: Georgia, serif; line-height: 1.1; }
 .cd-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+.hero-team-score { margin-top: 16px; }
+.hero-ts-row { display: flex; align-items: center; gap: 10px; justify-content: center; }
+.hero-ts-name { font-family: Georgia, serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; flex: 1; }
+.hero-ts-name.ts-red { color: #f4a18d; text-align: right; }
+.hero-ts-name.ts-blue { color: #92c4e6; text-align: left; }
+.hero-ts-score { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 90px; }
+.hero-ts-nums { font-family: Georgia, serif; font-size: 38px; font-weight: 700; color: var(--gold); line-height: 1; display: flex; align-items: center; gap: 8px; }
+.hero-ts-sep { color: var(--muted); font-size: 26px; }
+.hero-ts-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
+.hero-ts-live { margin-top: 12px; text-align: center; }
+.hero-ts-live-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(212,177,74,0.1); border: 1px solid var(--gold); border-radius: 999px; padding: 3px 10px; font-size: 10px; color: var(--gold); letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
+.hero-ts-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 1.5s ease-in-out infinite; display: inline-block; flex-shrink: 0; }
+.hero-ts-flights { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+.hero-ts-flight { font-size: 11px; color: var(--muted); text-align: center; }
+.hero-ts-flight strong { color: var(--gold-soft); font-weight: 600; }
+.hero-match-table { margin-top: 10px; width: 100%; }
+.hero-match-row { display: grid; grid-template-columns: minmax(34px,auto) 1fr 26px 1fr minmax(34px,auto); align-items: center; gap: 3px; padding: 6px 2px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.hero-match-row:last-child { border-bottom: none; }
+.hero-match-names { display: flex; flex-direction: column; gap: 1px; }
+.hero-match-names.a { align-items: flex-end; }
+.hero-match-names.b { align-items: flex-start; }
+.hero-match-player { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.hero-match-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+.hero-match-badge.a { text-align: right; }
+.hero-match-badge.b { text-align: left; }
+.hero-match-hole { text-align: center; font-size: 11px; font-weight: 700; }
+.hero-match-hole.live { color: var(--gold); }
 
 .profile-bar {
   display: flex; align-items: center; gap: 8px;
@@ -453,27 +482,45 @@ audio::-webkit-media-controls-panel {
 .team-member-pill.red { background: rgba(197,99,77,0.2); border-color: #c5634d; color: #f4a18d; }
 .team-member-pill.blue { background: rgba(74,144,194,0.2); border-color: #4a90c2; color: #92c4e6; }
 
-.assign-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+.assign-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;
 }
-.assign-row:last-child { border-bottom: none; }
-.assign-name {
-  flex: 1; font-size: 14px; font-weight: 500;
+.assign-box {
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px; padding: 12px;
 }
-.assign-buttons { display: flex; gap: 6px; }
-.assign-btn {
-  padding: 6px 12px; border-radius: 999px;
-  font-size: 11px; font-weight: 700;
-  border: 1px solid; cursor: pointer;
-  font-family: inherit;
-  background: transparent;
+.assign-box-title {
+  font-weight: 700; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
 }
-.assign-btn.btn-red { color: #c5634d; border-color: #c5634d; }
-.assign-btn.btn-red.active { background: #c5634d; color: var(--bg); }
-.assign-btn.btn-blue { color: #4a90c2; border-color: #4a90c2; }
-.assign-btn.btn-blue.active { background: #4a90c2; color: var(--bg); }
+.assign-box.red .assign-box-title { color: #c5634d; }
+.assign-box.blue .assign-box-title { color: #4a90c2; }
+.assign-box-title span {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.assign-box.red .assign-box-title span { background: #c5634d; }
+.assign-box.blue .assign-box-title span { background: #4a90c2; }
+.assign-members {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.assign-member {
+  background: var(--bg); padding: 6px 8px; border-radius: 4px; font-size: 13px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer;
+}
+.assign-member:hover { background: rgba(255,255,255,0.06); }
+.assign-member-remove {
+  background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 0;
+  font-size: 16px; line-height: 1; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+}
+.assign-member-remove:hover { color: var(--text); }
+.unassigned-list {
+  display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+}
+.unassigned-label {
+  font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.unassigned-player {
+  background: var(--bg); padding: 6px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;
+}
+.unassigned-player:hover { background: rgba(255,255,255,0.06); }
 
 /* Trip Stats Tiles */
 .trip-stats-grid {
@@ -709,8 +756,9 @@ footer {
   margin-bottom: 10px;
 }
 .results-match-pill.ongoing { background: rgba(212,177,74,0.15); color: var(--gold); border: 1px solid var(--gold); }
-.results-match-pill.concluded { background: rgba(100,200,100,0.15); color: #7ec87e; border: 1px solid #7ec87e; }
 .results-match-pill.none { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.result-halved { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.singles-match-row .result-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
 .results-detail-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -844,6 +892,28 @@ footer {
 .hole-score.lead-b { color: #92c4e6; }
 .hole-score.as { color: var(--muted); }
 .hole-score.done { color: #7ec87e; }
+.singles-tabs { display: flex; gap: 6px; padding: 8px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.mode-bar { display: flex; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.mode-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.mode-btn.active { background: var(--bg-soft); color: var(--text); border-color: var(--text); }
+.quick-form { padding: 16px; overflow-y: auto; flex: 1; }
+.quick-winner-row { display: flex; gap: 8px; margin-bottom: 4px; }
+.quick-winner-btn { flex: 1; padding: 12px 8px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.quick-winner-btn.red.active { background: rgba(197,99,77,0.25); border-color: #c5634d; color: #f4a18d; }
+.quick-winner-btn.as.active { background: rgba(212,177,74,0.15); border-color: var(--gold); color: var(--gold); }
+.quick-winner-btn.blue.active { background: rgba(74,144,194,0.25); border-color: #4a90c2; color: #92c4e6; }
+.quick-margin-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.quick-margin-btn { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.quick-margin-btn.active { background: var(--bg-soft); border-color: var(--text); color: var(--text); }
+.quick-save-btn { margin-top: 20px; width: 100%; padding: 13px; background: var(--gold); color: var(--bg); border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.match-tab { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.match-tab.active { background: var(--bg-card); border-color: var(--gold); color: var(--gold); }
+.singles-match-row { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 6px; }
+.singles-pair-row { display: flex; align-items: center; gap: 6px; margin: 6px 0; }
+.singles-pair-select { flex: 1; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 7px 8px; border-radius: 8px; font-family: inherit; font-size: 13px; appearance: none; min-width: 0; }
+.singles-pair-select.red-sel { border-color: #c5634d; color: #f4a18d; }
+.singles-pair-select.blue-sel { border-color: #4a90c2; color: #92c4e6; }
+.singles-pair-remove { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; touch-action: manipulation; flex-shrink: 0; }
 
 .builder-flight {
   background: var(--bg-soft);
@@ -912,6 +982,9 @@ footer {
 .builder-chip.team-blue.pending { background: rgba(74,144,194,0.45); }
 .builder-chip.blocked { opacity: 0.28; pointer-events: none; }
 .builder-flight-choice.blocked { opacity: 0.3; pointer-events: none; border-color: var(--border); color: var(--muted); }
+.builder-sides-row { display: flex; align-items: flex-start; gap: 8px; min-height: 28px; }
+.builder-side { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+.builder-vs-label { color: var(--muted); font-size: 11px; padding-top: 7px; flex-shrink: 0; }
 .builder-unassigned-label {
   font-size: 11px;
   color: var(--muted);
@@ -1108,7 +1181,7 @@ footer {
   <h1>2026</h1>
   <div class="sub">AMOREIRA · ÓBIDOS · PORTUGAL</div>
   <div class="sub" style="margin-top:4px;">14.05. – 18.05.2026</div>
-  <div class="countdowns">
+  <div id="heroCountdowns" class="countdowns">
     <div class="cd-group">
       <div class="cd-title">🪁 Team Kite & Golf · 09.05.</div>
       <div class="countdown" id="countdownKite"></div>
@@ -1116,6 +1189,23 @@ footer {
     <div class="cd-group">
       <div class="cd-title">⛳ Einlocher (Hauptfeld) · 14.05.</div>
       <div class="countdown" id="countdownEinlocher"></div>
+    </div>
+  </div>
+  <div id="heroTeamScore" class="hero-team-score" style="display:none;">
+    <div class="hero-ts-row">
+      <span class="hero-ts-name ts-red">Team Parli</span>
+      <div class="hero-ts-score">
+        <div class="hero-ts-nums">
+          <span id="heroScoreA">0</span>
+          <span class="hero-ts-sep">:</span>
+          <span id="heroScoreB">0</span>
+        </div>
+        <div class="hero-ts-lbl">Gesamtstand</div>
+      </div>
+      <span class="hero-ts-name ts-blue">Team Consti</span>
+    </div>
+    <div id="heroLiveSection" style="display:none;margin-top:12px;padding:0 2px;">
+      <div id="heroLiveFlights" class="hero-match-table"></div>
     </div>
   </div>
 </div>
@@ -1306,8 +1396,7 @@ footer {
   <h2>Tagesteams</h2>
 
   <h3>🏆 Trophy-Teams</h3>
-  <p class="small">Spielerzuweisung für die Singles-Wertung am Finaltag · vom OK pflegbar</p>
-  
+
   <div class="trophy-team-card team-red">
     <div class="trophy-team-header">
       <span class="trophy-team-dot dot-red"></span>
@@ -1330,17 +1419,16 @@ footer {
     </div>
   </div>
 
-  <div class="card" style="margin-top:10px;">
+  <div id="teamAssignCard" class="card" style="margin-top:10px;display:none;">
     <p class="small" style="margin:0 0 10px;">Tippe auf einen Spieler, um ihn dem Team zuzuweisen. Nochmal tippen entfernt ihn wieder.</p>
     <div id="teamAssignList"></div>
+    <button class="btn" style="margin-top:14px;width:100%;background:var(--bg-soft);border:1px solid var(--border);color:var(--text);" onclick="lockTrophyTeams()">🔒 Definitiv speichern</button>
   </div>
-
-  <div class="divider"></div>
-
-  <h3>📅 Tagesauslosungen</h3>
-  <p class="small">Vom OK eingetragen sobald die Auslosung am Abend stattgefunden hat.</p>
-  <div id="teamsContent"></div>
-
+  <script>
+    try {
+      if (localStorage.getItem('tt2026__locked') !== 'true') document.getElementById('teamAssignCard').style.display = '';
+    } catch(e) {}
+  </script>
   <div class="card" style="margin-top:10px;">
     <h3 style="margin-top:0;">🔧 OK-Modus: Tages-Teams</h3>
     <label>Tag wählen</label>
@@ -1375,9 +1463,15 @@ footer {
     <button class="flight-detail-close" id="flightDetailClose">×</button>
     <div class="flight-detail-title" id="flightDetailTitle"></div>
   </div>
+  <div id="flightDetailTabs" style="display:none;" class="singles-tabs"></div>
   <div class="flight-detail-players" id="flightDetailPlayers"></div>
   <div class="flight-detail-status-bar" id="flightDetailStatus"></div>
+  <div class="mode-bar" id="flightDetailModeBar">
+    <button class="mode-btn active" id="modeDetailBtn" onclick="setDetailMode('detail')">Loch für Loch</button>
+    <button class="mode-btn" id="modeQuickBtn" onclick="setDetailMode('quick')">Schnelleingabe</button>
+  </div>
   <div class="flight-detail-holes" id="flightDetailHoles"></div>
+  <div class="quick-form" id="flightDetailQuick" style="display:none;"></div>
 </div>
 
 <section id="equipment">
@@ -2162,6 +2256,7 @@ let builderFlights = [];
 let builderActiveFlight = null;
 
 async function loadAllTeams() {
+  try { const s = localStorage.getItem('tt2026__teamsCache'); if (s) Object.assign(teamsCache, JSON.parse(s)); } catch(e) {}
   try {
     const res = await fetch('/api/teams');
     if (res.ok) {
@@ -2169,6 +2264,7 @@ async function loadAllTeams() {
       Object.entries(data).forEach(([date, teams]) => {
         teamsCache[date] = Array.isArray(teams) ? teams : [];
       });
+      try { localStorage.setItem('tt2026__teamsCache', JSON.stringify(teamsCache)); } catch(e) {}
     }
   } catch(e) {}
   renderTeams();
@@ -2177,7 +2273,7 @@ async function loadAllTeams() {
 
 function renderTeams() {
   const wrap = document.getElementById('teamsContent');
-  wrap.innerHTML = '';
+  if (!wrap) return;
   Object.keys(SCHEDULE).forEach(date => {
     const sched = SCHEDULE[date];
     const course = COURSES.find(c => c.id === sched.course);
@@ -2190,13 +2286,21 @@ function renderTeams() {
     let teamsHtml = '';
     if (teams.length > 0) {
       teams.forEach(t => {
-        const memberNames = (t.members || []).map(key => {
-          const p = PLAYERS.find(p => p.key === key);
-          return PLAYER_NICKNAMES[key] || (p ? p.name.split(' ').pop() : key);
-        });
-        teamsHtml += '<div style="margin-bottom:10px;"><div class="team-name" style="font-size:13px;">' + t.name + '</div><div class="team-members">';
-        memberNames.forEach(m => teamsHtml += '<span class="member">' + m + '</span>');
-        teamsHtml += '</div></div>';
+        const members = t.members || [];
+        teamsHtml += '<div style="margin-bottom:10px;"><div class="team-name" style="font-size:13px;">' + t.name + '</div>';
+        if (isSingles(date)) {
+          for (let i = 0; i + 1 < members.length; i += 2) {
+            const rName = PLAYER_NICKNAMES[members[i]] || members[i] || '–';
+            const bName = PLAYER_NICKNAMES[members[i+1]] || members[i+1] || '–';
+            teamsHtml += `<div class="team-members" style="margin-top:4px;"><span class="member" style="color:#f4a18d;">${rName}</span><span style="color:var(--muted);font-size:11px;margin:0 4px;">vs</span><span class="member" style="color:#92c4e6;">${bName}</span></div>`;
+          }
+        } else {
+          const memberNames = members.map(key => PLAYER_NICKNAMES[key] || key);
+          teamsHtml += '<div class="team-members">';
+          memberNames.forEach(m => teamsHtml += '<span class="member">' + m + '</span>');
+          teamsHtml += '</div>';
+        }
+        teamsHtml += '</div>';
       });
     } else {
       teamsHtml = '<p class="small" style="margin:0;">Noch keine Auslosung eingetragen.</p>';
@@ -2257,6 +2361,8 @@ function setActiveFlight(fi) {
 }
 
 function renderBuilder() {
+  const date = document.getElementById('teamDaySelect')?.value;
+  if (isSingles(date)) { renderSinglesBuilder(); return; }
   const container = document.getElementById('okTeamsBuilder');
   if (!container) return;
   const assignedKeys = new Set(builderFlights.flatMap(f => f.members));
@@ -2273,6 +2379,15 @@ function renderBuilder() {
       bc ? `<span style="color:#92c4e6;font-size:11px;">🔵${bc}</span>` : '',
     ].filter(Boolean).join(' ');
 
+    const half = Math.ceil(flight.members.length / 2);
+    const sA = flight.members.slice(0, half);
+    const sB = flight.members.slice(half);
+    const chip = (key, fi) => {
+      const nick = PLAYER_NICKNAMES[key] || key;
+      const tc = playerTeamClass(key);
+      return `<span class="builder-chip assigned ${tc}" onclick="event.stopPropagation();builderRemoveMember(${fi},'${key}')">${nick} ×</span>`;
+    };
+
     html += `<div class="builder-flight${isActive ? ' active' : ''}" onclick="setActiveFlight(${fi})">
       <div class="builder-flight-header">
         <input class="builder-flight-name" value="${flight.name}"
@@ -2282,13 +2397,16 @@ function renderBuilder() {
         <span style="margin-left:auto;display:flex;gap:6px;align-items:center;">${countBadge}</span>
         <button class="builder-remove-flight" onclick="event.stopPropagation();builderRemoveFlight(${fi})">×</button>
       </div>
-      <div class="builder-members">`;
-    if (flight.members.length === 0) html += `<span style="font-size:12px;color:var(--muted);">${isActive ? 'Spieler unten auswählen…' : 'Leer'}</span>`;
-    flight.members.forEach(key => {
-      const nick = PLAYER_NICKNAMES[key] || key;
-      const tc = playerTeamClass(key);
-      html += `<span class="builder-chip assigned ${tc}" onclick="event.stopPropagation();builderRemoveMember(${fi},'${key}')">${nick} ×</span>`;
-    });
+      <div class="builder-sides-row">`;
+
+    if (flight.members.length === 0) {
+      html += `<span style="font-size:12px;color:var(--muted);">${isActive ? 'Spieler unten auswählen…' : 'Leer'}</span>`;
+    } else {
+      html += `<div class="builder-side">${sA.map(k => chip(k, fi)).join('')}</div>`;
+      html += `<span class="builder-vs-label">vs</span>`;
+      html += `<div class="builder-side">${sB.length ? sB.map(k => chip(k, fi)).join('') : `<span style="font-size:12px;color:var(--muted);">${isActive ? 'weiter…' : ''}</span>`}</div>`;
+    }
+
     html += '</div></div>';
   });
 
@@ -2314,8 +2432,67 @@ function renderBuilder() {
   container.innerHTML = html;
 }
 
+function renderSinglesBuilder() {
+  const container = document.getElementById('okTeamsBuilder');
+  if (!container) return;
+  const redPlayers  = PLAYERS.filter(p => trophyTeamCache[p.key] === 'red');
+  const bluePlayers = PLAYERS.filter(p => trophyTeamCache[p.key] === 'blue');
+  const usedKeys    = new Set(builderFlights.flatMap(f => f.members.filter(k => k)));
+
+  function sel(fi, memberIdx, players, cls, currentKey) {
+    const opts = players.map(p => {
+      const used = usedKeys.has(p.key) && p.key !== currentKey;
+      return `<option value="${p.key}" ${p.key === currentKey ? 'selected' : ''} ${used ? 'disabled' : ''}>${PLAYER_NICKNAMES[p.key] || p.name}</option>`;
+    }).join('');
+    return `<select class="singles-pair-select ${cls}" onchange="singlesSetPlayer(${fi},${memberIdx},this.value)"><option value="">– wählen –</option>${opts}</select>`;
+  }
+
+  let html = '';
+  builderFlights.forEach((flight, fi) => {
+    const members = flight.members;
+    html += `<div class="builder-flight">
+      <div class="builder-flight-header">
+        <input class="builder-flight-name" value="${flight.name}" onclick="event.stopPropagation()" onchange="builderFlights[${fi}].name=this.value">
+        <button class="builder-remove-flight" onclick="builderRemoveFlight(${fi})">×</button>
+      </div>`;
+    for (let mi = 0; mi + 1 < members.length; mi += 2) {
+      html += `<div class="singles-pair-row">
+        ${sel(fi, mi,   redPlayers,  'red-sel',  members[mi])}
+        <span style="color:var(--muted);font-size:11px;flex-shrink:0;">vs</span>
+        ${sel(fi, mi+1, bluePlayers, 'blue-sel', members[mi+1])}
+        <button class="singles-pair-remove" onclick="singlesRemovePair(${fi},${mi})">×</button>
+      </div>`;
+    }
+    html += `<button class="builder-add-flight" style="font-size:12px;margin-top:4px;" onclick="singlesAddPair(${fi})">+ Paarung</button>`;
+    html += `</div>`;
+  });
+
+  if (redPlayers.length === 0 || bluePlayers.length === 0) {
+    html += `<p class="small" style="color:var(--muted);margin-top:10px;">Zuerst Teams zuweisen (Tab Teams → Trophy-Teams).</p>`;
+  }
+  html += `<button class="builder-add-flight" onclick="builderAddFlight()">+ Flight hinzufügen</button>`;
+  html += `<button class="btn" style="margin-top:14px;width:100%;" onclick="saveTeams()">Speichern</button>`;
+  container.innerHTML = html;
+}
+
+function singlesAddPair(fi) {
+  builderFlights[fi].members.push('', '');
+  renderBuilder();
+}
+
+function singlesRemovePair(fi, pairStart) {
+  builderFlights[fi].members.splice(pairStart, 2);
+  renderBuilder();
+}
+
+function singlesSetPlayer(fi, memberIdx, key) {
+  builderFlights[fi].members[memberIdx] = key;
+}
+
 function builderAddFlight() {
-  builderFlights.push({ name: 'Flight ' + (builderFlights.length + 1), members: [] });
+  const date = document.getElementById('teamDaySelect')?.value;
+  const members = isSingles(date) ? ['', ''] : [];
+  builderFlights.push({ name: 'Flight ' + (builderFlights.length + 1), members });
   builderActiveFlight = builderFlights.length - 1;
   renderBuilder();
 }
@@ -2361,14 +2538,17 @@ function builderAssignMember(key, fi) {
 
 async function saveTeams() {
   const date = document.getElementById('teamDaySelect').value;
+  const teamsToSave = isSingles(date)
+    ? builderFlights.map(f => ({ ...f, members: f.members.filter(k => k) }))
+    : builderFlights;
   try {
     const res = await fetch('/api/teams', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date, teams: builderFlights }),
+      body: JSON.stringify({ date, teams: teamsToSave }),
     });
     if (res.ok) {
-      teamsCache[date] = JSON.parse(JSON.stringify(builderFlights));
+      teamsCache[date] = JSON.parse(JSON.stringify(teamsToSave));
       renderTeams();
       toast('Teams gespeichert');
     } else {
@@ -2381,13 +2561,38 @@ async function saveTeams() {
 let trophyTeamCache = {};
 
 async function loadTrophyTeams() {
+  try { const s = localStorage.getItem('tt2026__trophyTeams'); if (s) trophyTeamCache = JSON.parse(s); } catch(e) {}
   renderTrophyTeams();
   try {
     const res = await fetch('/api/trophy-teams');
-    if (res.ok) trophyTeamCache = await res.json();
+    if (res.ok) {
+      trophyTeamCache = await res.json();
+      const _lv = trophyTeamCache['__locked'];
+      localStorage.setItem('tt2026__locked', (_lv === 'true' || _lv === true) ? 'true' : 'false');
+      try { localStorage.setItem('tt2026__trophyTeams', JSON.stringify(trophyTeamCache)); } catch(e) {}
+    }
   } catch(e) {}
   renderTrophyTeams();
   renderBuilder();
+}
+
+function isTrophyTeamsLocked() {
+  const v = trophyTeamCache['__locked'];
+  return v === 'true' || v === true;
+}
+
+async function lockTrophyTeams() {
+  trophyTeamCache['__locked'] = 'true';
+  localStorage.setItem('tt2026__locked', 'true');
+  try { localStorage.setItem('tt2026__trophyTeams', JSON.stringify(trophyTeamCache)); } catch(e) {}
+  renderTrophyTeams();
+  try {
+    await fetch('/api/trophy-teams', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerKey: '__locked', team: 'true' }),
+    });
+  } catch(e) { toast('Fehler beim Sperren'); }
 }
 
 function getPlayerTeam(playerKey) {
@@ -2395,6 +2600,7 @@ function getPlayerTeam(playerKey) {
 }
 
 async function assignTeam(playerKey, team) {
+  if (isTrophyTeamsLocked()) return;
   const current = getPlayerTeam(playerKey);
   const next = current === team ? '' : team;
   trophyTeamCache[playerKey] = next; // optimistic update
@@ -2407,6 +2613,14 @@ async function assignTeam(playerKey, team) {
       body: JSON.stringify({ playerKey, team: next }),
     });
   } catch(e) { toast('Fehler beim Speichern'); }
+}
+
+function showTeamMenu(playerKey) {
+  if (isTrophyTeamsLocked()) return;
+  const player = PLAYERS.find(p => p.key === playerKey);
+  const choice = confirm(player.name + ' in welches Team?\n\nOK = Parli\nAbbrechen = Consti');
+  if (choice) assignTeam(playerKey, 'red');
+  else assignTeam(playerKey, 'blue');
 }
 
 function renderTrophyTeams() {
@@ -2434,27 +2648,161 @@ function renderTrophyTeams() {
   document.getElementById('countRed').textContent = redMembers.length + ' Spieler';
   document.getElementById('countBlue').textContent = blueMembers.length + ' Spieler';
 
-  // Assignment list
+  // Assignment two-box layout
   const list = document.getElementById('teamAssignList');
-  list.innerHTML = '';
-  PLAYERS.forEach(p => {
-    const current = getPlayerTeam(p.key);
-    const row = document.createElement('div');
-    row.className = 'assign-row';
-    row.innerHTML =
-      '<div class="assign-name">' + p.name + ' <span class="small">· HCP ' + p.hcp + '</span></div>' +
-      '<div class="assign-buttons">' +
-        '<button class="assign-btn btn-red' + (current === 'red' ? ' active' : '') + '" data-player="' + p.key + '" data-team="red">Parli</button>' +
-        '<button class="assign-btn btn-blue' + (current === 'blue' ? ' active' : '') + '" data-player="' + p.key + '" data-team="blue">Consti</button>' +
-      '</div>';
-    list.appendChild(row);
-  });
+  const unassigned = PLAYERS.filter(p => !getPlayerTeam(p.key));
 
-  list.querySelectorAll('.assign-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      assignTeam(btn.dataset.player, btn.dataset.team);
+  list.innerHTML =
+    '<div class="assign-grid">' +
+      '<div class="assign-box red">' +
+        '<div class="assign-box-title"><span></span>Parli</div>' +
+        '<div class="assign-members">' +
+          redMembers.map(p =>
+            '<div class="assign-member" onclick="assignTeam(\'' + p.key + '\', null)">' +
+            p.name +
+            '<span class="assign-member-remove">×</span>' +
+            '</div>'
+          ).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="assign-box blue">' +
+        '<div class="assign-box-title"><span></span>Consti</div>' +
+        '<div class="assign-members">' +
+          blueMembers.map(p =>
+            '<div class="assign-member" onclick="assignTeam(\'' + p.key + '\', null)">' +
+            p.name +
+            '<span class="assign-member-remove">×</span>' +
+            '</div>'
+          ).join('') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    (unassigned.length > 0 ?
+      '<div class="unassigned-list">' +
+        '<div class="unassigned-label">Nicht zugewiesen</div>' +
+        unassigned.map(p =>
+          '<div onclick="showTeamMenu(\'' + p.key + '\')" class="unassigned-player">' +
+          p.name + ' <span style="color:var(--muted);">· HCP ' + p.hcp + '</span>' +
+          '</div>'
+        ).join('') +
+      '</div>'
+    : '');
+
+  const locked = isTrophyTeamsLocked();
+  const assignCard = document.getElementById('teamAssignCard');
+  if (assignCard) assignCard.style.display = locked ? 'none' : '';
+
+  renderHeroTeamScore();
+}
+
+let heroLiveInterval = null;
+
+function renderHeroTeamScore() {
+  const hasTeams = Object.values(trophyTeamCache).some(t => t === 'red' || t === 'blue');
+  document.getElementById('heroCountdowns').style.display = hasTeams ? 'none' : '';
+  document.getElementById('heroTeamScore').style.display = hasTeams ? '' : 'none';
+  if (!hasTeams) { stopHeroLivePoll(); return; }
+
+  let allA = 0, allB = 0;
+  Object.keys(teamsCache).forEach(d => {
+    (teamsCache[d] || []).forEach((_, fi) => {
+      iterateFlightResults(d, fi, (holes) => {
+        const { result } = calculateMatch(holes);
+        if (!result) return;
+        if (result.winner === 'a') allA += 1;
+        else if (result.winner === 'b') allB += 1;
+        else { allA += 0.5; allB += 0.5; }
+      });
     });
   });
+
+  const fmt = v => v % 1 === 0 ? String(v) : v.toFixed(1);
+  document.getElementById('heroScoreA').textContent = fmt(allA);
+  document.getElementById('heroScoreB').textContent = fmt(allB);
+
+  // Match grid: alle Flights mit eingetragenen Resultaten (offen oder abgeschlossen)
+  const matchRows = [];
+
+  const teamHex = c => c === 'red' ? '#f4a18d' : c === 'blue' ? '#92c4e6' : 'var(--text)';
+
+  Object.keys(teamsCache).sort().forEach(date => {
+    (teamsCache[date] || []).forEach((flight, fi) => {
+      if (isSingles(date)) {
+        const count = singlesMatchCount(date, fi);
+        const { sideA, sideB } = getFlightSides(date, fi);
+        for (let mi = 0; mi < count; mi++) {
+          const cached = resultsCache[getResultKey(date, fi, mi)];
+          if (!cached?.holes) continue;
+          const { score, lastPlayed, result } = calculateMatch(cached.holes);
+          if (lastPlayed < 0 || result) continue;
+          const hA = teamHex(sideColor([sideA[mi]]));
+          const hB = teamHex(sideColor([sideB[mi]]));
+          matchRows.push(buildHeroRow(
+            [PLAYER_NICKNAMES[sideA[mi]] || sideA[mi] || '—'],
+            [PLAYER_NICKNAMES[sideB[mi]] || sideB[mi] || '—'],
+            hA, hB, score, lastPlayed, `openFlightDetail('${date}',${fi},${mi})`));
+        }
+      } else {
+        const cached = resultsCache[getResultKey(date, fi, null)];
+        if (!cached?.holes) return;
+        const { score, lastPlayed, result } = calculateMatch(cached.holes);
+        if (lastPlayed < 0 || result) return;
+        const { sideA, sideB } = getFlightSides(date, fi);
+        const hA = teamHex(sideColor(sideA));
+        const hB = teamHex(sideColor(sideB));
+        matchRows.push(buildHeroRow(
+          sideA.map(k => PLAYER_NICKNAMES[k] || k),
+          sideB.map(k => PLAYER_NICKNAMES[k] || k),
+          hA, hB, score, lastPlayed, `openFlightDetail('${date}',${fi})`));
+      }
+    });
+  });
+
+  const liveSec = document.getElementById('heroLiveSection');
+  if (matchRows.length > 0) {
+    liveSec.style.display = '';
+    document.getElementById('heroLiveFlights').innerHTML = matchRows.join('');
+  } else {
+    liveSec.style.display = 'none';
+  }
+  startHeroLivePoll();
+}
+
+function buildHeroRow(namesA, namesB, hA, hB, score, lastPlayed, onclick) {
+  const winA = score > 0, winB = score < 0, tied = score === 0;
+
+  const playerColor = (hex, wins) => wins ? hex : tied ? 'var(--text)' : 'var(--muted)';
+  const playerWeight = wins => wins ? 700 : 400;
+  const namesHtml = (names, hex, wins, side) =>
+    `<div class="hero-match-names ${side}">${names.map(n => `<span class="hero-match-player" style="color:${playerColor(hex,wins)};font-weight:${playerWeight(wins)}">${n}</span>`).join('')}</div>`;
+
+  const badge = (hex, label, side) =>
+    `<span class="hero-match-badge ${side}" style="background:${hex}22;color:${hex};border:1px solid ${hex}55">${label}</span>`;
+  const badgeEmpty = `<span></span>`;
+  const badgeAs =
+    `<span class="hero-match-badge a" style="background:rgba(255,255,255,0.07);color:var(--muted);text-align:right">A/S</span>`;
+
+  const cellA = winA ? badge(hA, score + 'UP', 'a') : tied ? badgeAs : badgeEmpty;
+  const cellB = winB ? badge(hB, Math.abs(score) + 'UP', 'b') : badgeEmpty;
+
+  return `<div class="hero-match-row" onclick="${onclick}" style="cursor:pointer;">
+    ${cellA}
+    ${namesHtml(namesA, hA, winA, 'a')}
+    <div class="hero-match-hole live">${lastPlayed + 1}</div>
+    ${namesHtml(namesB, hB, winB, 'b')}
+    ${cellB}
+  </div>`;
+}
+
+function startHeroLivePoll() {
+  if (heroLiveInterval) return;
+  heroLiveInterval = setInterval(() => loadAllResults(), 600000);
+}
+
+function stopHeroLivePoll() {
+  if (!heroLiveInterval) return;
+  clearInterval(heroLiveInterval);
+  heroLiveInterval = null;
 }
 
 function updateCountdown() {
@@ -3031,8 +3379,72 @@ function resetData() {
 let resultsCache = {};
 let detailDate = null;
 let detailFlightIdx = null;
+let detailMatchIdx = null; // null = normal, 0/1/... = singles sub-match
 let detailHoles = new Array(18).fill(null);
 let saveResultTimer = null;
+let detailMode = 'detail'; // 'detail' | 'quick'
+let quickWinner = null; // 'a' | 'b' | 'as'
+let quickMarginN = 1, quickMarginM = 0;
+
+const QUICK_MARGINS = [
+  { label: '1UP',  N: 1,  M: 0 },
+  { label: '2&1',  N: 2,  M: 1 },
+  { label: '3&2',  N: 3,  M: 2 },
+  { label: '4&3',  N: 4,  M: 3 },
+  { label: '5&4',  N: 5,  M: 4 },
+  { label: '6&5',  N: 6,  M: 5 },
+  { label: '7&6',  N: 7,  M: 6 },
+  { label: '8&7',  N: 8,  M: 7 },
+  { label: '9&8',  N: 9,  M: 8 },
+  { label: '10&8', N: 10, M: 8 },
+];
+
+function isSingles(date) {
+  return (SCHEDULE[date]?.format || '').includes('Singles');
+}
+
+function sideColor(keys) {
+  const r = keys.filter(k => trophyTeamCache[k] === 'red').length;
+  const b = keys.filter(k => trophyTeamCache[k] === 'blue').length;
+  return r > b ? 'red' : b > r ? 'blue' : null;
+}
+
+function colorHex(c) {
+  return c === 'red' ? '#f4a18d' : c === 'blue' ? '#92c4e6' : null;
+}
+
+function styledName(key) {
+  const name = PLAYER_NICKNAMES[key] || key || '—';
+  const c = colorHex(trophyTeamCache[key]);
+  return c ? `<span style="color:${c};font-weight:700;">${name}</span>` : name;
+}
+
+function styledNames(keys) {
+  return keys.map(k => styledName(k)).join(' · ') || '—';
+}
+
+function getResultKey(date, fi, mi) {
+  return mi !== null ? `${date}__${fi}__${mi}` : `${date}__${fi}`;
+}
+
+function singlesMatchCount(date, fi) {
+  const flights = teamsCache[date] || [];
+  const members = (flights[fi] || {}).members || [];
+  return Math.floor(members.filter(k => k).length / 2);
+}
+
+function iterateFlightResults(d, fi, cb) {
+  if (isSingles(d)) {
+    const count = singlesMatchCount(d, fi);
+    for (let mi = 0; mi < count; mi++) {
+      const cached = resultsCache[getResultKey(d, fi, mi)];
+      if (cached?.holes) cb(cached.holes, mi);
+    }
+  } else {
+    const cached = resultsCache[getResultKey(d, fi, null)];
+    if (cached?.holes) cb(cached.holes, null);
+  }
+}
 
 function calculateMatch(holes) {
   const n = holes.length;
@@ -3070,19 +3482,30 @@ function matchScoreLabel(score) {
 }
 
 async function loadAllResults() {
+  try { const s = localStorage.getItem('tt2026__resultsCache'); if (s) Object.assign(resultsCache, JSON.parse(s)); } catch(e) {}
   try {
     const res = await fetch('/api/results');
     if (res.ok) {
       const data = await res.json();
       Object.entries(data).forEach(([k, v]) => { resultsCache[k] = v; });
+      try { localStorage.setItem('tt2026__resultsCache', JSON.stringify(resultsCache)); } catch(e) {}
     }
   } catch(e) {}
   renderResultsTab();
+  renderHeroTeamScore();
 }
 
 function getFlightSides(date, fi) {
   const flights = teamsCache[date] || [];
   const members = (flights[fi] || {}).members || [];
+  if (isSingles(date)) {
+    const sideA = [], sideB = [];
+    for (let i = 0; i + 1 < members.length; i += 2) {
+      if (members[i]) sideA.push(members[i]);
+      if (members[i + 1]) sideB.push(members[i + 1]);
+    }
+    return { sideA, sideB };
+  }
   const half = Math.ceil(members.length / 2);
   return { sideA: members.slice(0, half), sideB: members.slice(half) };
 }
@@ -3105,35 +3528,61 @@ function renderResultsTab() {
   }
 
   let totalA = 0, totalB = 0;
+
+  function resultDisplay(holes, keysA, keysB) {
+    const { result, lastPlayed, score } = calculateMatch(holes);
+    const cA = colorHex(sideColor(keysA));
+    const cB = colorHex(sideColor(keysB));
+    if (result) {
+      if (result.winner === 'halved') {
+        totalA += 0.5; totalB += 0.5;
+        const ca = cA || 'var(--muted)', cb = cB || 'var(--muted)';
+        return `<div class="result-halved"><span style="color:${ca};">½&nbsp;Pkt</span><span style="color:var(--muted);">·</span><span style="color:${cb};">½&nbsp;Pkt</span></div>`;
+      }
+      const win = result.winner === 'a';
+      if (win) totalA += 1; else totalB += 1;
+      const c = win ? (cA || 'var(--gold)') : (cB || 'var(--gold)');
+      const margin = result.margin.replace('up', 'UP').replace('&', '&amp;');
+      return `<span class="results-match-pill" style="background:${c}22;color:${c};border:1px solid ${c};">${margin}</span>`;
+    } else if (lastPlayed >= 0) {
+      const leadC = score > 0 ? (cA || 'var(--gold)') : score < 0 ? (cB || 'var(--gold)') : 'var(--muted)';
+      const label = score === 0 ? `AS · ${lastPlayed+1}` : `${Math.abs(score)}UP · Loch ${lastPlayed+1}`;
+      return `<span class="results-match-pill ongoing" style="color:${leadC};border-color:${leadC};background:${leadC}18;">${label}</span>`;
+    }
+    return `<span class="results-match-pill none">–</span>`;
+  }
+
   container.innerHTML = flights.map((flight, fi) => {
     const { sideA, sideB } = getFlightSides(date, fi);
-    const cached = resultsCache[`${date}__${fi}`];
-    const holes = cached?.holes || new Array(18).fill(null);
-    const { result, lastPlayed } = calculateMatch(holes);
-    let pillHtml, pillClass;
-    if (result) {
-      pillClass = 'concluded';
-      const winnerName = result.winner === 'a' ? sideNames(sideA) : result.winner === 'b' ? sideNames(sideB) : '';
-      pillHtml = result.winner === 'halved' ? 'AS ½ Punkt' : `${winnerName} · ${result.margin}`;
-      if (result.winner === 'a') { totalA += 1; } else if (result.winner === 'b') { totalB += 1; } else { totalA += 0.5; totalB += 0.5; }
-    } else if (lastPlayed >= 0) {
-      const { score } = calculateMatch(holes);
-      const side = score > 0 ? 'A' : score < 0 ? 'B' : '';
-      pillHtml = score === 0 ? 'AS (Loch ' + (lastPlayed+1) + ')' : `${side} ${Math.abs(score)}UP (Loch ${lastPlayed+1})`;
-      pillClass = 'ongoing';
+    if (isSingles(date)) {
+      const count = singlesMatchCount(date, fi);
+      const matchRows = Array.from({ length: count }, (_, mi) => {
+        const kA = sideA[mi], kB = sideB[mi];
+        const cached = resultsCache[getResultKey(date, fi, mi)];
+        const holes = cached?.holes || new Array(18).fill(null);
+        return `<div class="singles-match-row">
+          <div class="results-sides">
+            <div class="results-side a">${styledName(kA)}</div>
+            <div class="results-vs">vs</div>
+            <div class="results-side b">${styledName(kB)}</div>
+          </div>
+          <div class="result-row"><div style="flex:1;text-align:center;">${resultDisplay(holes, [kA], [kB])}</div><button class="results-detail-btn" style="float:none;" onclick="openFlightDetail('${date}',${fi},${mi})">Detail →</button></div>
+        </div>`;
+      }).join('');
+      return `<div class="results-flight-card"><div class="results-flight-name">${flight.name}</div>${matchRows}</div>`;
     } else {
-      pillHtml = 'Noch kein Resultat';
-      pillClass = 'none';
+      const cached = resultsCache[getResultKey(date, fi, null)];
+      const holes = cached?.holes || new Array(18).fill(null);
+      return `<div class="results-flight-card">
+        <div class="results-flight-name">${flight.name} <button class="results-detail-btn" onclick="openFlightDetail('${date}',${fi})">Detail →</button></div>
+        <div class="results-sides">
+          <div class="results-side a">${styledNames(sideA)}</div>
+          <div class="results-vs">vs</div>
+          <div class="results-side b">${styledNames(sideB)}</div>
+        </div>
+        <div style="text-align:center;">${resultDisplay(holes, sideA, sideB)}</div>
+      </div>`;
     }
-    return `<div class="results-flight-card">
-      <div class="results-flight-name">${flight.name} <button class="results-detail-btn" onclick="openFlightDetail('${date}',${fi})">Detail →</button></div>
-      <div class="results-sides">
-        <div class="results-side a">${sideNames(sideA)}</div>
-        <div class="results-vs">vs</div>
-        <div class="results-side b">${sideNames(sideB)}</div>
-      </div>
-      <span class="results-match-pill ${pillClass}">${pillHtml}</span>
-    </div>`;
   }).join('');
 
   renderResultsSummary(date, totalA, totalB);
@@ -3149,46 +3598,157 @@ function renderResultsSummary(date, dayA, dayB) {
   Object.keys(flights_by_date).forEach(d => {
     const flights = flights_by_date[d];
     flights.forEach((_, fi) => {
-      const cached = resultsCache[`${d}__${fi}`];
-      if (!cached?.holes) return;
-      const { result } = calculateMatch(cached.holes);
-      if (!result) return;
-      if (result.winner === 'a') allA += 1;
-      else if (result.winner === 'b') allB += 1;
-      else { allA += 0.5; allB += 0.5; }
+      iterateFlightResults(d, fi, (holes) => {
+        const { result } = calculateMatch(holes);
+        if (!result) return;
+        if (result.winner === 'a') allA += 1;
+        else if (result.winner === 'b') allB += 1;
+        else { allA += 0.5; allB += 0.5; }
+      });
     });
   });
 
+  const fmt = v => v % 1 === 0 ? String(v) : v.toFixed(1);
   document.getElementById('resultsSummary').innerHTML = `
     <div class="results-summary-card">
       <div class="results-summary-row">
         <span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Tagesstand</span>
-        <span><b>${dayA}</b> · Seite A &nbsp;–&nbsp; Seite B · <b>${dayB}</b></span>
+        <span><b style="color:#f4a18d;">${fmt(dayA)}</b> · Parli &nbsp;–&nbsp; Consti · <b style="color:#92c4e6;">${fmt(dayB)}</b></span>
       </div>
       <div class="results-summary-row">
         <span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;">Gesamtstand</span>
-        <span><b>${allA}</b> · Seite A &nbsp;–&nbsp; Seite B · <b>${allB}</b></span>
+        <span><b style="color:#f4a18d;">${fmt(allA)}</b> · Parli &nbsp;–&nbsp; Consti · <b style="color:#92c4e6;">${fmt(allB)}</b></span>
       </div>
     </div>`;
 }
 
-function openFlightDetail(date, fi) {
+function setDetailMode(mode) {
+  detailMode = mode;
+  document.getElementById('flightDetailHoles').style.display = mode === 'detail' ? '' : 'none';
+  document.getElementById('flightDetailQuick').style.display = mode === 'quick' ? '' : 'none';
+  document.getElementById('modeDetailBtn').classList.toggle('active', mode === 'detail');
+  document.getElementById('modeQuickBtn').classList.toggle('active', mode === 'quick');
+  if (mode === 'quick') renderQuickForm();
+}
+
+function renderQuickForm() {
+  const { sideA, sideB } = getFlightSides(detailDate, detailFlightIdx);
+  const nameA = isSingles(detailDate)
+    ? (PLAYER_NICKNAMES[sideA[detailMatchIdx]] || sideA[detailMatchIdx] || 'A')
+    : sideNames(sideA);
+  const nameB = isSingles(detailDate)
+    ? (PLAYER_NICKNAMES[sideB[detailMatchIdx]] || sideB[detailMatchIdx] || 'B')
+    : sideNames(sideB);
+
+  const winnerBtns = `
+    <div class="quick-winner-row">
+      <button class="quick-winner-btn red${quickWinner === 'a' ? ' active' : ''}" onclick="setQuickWinner('a')">${nameA}</button>
+      <button class="quick-winner-btn as${quickWinner === 'as' ? ' active' : ''}" onclick="setQuickWinner('as')">AS</button>
+      <button class="quick-winner-btn blue${quickWinner === 'b' ? ' active' : ''}" onclick="setQuickWinner('b')">${nameB}</button>
+    </div>`;
+
+  const marginBtns = (quickWinner && quickWinner !== 'as') ? `
+    <div style="font-size:12px;color:var(--muted);margin-top:16px;margin-bottom:4px;">Ergebnis</div>
+    <div class="quick-margin-row">
+      ${QUICK_MARGINS.map(m => `<button class="quick-margin-btn${quickMarginN === m.N && quickMarginM === m.M ? ' active' : ''}" onclick="setQuickMargin(${m.N},${m.M})">${m.label}</button>`).join('')}
+    </div>` : '';
+
+  const saveBtn = quickWinner ? `<button class="quick-save-btn" onclick="saveQuickResult()">Speichern</button>` : '';
+
+  document.getElementById('flightDetailQuick').innerHTML = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Sieger</div>
+    ${winnerBtns}${marginBtns}${saveBtn}`;
+}
+
+function setQuickWinner(w) {
+  quickWinner = w;
+  renderQuickForm();
+}
+
+function setQuickMargin(N, M) {
+  quickMarginN = N;
+  quickMarginM = M;
+  renderQuickForm();
+}
+
+function buildSyntheticHoles(winner, N, M) {
+  const sign = winner === 'a' ? 1 : -1;
+  const holes = new Array(18).fill(null);
+  for (let i = 0; i < N; i++) holes[i] = sign;
+  for (let i = N; i <= 17 - M; i++) holes[i] = 0;
+  return holes;
+}
+
+function saveQuickResult() {
+  if (!quickWinner) return;
+  detailHoles = quickWinner === 'as'
+    ? new Array(18).fill(0)
+    : buildSyntheticHoles(quickWinner, quickMarginN, quickMarginM);
+  clearTimeout(saveResultTimer);
+  saveFlightResult();
+  setDetailMode('detail');
+  renderHoleList();
+}
+
+function openFlightDetail(date, fi, mi) {
   detailDate = date;
   detailFlightIdx = fi;
-  const cached = resultsCache[`${date}__${fi}`];
+  detailMatchIdx = isSingles(date) ? (mi ?? 0) : null;
+
+  const key = getResultKey(date, fi, detailMatchIdx);
+  const cached = resultsCache[key];
   detailHoles = cached?.holes ? [...cached.holes] : new Array(18).fill(null);
+
+  // Init quick-entry state from existing result
+  const existingResult = calculateMatch(detailHoles).result;
+  if (existingResult) {
+    if (existingResult.winner === 'halved') {
+      quickWinner = 'as';
+    } else {
+      quickWinner = existingResult.winner;
+      const amp = existingResult.margin.indexOf('&');
+      if (amp >= 0) { quickMarginN = parseInt(existingResult.margin); quickMarginM = parseInt(existingResult.margin.slice(amp + 1)); }
+      else { quickMarginN = parseInt(existingResult.margin); quickMarginM = 0; }
+    }
+  } else {
+    quickWinner = null; quickMarginN = 1; quickMarginM = 0;
+  }
+
   const flights = teamsCache[date] || [];
   const flight = flights[fi] || {};
   const { sideA, sideB } = getFlightSides(date, fi);
-  const sched = SCHEDULE[date] || {};
+
   document.getElementById('flightDetailTitle').textContent = `${flight.name || 'Flight'} · ${date.slice(8,10)}.${date.slice(5,7)}.`;
-  document.getElementById('flightDetailPlayers').innerHTML = `
-    <span class="side-a">${sideNames(sideA)}</span>
-    <span class="vs-label">vs</span>
-    <span class="side-b">${sideNames(sideB)}</span>`;
+
+  const tabsEl = document.getElementById('flightDetailTabs');
+  if (isSingles(date)) {
+    const count = singlesMatchCount(date, fi);
+    tabsEl.style.display = 'flex';
+    tabsEl.innerHTML = Array.from({ length: count }, (_, i) => {
+      const pA = PLAYER_NICKNAMES[sideA[i]] || sideA[i] || `A${i+1}`;
+      const pB = PLAYER_NICKNAMES[sideB[i]] || sideB[i] || `B${i+1}`;
+      return `<button class="match-tab${i === detailMatchIdx ? ' active' : ''}" onclick="openFlightDetail('${date}',${fi},${i})">${pA} vs ${pB}</button>`;
+    }).join('');
+    const pA = PLAYER_NICKNAMES[sideA[detailMatchIdx]] || sideA[detailMatchIdx] || '—';
+    const pB = PLAYER_NICKNAMES[sideB[detailMatchIdx]] || sideB[detailMatchIdx] || '—';
+    document.getElementById('flightDetailPlayers').innerHTML = `
+      <span class="side-a">${pA}</span>
+      <span class="vs-label">vs</span>
+      <span class="side-b">${pB}</span>`;
+  } else {
+    tabsEl.style.display = 'none';
+    tabsEl.innerHTML = '';
+    document.getElementById('flightDetailPlayers').innerHTML = `
+      <span class="side-a">${sideNames(sideA)}</span>
+      <span class="vs-label">vs</span>
+      <span class="side-b">${sideNames(sideB)}</span>`;
+  }
+
+  document.getElementById('flightDetailHoles').scrollTop = 0;
   document.getElementById('flightDetailOverlay').style.display = 'flex';
   document.body.style.overflow = 'hidden';
   renderHoleList();
+  setDetailMode(existingResult ? 'quick' : 'detail');
 }
 
 function closeFlightDetail() {
@@ -3255,13 +3815,15 @@ function setHole(holeIdx, val) {
 }
 
 async function saveFlightResult() {
+  const apiFlightIdx = detailMatchIdx !== null ? `${detailFlightIdx}__${detailMatchIdx}` : detailFlightIdx;
+  const cacheKey = getResultKey(detailDate, detailFlightIdx, detailMatchIdx);
   try {
     await fetch('/api/results', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: detailDate, flightIdx: detailFlightIdx, holes: detailHoles }),
+      body: JSON.stringify({ date: detailDate, flightIdx: apiFlightIdx, holes: detailHoles }),
     });
-    resultsCache[`${detailDate}__${detailFlightIdx}`] = { holes: [...detailHoles] };
+    resultsCache[cacheKey] = { holes: [...detailHoles] };
   } catch(e) { console.warn('Save result failed', e); }
 }
 
@@ -3560,7 +4122,13 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     fetchCloudStats().then(() => refreshAllStatsUI());
     flushPendingTracks();
+    loadTrophyTeams();
+    loadAllResults();
   }
+});
+
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) loadTrophyTeams();
 });
 </script>
 </body>
