@@ -323,6 +323,20 @@ a { color: var(--gold); text-decoration: none; }
 }
 .counter-btn:active { transform: scale(0.95); }
 .counter-btn.minus { color: var(--red-bad); border-color: var(--red-bad); }
+.konsum-counter {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.konsum-row {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  align-items: center;
+  padding: 14px;
+  gap: 8px;
+}
+.konsum-divider { height: 1px; background: var(--border); margin: 0 14px; }
 
 input[type="number"], input[type="text"], select, textarea {
   background: var(--bg-soft); color: var(--text);
@@ -1932,31 +1946,30 @@ body.detail-open .notification-center {
   <p class="small">Daten werden für alle synchronisiert.</p>
 
   <h3>🥂 Konsum (heute)</h3>
-  <div class="counter">
-    <div>
+  <div class="konsum-counter">
+    <div class="konsum-row">
       <div class="counter-value" id="beerToday">0</div>
       <div class="counter-label">Bier heute</div>
+      <div class="counter-controls">
+        <button class="counter-btn minus" onclick="adjust('beer', -1)">−</button>
+        <button class="counter-btn" onclick="adjust('beer', 1)">+</button>
+      </div>
     </div>
-    <div class="counter-controls">
-      <button class="counter-btn minus" onclick="adjust('beer', -1)">−</button>
-      <button class="counter-btn" onclick="adjust('beer', 1)">+</button>
-    </div>
-  </div>
-  <div class="counter" style="margin-top:8px;">
-    <div>
+    <div class="konsum-divider"></div>
+    <div class="konsum-row">
       <div class="counter-value" id="schirmliToday">0</div>
-      <div class="counter-label">Schirmlidrinks heute</div>
-    </div>
-    <div class="counter-controls">
-      <button class="counter-btn minus" onclick="adjust('schirmli', -1)">−</button>
-      <button class="counter-btn" onclick="adjust('schirmli', 1)">+</button>
+      <div class="counter-label">Schirmli heute</div>
+      <div class="counter-controls">
+        <button class="counter-btn minus" onclick="adjust('schirmli', -1)">−</button>
+        <button class="counter-btn" onclick="adjust('schirmli', 1)">+</button>
+      </div>
     </div>
   </div>
   <div class="card" style="margin-top:10px;">
-    <div class="row"><span class="lbl">🍺 Total Trip</span><span class="val" id="beerTotal">0 🍺</span></div>
-    <div class="row"><span class="lbl">🍺 Tagesbestmarke</span><span class="val" id="beerRecord">0</span></div>
-    <div class="row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:6px;"><span class="lbl">🍹 Total Trip</span><span class="val" id="schirmliTotal">0 🍹</span></div>
-    <div class="row"><span class="lbl">🍹 Tagesbestmarke</span><span class="val" id="schirmliRecord">–</span></div>
+    <div class="row"><span class="lbl">Bier · Total Trip</span><span class="val" id="beerTotal">0 🍺</span></div>
+    <div class="row"><span class="lbl">Bier · Bestmarke Tag</span><span class="val" id="beerRecord">–</span></div>
+    <div class="row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:6px;"><span class="lbl">Schirmli · Total Trip</span><span class="val" id="schirmliTotal">0 🍹</span></div>
+    <div class="row"><span class="lbl">Schirmli · Bestmarke Tag</span><span class="val" id="schirmliRecord">–</span></div>
     <div class="row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:6px;"><span class="lbl">Promille (geschätzt)</span><span class="val" id="promilleVal">0.00 ‰</span></div>
     <div class="meter"><div class="meter-fill" id="promilleBar" style="width:0%; background: var(--muted);"></div></div>
     <p class="small" id="promilleStatus" style="margin-top:6px;">🔵 Noch nicht qualifiziert · 0.70‰ fehlen bis zur Auslosungs-Berechtigung</p>
