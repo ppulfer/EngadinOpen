@@ -19,38 +19,28 @@ export default async function handler(request) {
     try {
       console.log('NOTIFY_START', { since });
 
-      // Get all event keys matching pattern
-      const allKeys = await kv.keys('event:*');
-      console.log('FOUND_KEYS', { count: allKeys?.length || 0 });
+      // Single range query instead of keys() + N individual gets
+      const members = await kv.zrange('events', since, '+inf', { byScore: true });
 
-      if (allKeys && allKeys.length > 0) {
-        // Get all events
-        const eventValues = await Promise.all(
-          allKeys.map(key => kv.get(key))
-        );
-
-        events = eventValues
-          .map((value, idx) => {
+      if (members && members.length > 0) {
+        events = members
+          .map(m => {
             try {
-              // Value is already parsed by Vercel KV
-              const event = typeof value === 'string' ? JSON.parse(value) : value;
-              // Only return events newer than 'since'
-              return event.timestamp >= since ? event : null;
+              return typeof m === 'string' ? JSON.parse(m) : m;
             } catch (e) {
-              console.error('PARSE_ERROR', { key: allKeys[idx], error: e.message });
+              console.error('PARSE_ERROR', e.message);
               return null;
             }
           })
           .filter(Boolean)
-          .sort((a, b) => b.timestamp - a.timestamp); // Newest first
-
-        console.log('PARSED_EVENTS', { total: events.length, since });
+          .sort((a, b) => b.timestamp - a.timestamp);
       }
+
+      console.log('EVENTS_FETCHED', { count: events.length, since });
     } catch (kvError) {
       console.error('KV_ERROR', kvError.message);
     }
 
-    // Always return valid response
     const response = { events: events || [], timestamp: Date.now() };
     return new Response(JSON.stringify(response), {
       status: 200,
@@ -62,7 +52,6 @@ export default async function handler(request) {
     });
   } catch (error) {
     console.error('Notify handler error:', error);
-    // Return empty events on error instead of 500
     return new Response(JSON.stringify({ events: [], timestamp: Date.now() }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

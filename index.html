@@ -4864,7 +4864,7 @@ if ('mediaSession' in navigator) {
 
 // Event cache
 const EVENT_CACHE_KEY = 'tt2026__eventCache';
-const MAX_CACHED_EVENTS = 50;
+const MAX_CACHED_EVENTS = 300;
 
 function freshCache() {
   return { events: [], lastTimestamp: Date.now() - 600000 };
@@ -4955,7 +4955,7 @@ function updateNotificationCenter() {
     return;
   }
 
-  const GROUP_WINDOW_MS = 5 * 60 * 1000;
+  const GROUP_WINDOW_MS = 60 * 60 * 1000;
   const groups = [];
   for (const event of sorted) {
     const last = groups[groups.length - 1];
@@ -4983,6 +4983,8 @@ function updateNotificationCenter() {
     else if (group.field === 'birdies_removed') { emoji = '🏌️'; label = 'Birdie entfernt'; className = 'removed'; }
     else if (group.field === 'beer') { emoji = '🍺'; label = 'Beer'; }
     else if (group.field === 'beer_removed') { emoji = '🍺'; label = 'Beer entfernt'; className = 'removed'; }
+    else if (group.field === 'schirmli') { emoji = '🍹'; label = 'Schirmli'; }
+    else if (group.field === 'schirmli_removed') { emoji = '🍹'; label = 'Schirmli entfernt'; className = 'removed'; }
     else if (group.field === 'balls') { emoji = '⚪'; label = 'Ballverlust'; }
     else if (group.field === 'balls_removed') { emoji = '⚪'; label = 'Ballverlust entfernt'; className = 'removed'; }
     const countLabel = group.count > 1 ? `<b>${group.count}×</b> ` : '';

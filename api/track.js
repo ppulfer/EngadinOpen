@@ -52,17 +52,17 @@ export default async function handler(request) {
       await kv.hset('trip_stats', { [key]: 0 });
     }
 
-    // Publish notification for birdies, beers, and balls (both added and removed)
-    if ((field === 'birdies' || field === 'beer' || field === 'balls') && d !== 0) {
+    // Publish notification event into sorted set (score = timestamp for range queries)
+    if ((field === 'birdies' || field === 'beer' || field === 'schirmli' || field === 'balls') && d !== 0) {
       const finalValue = Math.max(0, newVal);
       const timestamp = Date.now();
       const eventField = d > 0 ? field : `${field}_removed`;
-      const eventData = JSON.stringify({ player, field: eventField, value: finalValue, timestamp });
+      const member = JSON.stringify({ player, field: eventField, value: finalValue, timestamp });
       try {
-        // Store as JSON string with timestamp key
-        const key = `event:${timestamp}:${player}:${eventField}`;
-        await kv.set(key, eventData, { ex: 2592000 }); // 30 days TTL
-        console.log('EVENT_SAVED', key);
+        await kv.zadd('events', { score: timestamp, member });
+        // Prune entries older than 30 days
+        await kv.zremrangebyscore('events', 0, timestamp - 2592000000);
+        console.log('EVENT_SAVED', { player, eventField, timestamp });
       } catch (e) {
         console.error('KV_ERROR', e.message);
       }
