@@ -1141,37 +1141,43 @@ body.detail-open .notification-center {
   color: var(--gold);
 }
 .tracker-history-wrap[open] summary::before { transform: rotate(90deg); }
-.history-row {
-  display: grid;
-  grid-template-columns: minmax(72px, auto) 1fr 1fr 1fr;
-  gap: 8px;
-  align-items: center;
-  padding: 6px 0;
+.history-day-card {
+  padding: 10px 0;
   border-bottom: 1px solid rgba(212,177,74,0.08);
 }
-.history-row:last-child { border-bottom: none; }
-.history-date {
-  color: var(--muted);
+.history-day-card:last-child { border-bottom: none; }
+.history-day-header {
   font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+.history-day-fields {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 .history-cell {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
-  font-size: 13px;
 }
+.history-cell span { font-size: 18px; line-height: 1; }
 .history-cell input {
-  width: 48px;
+  width: 100%;
+  min-height: 42px;
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 4px 6px;
-  font-size: 13px;
+  border-radius: 8px;
+  padding: 4px 2px;
+  font-size: 15px;
   text-align: center;
   font-family: inherit;
+  -webkit-appearance: none;
+  touch-action: manipulation;
 }
 .history-cell input:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
 .history-empty { color: var(--muted); font-size: 12px; margin: 0; padding: 4px 0; }
@@ -1218,29 +1224,32 @@ body.detail-open .notification-center {
 }
 .history-new-values {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
 }
 .history-new-value {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 4px;
 }
 .history-new-value label {
-  font-size: 11px;
-  color: var(--muted);
-  text-align: center;
+  font-size: 16px;
+  line-height: 1;
 }
 .history-new-value input {
   width: 100%;
-  padding: 8px 4px;
-  border-radius: 6px;
+  min-height: 42px;
+  padding: 4px 2px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
-  font-size: 13px;
+  font-size: 15px;
   text-align: center;
   font-family: inherit;
+  -webkit-appearance: none;
+  touch-action: manipulation;
 }
 .history-new-value input:focus {
   outline: 1px solid var(--gold);
@@ -1248,25 +1257,22 @@ body.detail-open .notification-center {
 }
 .history-new-btn {
   display: flex;
-  gap: 6px;
 }
-.history-new-btn button {
+.history-new-btn .btn {
   flex: 1;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
   font-weight: 700;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-family: inherit;
-}
-.history-new-btn .btn {
   background: var(--gold);
   color: var(--bg);
+  touch-action: manipulation;
+  min-height: 46px;
 }
-.history-new-btn .btn:active {
-  opacity: 0.8;
-}
+.history-new-btn .btn:active { opacity: 0.8; }
 
 @media (min-width: 600px) {
   .history-new-row {
@@ -1279,16 +1285,17 @@ body.detail-open .notification-center {
     min-width: 120px;
   }
   .history-new-values {
-    grid-template-columns: 80px 80px 80px;
+    grid-template-columns: repeat(4, 80px);
     gap: 8px;
   }
   .history-new-btn {
     flex: 0;
   }
-  .history-new-btn button {
+  .history-new-btn .btn {
     flex: 0;
-    width: 44px;
-    padding: 8px;
+    width: auto;
+    padding: 8px 20px;
+    min-height: unset;
   }
 }
 
@@ -3589,12 +3596,14 @@ function renderTrackerHistory() {
     const schirmli = parseInt(CLOUD_STATS[currentProfile + '__schirmli__' + date] || 0, 10);
     const balls = parseInt(CLOUD_STATS[currentProfile + '__balls__' + date] || 0, 10);
     const birdies = parseInt(CLOUD_STATS[currentProfile + '__birdies__' + date] || 0, 10);
-    return '<div class="history-row">'
-      + '<span class="history-date">' + label + '</span>'
+    return '<div class="history-day-card">'
+      + '<div class="history-day-header">' + label + '</div>'
+      + '<div class="history-day-fields">'
       + '<label class="history-cell"><span>🍺</span><input type="number" min="0" value="' + beer + '" data-date="' + date + '" data-field="beer"></label>'
       + '<label class="history-cell"><span>🍹</span><input type="number" min="0" value="' + schirmli + '" data-date="' + date + '" data-field="schirmli"></label>'
       + '<label class="history-cell"><span>⚪</span><input type="number" min="0" value="' + balls + '" data-date="' + date + '" data-field="balls"></label>'
       + '<label class="history-cell"><span>🏌️</span><input type="number" min="0" value="' + birdies + '" data-date="' + date + '" data-field="birdies"></label>'
+      + '</div>'
       + '</div>';
   }).join('');
 
