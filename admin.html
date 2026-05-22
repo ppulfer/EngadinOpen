@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin – Tschopp Trophy 2026</title>
+<title>Admin – Engadin Open 2026</title>
 <style>
 * { box-sizing: border-box; }
 body {
   margin: 0; padding: 20px;
-  background: #0e2920; color: #f3ead2;
+  background: #0b1f3a; color: #f0ede3;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 14px; line-height: 1.5;
 }
-a { color: #d4b14a; }
-h1 { color: #d4b14a; margin: 0 0 4px; }
-h2 { color: #e9cd6f; font-size: 16px; margin: 24px 0 10px; }
+a { color: #c9a227; }
+h1 { color: #c9a227; margin: 0 0 4px; }
+h2 { color: #dbb940; font-size: 16px; margin: 24px 0 10px; }
 .container { max-width: 1100px; margin: 0 auto; }
 
 .auth-bar {
@@ -22,19 +22,19 @@ h2 { color: #e9cd6f; font-size: 16px; margin: 24px 0 10px; }
   margin-bottom: 20px;
 }
 .auth-bar input {
-  background: #1a4233; color: #f3ead2;
-  border: 1px solid rgba(212,177,74,0.3); border-radius: 6px;
+  background: #163258; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.3); border-radius: 6px;
   padding: 8px 12px; font-size: 14px; width: 200px;
 }
 
 button {
-  background: #d4b14a; color: #0e2920;
+  background: #c9a227; color: #0b1f3a;
   padding: 8px 16px; border: none; border-radius: 6px;
   font-weight: 600; cursor: pointer; font-family: inherit; font-size: 14px;
 }
 button:hover { background: #e9cd6f; }
-button.ghost { background: transparent; color: #d4b14a; border: 1px solid #d4b14a; }
-button.ghost:hover { background: rgba(212,177,74,0.1); }
+button.ghost { background: transparent; color: #c9a227; border: 1px solid #c9a227; }
+button.ghost:hover { background: rgba(201,162,39,0.1); }
 button.danger { background: transparent; color: #c5634d; border: 1px solid #c5634d; padding: 4px 10px; font-size: 12px; }
 button.danger:hover { background: rgba(197,99,77,0.15); }
 button.save { background: #4ea36b; color: #fff; padding: 4px 10px; font-size: 12px; }
@@ -43,26 +43,26 @@ button.save:hover { background: #5cb87a; }
 .status { padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
 .status.success { background: rgba(78,163,107,0.2); border: 1px solid #4ea36b; color: #4ea36b; }
 .status.error { background: rgba(197,99,77,0.2); border: 1px solid #c5634d; color: #c5634d; }
-.status.info { background: rgba(212,177,74,0.1); border: 1px solid rgba(212,177,74,0.3); color: #d4b14a; }
+.status.info { background: rgba(201,162,39,0.1); border: 1px solid rgba(201,162,39,0.3); color: #c9a227; }
 
 /* Stats table */
 table { width: 100%; border-collapse: collapse; }
 thead th {
   text-align: left; padding: 8px 10px;
-  background: #1a4233; color: #e9cd6f;
+  background: #163258; color: #dbb940;
   font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
   position: sticky; top: 0;
 }
 tbody tr { border-bottom: 1px solid rgba(212,177,74,0.08); }
-tbody tr:hover { background: rgba(212,177,74,0.04); }
+tbody tr:hover { background: rgba(201,162,39,0.04); }
 td { padding: 8px 10px; }
-.td-key { color: #9bb0a4; font-size: 12px; font-family: monospace; }
-.td-player { font-weight: 600; color: #d4b14a; }
-.td-date { color: #9bb0a4; font-size: 12px; }
+.td-key { color: #8fa0b8; font-size: 12px; font-family: monospace; }
+.td-player { font-weight: 600; color: #c9a227; }
+.td-date { color: #8fa0b8; font-size: 12px; }
 
 .val-input {
-  background: #0e2920; color: #f3ead2;
-  border: 1px solid rgba(212,177,74,0.3); border-radius: 4px;
+  background: #0b1f3a; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.3); border-radius: 4px;
   padding: 4px 8px; font-size: 14px; width: 70px; text-align: center;
 }
 .val-input:focus { outline: 1px solid #d4b14a; }
@@ -71,40 +71,40 @@ td { padding: 8px 10px; }
 
 /* Add row form */
 .add-section {
-  background: #143729; border: 1px solid rgba(212,177,74,0.2);
+  background: #0f2849; border: 1px solid rgba(201,162,39,0.2);
   border-radius: 8px; padding: 16px; margin-top: 16px;
 }
 .add-form {
   display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;
 }
 .add-form .field { display: flex; flex-direction: column; gap: 4px; }
-.add-form label { font-size: 11px; color: #9bb0a4; text-transform: uppercase; }
+.add-form label { font-size: 11px; color: #8fa0b8; text-transform: uppercase; }
 .add-form input, .add-form select {
-  background: #0e2920; color: #f3ead2;
-  border: 1px solid rgba(212,177,74,0.3); border-radius: 6px;
+  background: #0b1f3a; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.3); border-radius: 6px;
   padding: 8px 10px; font-size: 14px; font-family: inherit;
 }
 .add-form select { min-width: 140px; }
 
 /* Summary row */
 .player-summary {
-  background: #1a4233; border: 1px solid rgba(212,177,74,0.15); border-radius: 8px;
+  background: #163258; border: 1px solid rgba(201,162,39,0.15); border-radius: 8px;
   padding: 10px 14px; margin-bottom: 6px;
   display: flex; align-items: center; gap: 12px; cursor: pointer;
 }
-.player-summary:hover { background: #1f4d3c; }
-.player-summary .name { font-weight: 700; color: #d4b14a; flex: 1; }
-.player-summary .totals { display: flex; gap: 16px; font-size: 13px; color: #9bb0a4; }
+.player-summary:hover { background: #1a3660; }
+.player-summary .name { font-weight: 700; color: #c9a227; flex: 1; }
+.player-summary .totals { display: flex; gap: 16px; font-size: 13px; color: #8fa0b8; }
 .player-summary .totals span { display: flex; align-items: center; gap: 4px; }
-.chevron { transition: transform 0.2s; margin-left: auto; color: #9bb0a4; }
+.chevron { transition: transform 0.2s; margin-left: auto; color: #8fa0b8; }
 .chevron.open { transform: rotate(90deg); }
 .player-rows { display: none; }
 .player-rows.open { display: block; margin-bottom: 12px; }
 
 .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
 .filter-bar input, .filter-bar select {
-  background: #1a4233; color: #f3ead2;
-  border: 1px solid rgba(212,177,74,0.2); border-radius: 6px;
+  background: #163258; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.2); border-radius: 6px;
   padding: 6px 10px; font-size: 13px;
 }
 
@@ -115,15 +115,15 @@ td { padding: 8px 10px; }
   margin: 16px 0 20px;
 }
 .tab-btn {
-  background: transparent; color: #9bb0a4;
+  background: transparent; color: #8fa0b8;
   border: none; border-bottom: 2px solid transparent;
   padding: 10px 16px; font-size: 14px; font-weight: 600;
   cursor: pointer; border-radius: 0;
   font-family: inherit;
 }
-.tab-btn:hover { background: rgba(212,177,74,0.05); color: #d4b14a; }
+.tab-btn:hover { background: rgba(201,162,39,0.05); color: #c9a227; }
 .tab-btn.active {
-  color: #d4b14a; border-bottom-color: #d4b14a; background: transparent;
+  color: #c9a227; border-bottom-color: #c9a227; background: transparent;
 }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
@@ -131,12 +131,12 @@ td { padding: 8px 10px; }
 /* Settings toggle */
 .setting-row {
   display: flex; align-items: center; justify-content: space-between;
-  background: #143729; border: 1px solid rgba(212,177,74,0.15);
+  background: #0f2849; border: 1px solid rgba(201,162,39,0.15);
   border-radius: 8px; padding: 14px 16px; gap: 16px;
   margin-bottom: 10px;
 }
 .setting-info .setting-title { font-weight: 600; color: #f3ead2; font-size: 14px; }
-.setting-info .setting-desc { font-size: 12px; color: #9bb0a4; margin-top: 2px; }
+.setting-info .setting-desc { font-size: 12px; color: #8fa0b8; margin-top: 2px; }
 .toggle-switch { position: relative; cursor: pointer; flex-shrink: 0; }
 .toggle-switch input { display: none; }
 .toggle-track {
@@ -165,52 +165,324 @@ td { padding: 8px 10px; }
   min-width: 60px; text-align: right;
 }
 .toggle-state.locked { color: #c5634d; }
+
+/* Score grid */
+.score-grid { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+.score-grid th {
+  text-align: left; padding: 8px 10px;
+  background: #163258; color: #dbb940;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+}
+.score-grid td { padding: 8px 10px; border-bottom: 1px solid rgba(201,162,39,0.08); }
+.score-grid tr:last-child td { border-bottom: none; }
+.score-grid .player-name { font-weight: 700; color: #c9a227; width: 70px; }
+.score-input {
+  background: #0b1f3a; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.3); border-radius: 6px;
+  padding: 6px 8px; font-size: 14px; width: 60px; text-align: center;
+  font-family: inherit;
+}
+.score-input:focus { outline: 1px solid #c9a227; }
+.score-vpar {
+  font-size: 12px; font-weight: 700; min-width: 32px; display: inline-block; text-align: center;
+}
+
+/* Password Gate */
+#pwGate {
+  position: fixed; inset: 0;
+  background: #0b1f3a;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.3s;
+}
+#pwGate.hidden { opacity: 0; pointer-events: none; }
+.pw-box {
+  text-align: center;
+  padding: 40px 32px;
+  background: #163258;
+  border: 1px solid rgba(201,162,39,0.3);
+  border-radius: 16px;
+  width: 320px;
+}
+.pw-box h2 { color: #c9a227; margin: 0 0 6px; font-size: 20px; }
+.pw-box p { color: #8fa0b8; font-size: 13px; margin: 0 0 24px; }
+.pw-box input {
+  width: 100%; padding: 12px 14px;
+  background: #0b1f3a; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.4); border-radius: 8px;
+  font-size: 16px; text-align: center; letter-spacing: 2px;
+  margin-bottom: 14px; box-sizing: border-box;
+  font-family: inherit;
+}
+.pw-box input:focus { outline: 1px solid #c9a227; }
+.pw-box button {
+  width: 100%; padding: 12px;
+  background: #c9a227; color: #0b1f3a;
+  border: none; border-radius: 8px;
+  font-weight: 700; font-size: 15px; cursor: pointer;
+}
+.pw-box button:hover { background: #dbb940; }
+.pw-error { color: #c5634d; font-size: 12px; margin-top: 10px; min-height: 18px; }
 </style>
 </head>
 <body>
-<div class="container">
+
+<div id="pwGate">
+  <div class="pw-box">
+    <h2>⚙️ Admin</h2>
+    <p>Engadin Open 2026</p>
+    <input type="password" id="pwInput" placeholder="Passwort" onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()">Einloggen</button>
+    <div class="pw-error" id="pwError"></div>
+  </div>
+</div>
+
+<div class="container" id="adminContent" style="display:none;">
   <p style="margin:0 0 4px"><a href="/">← Back to App</a></p>
   <h1>⚙️ Admin</h1>
 
   <div id="statusMsg"></div>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="stats">📊 Stats</button>
-    <button class="tab-btn" data-tab="settings">⚙️ Einstellungen</button>
+    <button class="tab-btn active" data-tab="scores">🏌️ Scores</button>
+    <button class="tab-btn" data-tab="players">👥 Spieler</button>
   </div>
 
-  <div class="tab-panel active" id="panel-stats">
-    <div class="auth-bar">
-      <button onclick="loadStats()">🔄 Neu laden</button>
-    </div>
-    <div id="statsContent"></div>
+  <div class="tab-panel active" id="panel-scores">
+    <p style="color:#8fa0b8;font-size:13px;margin:0 0 16px;">Gesamtschläge pro Spieler und Runde eingeben. Par 72 für alle Runden.</p>
+    <div id="scoreGrid"></div>
+    <button onclick="saveAllScores()" style="width:100%;margin-top:4px;">💾 Alle Scores speichern</button>
+    <div id="scoreStatus" style="margin-top:10px;font-size:13px;"></div>
   </div>
 
-  <div class="tab-panel" id="panel-settings">
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Trophy-Teams</div>
-        <div class="setting-desc">Wenn gesperrt, können Spieler ihre Team-Zuteilung nicht mehr ändern.</div>
+  <div class="tab-panel" id="panel-players">
+    <div id="playerList" style="margin-bottom:16px;"></div>
+    <div class="add-section">
+      <h2 style="margin-top:0;">Spieler hinzufügen</h2>
+      <div class="add-form">
+        <div class="field">
+          <label>Key (keine Leerzeichen, z.B. "mueller")</label>
+          <input type="text" id="newPlayerKey" placeholder="mueller" style="width:120px;">
+        </div>
+        <div class="field">
+          <label>Vollständiger Name</label>
+          <input type="text" id="newPlayerName" placeholder="Thomas Müller" style="width:180px;">
+        </div>
+        <div class="field">
+          <label>Spitzname</label>
+          <input type="text" id="newPlayerNick" placeholder="Mülli" style="width:100px;">
+        </div>
+        <div class="field">
+          <label>HCP</label>
+          <input type="number" id="newPlayerHcp" placeholder="0" step="0.1" style="width:70px;">
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <button onclick="addPlayer()">➕ Hinzufügen</button>
+        </div>
       </div>
-      <span class="toggle-state" id="toggleState">…</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="trophyLockToggle" onchange="onLockToggle()">
-        <span class="toggle-track"></span>
-      </label>
+      <div id="playerStatus" style="margin-top:10px;font-size:13px;"></div>
     </div>
   </div>
+
 </div>
 
 <script>
-const PLAYER_NICKNAMES = {
-  'parli': 'Parli', 'schrafl': 'Consti', 'hodgskin': 'Hodgskin',
-  'pulfer': 'Pulfer', 'fzimmermann': 'Flo', 'teulings': 'Teulings',
-  'ruetimann': 'Ruetimann', 'wieser': 'Karl', 'laenzlinger': 'Laenzlinger',
-  'hunter': 'Hunter', 'graf': 'Graf', 'debrunner': 'Debrunner',
-  'szimmermann': 'Zimmi', 'heule': 'Heule', 'wyser': 'Choco'
+let PLAYER_NICKNAMES = {
+  'laenzlinger': 'Länz', 'parli': 'Parli', 'mansour': 'Jens',
+  'koelbener': 'Köbi', 'hartmann': 'Manu', 'isaak': 'Isaak'
 };
+let PLAYERS = ['laenzlinger','parli','mansour','koelbener','hartmann','isaak'];
+let PLAYERS_FULL = [];
 
-const FIELD_LABELS = { birdies: '🏌️ Birdies', beer: '🍺 Beers', balls: '⚪ Balls' };
+const DEFAULT_PLAYERS = [
+  { key: 'laenzlinger', name: 'Fabian Länzlinger', hcp: 0, nickname: 'Länz',  feature: 'Tequila-Shots' },
+  { key: 'parli',       name: 'Linard Parli',       hcp: 0, nickname: 'Parli', feature: 'Hat für alle einen Rat' },
+  { key: 'mansour',     name: 'Jens-Malek Mansour', hcp: 0, nickname: 'Jens',  feature: 'Immer locker bleiben' },
+  { key: 'koelbener',   name: 'Roman Kölbener',     hcp: 0, nickname: 'Köbi',  feature: 'Schlägt weiter als er puttet' },
+  { key: 'hartmann',    name: 'Manuel Hartmann',    hcp: 0, nickname: 'Manu',  feature: 'Fairway-Maschine' },
+  { key: 'isaak',       name: 'Michael Isaak',      hcp: 0, nickname: 'Isaak', feature: 'Birdie oder Bogey' },
+];
+
+async function loadPlayersFull() {
+  try {
+    const res = await fetch('/api/players');
+    if (!res.ok) return;
+    let data = await res.json();
+    if (data.length === 0) {
+      await Promise.all(DEFAULT_PLAYERS.map(p => fetch('/api/players', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set', ...p }),
+      })));
+      const res2 = await fetch('/api/players');
+      data = await res2.json();
+    }
+    PLAYERS_FULL = data;
+    PLAYERS = data.map(p => p.key);
+    PLAYER_NICKNAMES = {};
+    data.forEach(p => { PLAYER_NICKNAMES[p.key] = p.nickname || p.name.split(' ')[0]; });
+    renderPlayerList();
+    buildScoreGrid();
+  } catch(e) {}
+}
+
+function renderPlayerList() {
+  const el = document.getElementById('playerList');
+  if (!el) return;
+  if (PLAYERS_FULL.length === 0) {
+    el.innerHTML = '<p style="color:#8fa0b8;font-size:13px;">Keine Spieler gespeichert — Standardliste wird verwendet.</p>';
+    return;
+  }
+  el.innerHTML = `
+    <table>
+      <thead><tr><th>Name</th><th>Spitzname</th><th>Key</th><th>HCP</th><th>Aktionen</th></tr></thead>
+      <tbody>
+        ${PLAYERS_FULL.map(p => `
+          <tr>
+            <td style="font-weight:600">${p.name}</td>
+            <td>${p.nickname || '–'}</td>
+            <td class="td-key">${p.key}</td>
+            <td>
+              <input class="val-input" type="number" step="0.1" min="0" max="54"
+                value="${p.hcp}" id="hcp_${p.key}" style="width:60px;">
+            </td>
+            <td>
+              <div class="actions">
+                <button class="save" onclick="savePlayerHcp('${p.key}', '${p.name}', '${p.nickname || ''}')">HCP</button>
+                <button class="danger" onclick="deletePlayer('${p.key}', '${p.name}')">Löschen</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+async function savePlayerHcp(key, name, nickname) {
+  const hcp = parseFloat(document.getElementById('hcp_' + key)?.value) || 0;
+  const p = PLAYERS_FULL.find(x => x.key === key) || {};
+  try {
+    await fetch('/api/players', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set', key, name, hcp, nickname: nickname || p.nickname, feature: p.feature || '' }) });
+    setPlayerStatus('✓ HCP gespeichert', '#4db36a');
+    await loadPlayersFull();
+  } catch(e) { setPlayerStatus('Fehler: ' + e.message, '#c5634d'); }
+}
+
+async function addPlayer() {
+  const key = document.getElementById('newPlayerKey').value.trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+  const name = document.getElementById('newPlayerName').value.trim();
+  const nick = document.getElementById('newPlayerNick').value.trim();
+  const hcp = parseFloat(document.getElementById('newPlayerHcp').value) || 0;
+  if (!key || !name) { setPlayerStatus('Key und Name sind pflicht', '#c5634d'); return; }
+  try {
+    await fetch('/api/players', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set', key, name, hcp, nickname: nick || name.split(' ')[0], feature: '' }) });
+    document.getElementById('newPlayerKey').value = '';
+    document.getElementById('newPlayerName').value = '';
+    document.getElementById('newPlayerNick').value = '';
+    document.getElementById('newPlayerHcp').value = '';
+    setPlayerStatus('✓ Spieler hinzugefügt', '#4db36a');
+    await loadPlayersFull();
+  } catch(e) { setPlayerStatus('Fehler: ' + e.message, '#c5634d'); }
+}
+
+async function deletePlayer(key, name) {
+  if (!confirm(`Spieler "${name}" wirklich löschen? Alle Scores bleiben erhalten.`)) return;
+  try {
+    await fetch('/api/players', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', key }) });
+    setPlayerStatus('✓ Spieler gelöscht', '#4db36a');
+    await loadPlayersFull();
+  } catch(e) { setPlayerStatus('Fehler: ' + e.message, '#c5634d'); }
+}
+
+function setPlayerStatus(msg, color) {
+  const el = document.getElementById('playerStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color;
+  setTimeout(() => { el.textContent = ''; }, 3000);
+}
+const ROUND_DATES = ['2026-07-16','2026-07-17','2026-07-18','2026-07-19'];
+const ROUND_LABELS = ['R1 · Do · Zuoz','R2 · Fr · Samedan','R3 · Sa · Samedan','R4 · So · Zuoz'];
+const ROUND_PAR = 72;
+
+function buildScoreGrid() {
+  const grid = document.getElementById('scoreGrid');
+  if (!grid) return;
+  let html = '<table class="score-grid"><thead><tr><th>Spieler</th>';
+  ROUND_LABELS.forEach(l => html += `<th>${l}</th><th style="color:#8fa0b8">+/-</th>`);
+  html += '</tr></thead><tbody>';
+  PLAYERS.forEach(pk => {
+    const name = PLAYER_NICKNAMES[pk] || pk;
+    html += `<tr><td class="player-name">${name}</td>`;
+    ROUND_DATES.forEach((d, ri) => {
+      const inputId = `score_${pk}_${ri}`;
+      const vpId = `vp_${pk}_${ri}`;
+      html += `<td><input class="score-input" id="${inputId}" type="number" min="50" max="120" placeholder="–" oninput="updateVp('${pk}',${ri})"></td>`;
+      html += `<td><span class="score-vpar" id="${vpId}">–</span></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  grid.innerHTML = html;
+}
+
+function updateVp(pk, ri) {
+  const val = parseInt(document.getElementById(`score_${pk}_${ri}`)?.value, 10);
+  const el = document.getElementById(`vp_${pk}_${ri}`);
+  if (!el) return;
+  if (isNaN(val)) { el.textContent = '–'; el.style.color = '#8fa0b8'; return; }
+  const vp = val - ROUND_PAR;
+  el.textContent = vp === 0 ? 'E' : (vp > 0 ? '+' : '') + vp;
+  el.style.color = vp < 0 ? '#4db36a' : vp > 0 ? '#d46a5a' : '#c9a227';
+}
+
+function prefillScores() {
+  PLAYERS.forEach(pk => {
+    ROUND_DATES.forEach((d, ri) => {
+      const key = pk + '__score__' + d;
+      const val = currentStats[key];
+      if (val !== undefined && val !== null && val !== '') {
+        const el = document.getElementById(`score_${pk}_${ri}`);
+        if (el) { el.value = val; updateVp(pk, ri); }
+      }
+    });
+  });
+}
+
+async function saveAllScores() {
+  const statusEl = document.getElementById('scoreStatus');
+  statusEl.textContent = 'Speichern…';
+  const ops = [];
+  PLAYERS.forEach(pk => {
+    ROUND_DATES.forEach((d, ri) => {
+      const el = document.getElementById(`score_${pk}_${ri}`);
+      if (!el) return;
+      const raw = el.value.trim();
+      const key = pk + '__score__' + d;
+      if (raw === '' || raw === '–') {
+        if (currentStats[key] !== undefined) {
+          ops.push(fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'delete', key }) }));
+        }
+      } else {
+        const val = parseInt(raw, 10);
+        if (!isNaN(val) && val >= 50 && val <= 120) {
+          ops.push(fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'set', key, value: val }) }));
+        }
+      }
+    });
+  });
+  await Promise.all(ops);
+  await loadStats();
+  prefillScores();
+  statusEl.style.color = '#4db36a';
+  statusEl.textContent = '✓ Gespeichert';
+  setTimeout(() => { statusEl.textContent = ''; }, 3000);
+}
 
 let currentStats = {};
 
@@ -228,211 +500,13 @@ async function loadStats() {
     const res = await fetch(`/api/admin`);
     if (res.status === 401) { showStatus('Wrong password', 'error'); return; }
     currentStats = await res.json();
-    renderStats();
+    prefillScores();
     clearStatus();
   } catch (e) {
     showStatus(`Error: ${e.message}`, 'error');
   }
 }
 
-function renderStats() {
-  // Group by player
-  const grouped = {};
-  for (const [key, value] of Object.entries(currentStats)) {
-    const parts = key.split('__');
-    if (parts.length !== 3) continue;
-    const [player, field, date] = parts;
-    if (!grouped[player]) grouped[player] = [];
-    grouped[player].push({ key, player, field, date, value: parseInt(value, 10) });
-  }
-
-  // Sort players by name
-  const players = Object.keys(grouped).sort((a, b) =>
-    (PLAYER_NICKNAMES[a] || a).localeCompare(PLAYER_NICKNAMES[b] || b)
-  );
-
-  const html = players.map(player => {
-    const rows = grouped[player].sort((a, b) => a.date.localeCompare(b.date) || a.field.localeCompare(b.field));
-    const totals = { birdies: 0, beer: 0, balls: 0 };
-    rows.forEach(r => { if (totals[r.field] !== undefined) totals[r.field] += r.value; });
-
-    const rowsHtml = rows.map(r => `
-      <tr>
-        <td class="td-date">${r.date}</td>
-        <td>${FIELD_LABELS[r.field] || r.field}</td>
-        <td>
-          <input class="val-input" type="number" min="0" value="${r.value}"
-            id="input__${r.key}" onkeydown="if(event.key==='Enter')saveRow('${r.key}')">
-        </td>
-        <td>
-          <div class="actions">
-            <button class="save" onclick="saveRow('${r.key}')">Save</button>
-            <button class="danger" onclick="deleteRow('${r.key}')">Delete</button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-
-    return `
-      <div class="player-summary" onclick="togglePlayer('${player}')">
-        <span class="name">${PLAYER_NICKNAMES[player] || player}</span>
-        <span class="totals">
-          <span>🏌️ ${totals.birdies}</span>
-          <span>🍺 ${totals.beer}</span>
-          <span>⚪ ${totals.balls}</span>
-        </span>
-        <span class="chevron" id="chevron__${player}">▶</span>
-      </div>
-      <div class="player-rows" id="rows__${player}">
-        <table>
-          <thead><tr><th>Date</th><th>Type</th><th>Value</th><th>Actions</th></tr></thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>
-      </div>
-    `;
-  }).join('');
-
-  document.getElementById('statsContent').innerHTML = `
-    ${html}
-    <div class="add-section">
-      <h2 style="margin-top:0">Add / Override Stat</h2>
-      <div class="add-form">
-        <div class="field">
-          <label>Player</label>
-          <select id="addPlayer">
-            ${Object.entries(PLAYER_NICKNAMES).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field">
-          <label>Type</label>
-          <select id="addField">
-            <option value="birdies">Birdies</option>
-            <option value="beer">Beers</option>
-            <option value="balls">Balls</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Datum</label>
-          <input type="date" id="addDate" min="2026-05-10" max="2026-05-19"
-            value="${(() => { const t = new Date().toISOString().split('T')[0]; return t >= '2026-05-10' && t <= '2026-05-19' ? t : '2026-05-14'; })()}"
-            style="width:155px">
-        </div>
-        <div class="field">
-          <label>Value</label>
-          <input type="number" id="addValue" value="1" min="0" style="width:80px">
-        </div>
-        <button onclick="addStat()">Add / Set</button>
-      </div>
-    </div>
-  `;
-}
-
-function togglePlayer(player) {
-  const rows = document.getElementById(`rows__${player}`);
-  const chevron = document.getElementById(`chevron__${player}`);
-  rows.classList.toggle('open');
-  chevron.classList.toggle('open');
-  if (chevron.classList.contains('open')) chevron.textContent = '▼';
-  else chevron.textContent = '▶';
-}
-
-async function saveRow(key) {
-  const input = document.getElementById(`input__${key}`);
-  const value = parseInt(input.value, 10);
-  if (isNaN(value) || value < 0) { showStatus('Invalid value', 'error'); return; }
-
-  try {
-    const res = await fetch(`/api/admin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'set', key, value })
-    });
-    if (!res.ok) throw new Error(await res.text());
-    currentStats[key] = value;
-    showStatus(`Saved: ${key} = ${value}`, 'success');
-  } catch (e) {
-    showStatus(`Error: ${e.message}`, 'error');
-  }
-}
-
-async function deleteRow(key) {
-  if (!confirm(`Delete "${key}"?`)) return;
-  try {
-    const res = await fetch(`/api/admin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'delete', key })
-    });
-    if (!res.ok) throw new Error(await res.text());
-    delete currentStats[key];
-    showStatus(`Deleted: ${key}`, 'success');
-    renderStats();
-  } catch (e) {
-    showStatus(`Error: ${e.message}`, 'error');
-  }
-}
-
-async function addStat() {
-  const player = document.getElementById('addPlayer').value;
-  const field = document.getElementById('addField').value;
-  const date = document.getElementById('addDate').value.trim();
-  const value = parseInt(document.getElementById('addValue').value, 10);
-
-  if (!date) { showStatus('Bitte Datum auswählen', 'error'); return; }
-  if (isNaN(value) || value < 0) { showStatus('Invalid value', 'error'); return; }
-
-  const key = `${player}__${field}__${date}`;
-  try {
-    const res = await fetch(`/api/admin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'set', key, value })
-    });
-    if (!res.ok) throw new Error(await res.text());
-    currentStats[key] = value;
-    showStatus(`Set: ${key} = ${value}`, 'success');
-    renderStats();
-  } catch (e) {
-    showStatus(`Error: ${e.message}`, 'error');
-  }
-}
-
-async function checkLockStatus() {
-  try {
-    const res = await fetch('/api/trophy-teams');
-    const data = await res.json();
-    const locked = data['__locked'] === 'true' || data['__locked'] === true;
-    document.getElementById('trophyLockToggle').checked = locked;
-    const stateEl = document.getElementById('toggleState');
-    stateEl.textContent = locked ? '🔒 Gesperrt' : '🔓 Offen';
-    stateEl.classList.toggle('locked', locked);
-  } catch(e) {
-    document.getElementById('toggleState').textContent = 'Fehler';
-  }
-}
-
-async function onLockToggle() {
-  const checkbox = document.getElementById('trophyLockToggle');
-  const shouldLock = checkbox.checked;
-  const stateEl = document.getElementById('toggleState');
-  stateEl.textContent = shouldLock ? '🔒 Gesperrt' : '🔓 Offen';
-  stateEl.classList.toggle('locked', shouldLock);
-  try {
-    const res = await fetch('/api/trophy-teams', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerKey: '__locked', team: shouldLock ? 'true' : '' }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    localStorage.setItem('tt2026__locked', shouldLock ? 'true' : 'false');
-    showStatus(shouldLock ? 'Teams gesperrt' : 'Teams entsperrt', 'success');
-  } catch(e) {
-    showStatus(`Fehler: ${e.message}`, 'error');
-    checkbox.checked = !shouldLock;
-    stateEl.textContent = !shouldLock ? '🔒 Gesperrt' : '🔓 Offen';
-    stateEl.classList.toggle('locked', !shouldLock);
-  }
-}
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -444,8 +518,31 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-loadStats();
-checkLockStatus();
+
+const ADMIN_PW = 'engadin2026';
+
+function checkPw() {
+  const val = document.getElementById('pwInput').value;
+  if (val === ADMIN_PW) {
+    sessionStorage.setItem('eo_admin_auth', '1');
+    document.getElementById('pwGate').classList.add('hidden');
+    document.getElementById('adminContent').style.display = '';
+    loadPlayersFull().then(() => { buildScoreGrid(); loadStats(); });
+  } else {
+    document.getElementById('pwError').textContent = 'Falsches Passwort';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+// Auto-unlock if already authenticated this session
+if (sessionStorage.getItem('eo_admin_auth') === '1') {
+  document.getElementById('pwGate').classList.add('hidden');
+  document.getElementById('adminContent').style.display = '';
+}
+
+// Auth check on load — calls loadStats/checkLockStatus only after login
+if (sessionStorage.getItem('eo_admin_auth') === '1') { loadPlayersFull().then(() => { buildScoreGrid(); loadStats(); }); } else { document.getElementById('pwInput').focus(); }
 </script>
 </body>
 </html>
