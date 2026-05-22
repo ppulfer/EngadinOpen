@@ -2893,6 +2893,7 @@ function lbGetScores() {
     // Totals across all rounds
     let bruttoStrokes = 0, bruttoRounds = 0;
     ROUND_DATES.forEach(d => {
+      if (d === curDate) return;
       const v = CLOUD_STATS[p.key + '__score__' + d];
       if (v !== undefined && v !== null && v !== '') {
         bruttoStrokes += parseInt(v, 10);
