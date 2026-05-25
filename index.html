@@ -2483,9 +2483,6 @@ function initCourses() {
       scoreCardHtml += '<td class="' + cls + '">' + h.par + '</td>';
     });
     scoreCardHtml += '<td><b>' + frontPar + '</b></td></tr>';
-    scoreCardHtml += '<tr><td class="row-label">Meter</td>';
-    front.forEach(h => scoreCardHtml += '<td>' + h.m + '</td>');
-    scoreCardHtml += '<td><b>' + frontM + '</b></td></tr>';
     scoreCardHtml += '<tr><td class="row-label">SI</td>';
     front.forEach(h => scoreCardHtml += '<td>' + h.si + '</td>');
     scoreCardHtml += '<td>—</td></tr>';
@@ -2499,9 +2496,6 @@ function initCourses() {
       scoreCardHtml += '<td class="' + cls + '">' + h.par + '</td>';
     });
     scoreCardHtml += '<td><b>' + backPar + '</b></td></tr>';
-    scoreCardHtml += '<tr><td class="row-label">Meter</td>';
-    back.forEach(h => scoreCardHtml += '<td>' + h.m + '</td>');
-    scoreCardHtml += '<td><b>' + backM + '</b></td></tr>';
     scoreCardHtml += '<tr><td class="row-label">SI</td>';
     back.forEach(h => scoreCardHtml += '<td>' + h.si + '</td>');
     scoreCardHtml += '<td>—</td></tr>';
@@ -3889,6 +3883,7 @@ function renderLegends() {
 }
 
 // === START ===
+try { const _c = localStorage.getItem('eo2026__cloudCache'); if (_c) CLOUD_STATS = JSON.parse(_c); } catch (_) {}
 loadPlayers();
 initTabs();
 initPlayerCards();
