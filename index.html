@@ -2002,7 +2002,35 @@ body.detail-open .notification-center {
   border-color: var(--gold-soft);
   font-weight: 700;
 }
+
+/* Stats Tab */
+.stats-filters { margin-bottom: 20px; }
+.stats-filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
+.stats-filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.stats-filter-btn {
+  background: transparent; color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+  padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.stats-filter-btn:hover { color: var(--gold); border-color: var(--gold); }
+.stats-filter-btn.active { background: rgba(201,162,39,0.15); color: var(--gold); border-color: var(--gold); }
+.stats-table-wrap { overflow-x: auto; margin-bottom: 24px; -webkit-overflow-scrolling: touch; }
+.stats-table { border-collapse: collapse; font-size: 13px; min-width: 100%; }
+.stats-table th {
+  padding: 8px 12px; background: #163258; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 1px; text-align: center; white-space: nowrap;
+}
+.stats-table th:first-child { text-align: left; min-width: 140px; }
+.stats-table td { padding: 7px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; white-space: nowrap; }
+.stats-table td:first-child { text-align: left; color: var(--muted); font-size: 12px; }
+.stats-table tr:hover td { background: rgba(255,255,255,0.02); }
+.stats-table .stat-section td { background: rgba(22,50,88,0.6); color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 5px 12px; }
+.stat-good { color: #4db36a; font-weight: 700; }
+.stat-bad { color: #c5634d; font-weight: 700; }
+.stats-chart-wrap { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.stats-chart-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 12px; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="pull-refresh" id="pullRefresh">
@@ -2038,7 +2066,7 @@ body.detail-open .notification-center {
   <button class="tab" data-tab="players">Spieler</button>
 
   <button class="tab" data-tab="legends">Legenden</button>
-
+  <button class="tab" data-tab="stats">📊 Stats</button>
   <button class="tab" data-tab="contacts">Kontakt</button>
 </nav>
 </div>
@@ -2238,6 +2266,9 @@ body.detail-open .notification-center {
   <div class="legend-hof" id="legendHof"></div>
 </section>
 
+
+<section id="stats"></section>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2291,6 +2322,7 @@ async function loadPlayers() {
       rebuildNicknames();
       renderLeaderboard();
       initPlayerCards();
+      initStats();
     }
   } catch (e) { /* keep defaults */ }
 }
@@ -2991,6 +3023,7 @@ async function loadScorecards() {
     scorecardCache = {};
   }
   renderLeaderboard();
+  renderStats();
 }
 
 function openScorecard(playerKey) {
@@ -3866,11 +3899,284 @@ function renderLegends() {
   }).join('');
 }
 
+// === STATS ===
+let statsRound = 'all';
+let statsPlayer = 'all';
+let _statsCharts = {};
+
+const STATS_COLORS = {
+  hartmann:    '#e8a838',
+  isaak:       '#4eb87a',
+  koelbener:   '#5b9bd5',
+  laenzlinger: '#e06060',
+  mansour:     '#b07dd5',
+  parli:       '#5bbccc',
+};
+
+function calcStats(playerKey, dates) {
+  let strokes = 0, putts = 0, holesPlayed = 0, totalPar = 0;
+  let gir = 0, onePutts = 0, threePutts = 0;
+  let birdieOrBetter = 0, pars = 0, bogeys = 0, doubles = 0;
+  let par3diff = 0, par3n = 0, par4diff = 0, par4n = 0, par5diff = 0, par5n = 0;
+  let front9s = 0, front9p = 0, front9n = 0, back9s = 0, back9p = 0, back9n = 0;
+
+  dates.forEach(date => {
+    const holes = scorecardCache[playerKey + '__' + date] || [];
+    const course = COURSES.find(c => c.id === SCHEDULE[date]?.course);
+    if (!course) return;
+    holes.forEach((h, i) => {
+      if (!h || !h.strokes) return;
+      const par = course.holes[i]?.par || 4;
+      const s = h.strokes;
+      const p = h.putts ?? 0;
+      strokes += s; putts += p; holesPlayed++; totalPar += par;
+      const diff = s - par;
+      if (diff <= -1) birdieOrBetter++;
+      else if (diff === 0) pars++;
+      else if (diff === 1) bogeys++;
+      else doubles++;
+      if (p === 1) onePutts++;
+      if (p >= 3) threePutts++;
+      if (h.putts != null && (s - p) <= (par - 2)) gir++;
+      if (par === 3) { par3diff += diff; par3n++; }
+      else if (par === 4) { par4diff += diff; par4n++; }
+      else { par5diff += diff; par5n++; }
+      if (i < 9) { front9s += s; front9p += par; front9n++; }
+      else { back9s += s; back9p += par; back9n++; }
+    });
+  });
+
+  if (holesPlayed === 0) return null;
+  return {
+    holesPlayed, strokes, scoreToPar: strokes - totalPar,
+    avgPutts: putts / holesPlayed,
+    girPct: Math.round(gir / holesPlayed * 100),
+    onePuttPct: Math.round(onePutts / holesPlayed * 100),
+    threePuttPct: Math.round(threePutts / holesPlayed * 100),
+    birdieOrBetter, pars, bogeys, doubles,
+    par3avg: par3n > 0 ? par3diff / par3n : null,
+    par4avg: par4n > 0 ? par4diff / par4n : null,
+    par5avg: par5n > 0 ? par5diff / par5n : null,
+    front9: front9n > 0 ? front9s - front9p : null,
+    back9: back9n > 0 ? back9s - back9p : null,
+  };
+}
+
+function _sfmt(val, dec = 0) {
+  if (val === null || val === undefined) return '–';
+  const v = dec > 0 ? +val.toFixed(dec) : Math.round(val);
+  return String(v);
+}
+function _sparfmt(val, dec = 1) {
+  if (val === null || val === undefined) return '–';
+  const v = val.toFixed(dec);
+  return val > 0 ? '+' + v : v;
+}
+function _scls(val, lowerBetter = true) {
+  if (val === null || val === undefined) return '';
+  return lowerBetter ? (val < 0 ? 'stat-good' : val > 0 ? 'stat-bad' : '')
+                     : (val > 0 ? 'stat-good' : val < 0 ? 'stat-bad' : '');
+}
+
+function initStats() {
+  const sec = document.getElementById('stats');
+  if (!sec) return;
+  const roundBtns = `<button class="stats-filter-btn active" data-val="all">Alle</button>`
+    + ROUND_LABELS.map((l, i) => `<button class="stats-filter-btn" data-val="${i}">${l.split(' ')[0]}</button>`).join('');
+  const playerBtns = `<button class="stats-filter-btn active" data-val="all">Alle</button>`
+    + PLAYERS.map(p => `<button class="stats-filter-btn" data-val="${p.key}" style="border-left:3px solid ${STATS_COLORS[p.key]||'#888'}">${p.nickname}</button>`).join('');
+
+  sec.innerHTML = `
+    <h2>📊 Statistiken</h2>
+    <div class="stats-filters">
+      <div class="stats-filter-label">Runde</div>
+      <div class="stats-filter-row" id="statsRoundFilter">${roundBtns}</div>
+      <div class="stats-filter-label" style="margin-top:10px;">Spieler</div>
+      <div class="stats-filter-row" id="statsPlayerFilter">${playerBtns}</div>
+    </div>
+    <div id="statsTableWrap"></div>
+    <div id="statsCharts"></div>`;
+
+  document.getElementById('statsRoundFilter').addEventListener('click', e => {
+    const btn = e.target.closest('.stats-filter-btn');
+    if (!btn) return;
+    statsRound = btn.dataset.val;
+    document.querySelectorAll('#statsRoundFilter .stats-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderStats();
+  });
+  document.getElementById('statsPlayerFilter').addEventListener('click', e => {
+    const btn = e.target.closest('.stats-filter-btn');
+    if (!btn) return;
+    statsPlayer = btn.dataset.val;
+    document.querySelectorAll('#statsPlayerFilter .stats-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderStats();
+  });
+  renderStats();
+}
+
+function renderStats() {
+  const tableWrap = document.getElementById('statsTableWrap');
+  if (!tableWrap) return;
+
+  const dates = statsRound === 'all' ? ROUND_DATES : [ROUND_DATES[parseInt(statsRound)]];
+  const players = statsPlayer === 'all' ? PLAYERS : PLAYERS.filter(p => p.key === statsPlayer);
+  const statsMap = {};
+  players.forEach(p => { statsMap[p.key] = calcStats(p.key, dates); });
+
+  const sections = [
+    { title: 'Score', rows: [
+      { label: 'Score vs Par',      key: 'scoreToPar',     fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
+      { label: 'Gesamtschläge',     key: 'strokes',        fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Gespielte Löcher',  key: 'holesPlayed',    fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Front 9 vs Par',    key: 'front9',         fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
+      { label: 'Back 9 vs Par',     key: 'back9',          fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
+    ]},
+    { title: 'Scoring-Verteilung', rows: [
+      { label: 'Birdie o. besser',  key: 'birdieOrBetter', fmt: v => _sfmt(v),       cls: v => _scls(v, false) },
+      { label: 'Pars',              key: 'pars',           fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Bogeys',            key: 'bogeys',         fmt: v => _sfmt(v),       cls: v => _scls(v) },
+      { label: 'Double+',           key: 'doubles',        fmt: v => _sfmt(v),       cls: v => _scls(v) },
+    ]},
+    { title: 'Par-Performance', rows: [
+      { label: 'Par 3 Ø vs Par',    key: 'par3avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
+      { label: 'Par 4 Ø vs Par',    key: 'par4avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
+      { label: 'Par 5 Ø vs Par',    key: 'par5avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
+    ]},
+    { title: 'Putting', rows: [
+      { label: 'Ø Putts / Loch',    key: 'avgPutts',       fmt: v => _sfmt(v, 2),    cls: v => _scls(v) },
+      { label: '1-Putt %',          key: 'onePuttPct',     fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
+      { label: '3-Putt %',          key: 'threePuttPct',   fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
+    ]},
+    { title: 'GIR', rows: [
+      { label: 'GIR %',             key: 'girPct',         fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
+    ]},
+  ];
+
+  let html = '<div class="stats-table-wrap"><table class="stats-table"><thead><tr><th>Statistik</th>';
+  players.forEach(p => {
+    html += `<th style="color:${STATS_COLORS[p.key]||'var(--gold)'}">${p.nickname}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+  sections.forEach(sec => {
+    html += `<tr class="stat-section"><td colspan="${players.length + 1}">${sec.title}</td></tr>`;
+    sec.rows.forEach(row => {
+      html += `<tr><td>${row.label}</td>`;
+      players.forEach(p => {
+        const s = statsMap[p.key];
+        if (!s) { html += '<td>–</td>'; return; }
+        const val = s[row.key];
+        html += `<td class="${row.cls(val)}">${row.fmt(val)}</td>`;
+      });
+      html += '</tr>';
+    });
+  });
+  html += '</tbody></table></div>';
+  tableWrap.innerHTML = html;
+
+  _renderStatsCharts(players, dates, statsMap);
+}
+
+function _destroyChart(id) {
+  if (_statsCharts[id]) { try { _statsCharts[id].destroy(); } catch(_) {} delete _statsCharts[id]; }
+}
+
+function _renderStatsCharts(players, dates, statsMap) {
+  const wrap = document.getElementById('statsCharts');
+  if (!wrap) return;
+
+  const hasMultiRound = statsRound === 'all' && ROUND_DATES.filter(d =>
+    players.some(p => (scorecardCache[p.key + '__' + d] || []).some(h => h?.strokes))
+  ).length > 1;
+
+  let html = '';
+  if (hasMultiRound) html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Score-Verlauf pro Runde</div><canvas id="chartVerlauf" height="160"></canvas></div>`;
+  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Scoring-Verteilung</div><canvas id="chartScoring" height="160"></canvas></div>`;
+  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Par 3 / 4 / 5 Performance (Ø vs Par)</div><canvas id="chartPar" height="160"></canvas></div>`;
+  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">GIR %</div><canvas id="chartGir" height="120"></canvas></div>`;
+  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Ø Putts pro Loch</div><canvas id="chartPutts" height="120"></canvas></div>`;
+  wrap.innerHTML = html;
+
+  Object.keys(_statsCharts).forEach(k => _destroyChart(k));
+
+  const baseOpts = {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#f0ede3', font: { family: 'system-ui', size: 11 } } } },
+    scales: {
+      x: { ticks: { color: '#8fa0b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: '#8fa0b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+    }
+  };
+  const pNames = players.map(p => p.nickname);
+  const pColors = players.map(p => STATS_COLORS[p.key] || '#888');
+
+  if (hasMultiRound) {
+    _statsCharts.verlauf = new Chart(document.getElementById('chartVerlauf'), {
+      type: 'line',
+      data: {
+        labels: ROUND_DATES.map((_, i) => 'R' + (i + 1)),
+        datasets: players.map((p, pi) => ({
+          label: p.nickname,
+          data: ROUND_DATES.map(d => { const s = calcStats(p.key, [d]); return s ? s.scoreToPar : null; }),
+          borderColor: pColors[pi], backgroundColor: pColors[pi] + '33',
+          tension: 0.3, spanGaps: true, pointRadius: 5,
+        }))
+      },
+      options: { ...baseOpts }
+    });
+  }
+
+  _statsCharts.scoring = new Chart(document.getElementById('chartScoring'), {
+    type: 'bar',
+    data: {
+      labels: pNames,
+      datasets: [
+        { label: 'Birdie+', data: players.map(p => statsMap[p.key]?.birdieOrBetter ?? 0), backgroundColor: '#4db36a' },
+        { label: 'Par',     data: players.map(p => statsMap[p.key]?.pars ?? 0),            backgroundColor: '#5b9bd5' },
+        { label: 'Bogey',   data: players.map(p => statsMap[p.key]?.bogeys ?? 0),          backgroundColor: '#e8a838' },
+        { label: 'Double+', data: players.map(p => statsMap[p.key]?.doubles ?? 0),         backgroundColor: '#c5634d' },
+      ]
+    },
+    options: { ...baseOpts, scales: { x: { ...baseOpts.scales.x, stacked: true }, y: { ...baseOpts.scales.y, stacked: true } } }
+  });
+
+  _statsCharts.par = new Chart(document.getElementById('chartPar'), {
+    type: 'bar',
+    data: {
+      labels: ['Par 3', 'Par 4', 'Par 5'],
+      datasets: players.map((p, pi) => ({
+        label: p.nickname,
+        data: [statsMap[p.key]?.par3avg ?? null, statsMap[p.key]?.par4avg ?? null, statsMap[p.key]?.par5avg ?? null],
+        backgroundColor: pColors[pi] + 'bb', borderColor: pColors[pi], borderWidth: 1,
+      }))
+    },
+    options: { ...baseOpts }
+  });
+
+  _statsCharts.gir = new Chart(document.getElementById('chartGir'), {
+    type: 'bar',
+    data: {
+      labels: pNames,
+      datasets: [{ label: 'GIR %', data: players.map(p => statsMap[p.key]?.girPct ?? null), backgroundColor: pColors }]
+    },
+    options: { ...baseOpts, plugins: { legend: { display: false } } }
+  });
+
+  _statsCharts.putts = new Chart(document.getElementById('chartPutts'), {
+    type: 'bar',
+    data: {
+      labels: pNames,
+      datasets: [{ label: 'Ø Putts/Loch', data: players.map(p => statsMap[p.key]?.avgPutts != null ? +statsMap[p.key].avgPutts.toFixed(2) : null), backgroundColor: pColors }]
+    },
+    options: { ...baseOpts, plugins: { legend: { display: false } } }
+  });
+}
+
 // === START ===
 try { const _c = localStorage.getItem('eo2026__cloudCache'); if (_c) CLOUD_STATS = JSON.parse(_c); } catch (_) {}
 loadPlayers();
 initTabs();
 initPlayerCards();
+initStats();
 initCourses();
 renderLegends();
 renderLeaderboard();
