@@ -3807,32 +3807,35 @@ document.getElementById('flightDetailClose').addEventListener('click', closeFlig
 
 // === Legends (Hall of Fame seit 2012) ===
 const LEGENDS = [
-  { year: 2022, location: "Zuoz / Samedan", participants: ["Pulfer","Manu","Parli","T. Hodgskin","Länz","Jens","Köbi","Kohli","Auer","J. Hodgskin"] },
-  { year: 2023, location: "Zuoz / Samedan", participants: ["Pulfer","Manu","Jens","Auer","Parli","Länz","Kohli","Sutter","Köbi"] },
-  { year: 2024, location: "Zuoz / Samedan", participants: ["Pulfer","Länz","Isaak","Manu","T. Hodgskin","Köbi","Jens"] },
-  { year: 2025, location: "Zuoz / Samedan", participants: ["Manu","Länz","Köbi","Isaak","Jens","Pulfer","T. Hodgskin","Parli"] },
+  { year: 2022, location: "Zuoz / Samedan", winner: "Parli",  participants: ["Pulfer","Manu","Parli","T. Hodgskin","Länz","Jens","Köbi","Kohli","Auer","J. Hodgskin"] },
+  { year: 2023, location: "Zuoz / Samedan", winner: "Manu",   participants: ["Pulfer","Manu","Jens","Auer","Parli","Länz","Kohli","Sutter","Köbi"] },
+  { year: 2024, location: "Zuoz / Samedan", winner: "Isaak",  participants: ["Pulfer","Länz","Isaak","Manu","T. Hodgskin","Köbi","Jens"] },
+  { year: 2025, location: "Zuoz / Samedan", winner: "Köbi",   participants: ["Manu","Länz","Köbi","Isaak","Jens","Pulfer","T. Hodgskin","Parli"] },
 ];
 
 function renderLegends() {
   const stats = {};
   LEGENDS.forEach(y => {
     y.participants.forEach(p => {
-      if (!stats[p]) stats[p] = { participations: 0 };
+      if (!stats[p]) stats[p] = { wins: 0, participations: 0 };
       stats[p].participations++;
     });
+    if (y.winner && stats[y.winner]) stats[y.winner].wins++;
   });
   const ranked = Object.entries(stats)
     .map(([name, s]) => ({ name, ...s }))
-    .sort((a, b) => b.participations - a.participations || a.name.localeCompare(b.name));
+    .sort((a, b) => b.wins - a.wins || b.participations - a.participations || a.name.localeCompare(b.name));
 
-  const maxPart = ranked[0].participations;
+  const maxWins = ranked[0].wins;
   const hof = document.getElementById('legendHof');
   hof.innerHTML = ranked.map((r, idx) => {
-    const isTop = r.participations === maxPart;
-    return '<div class="legend-hof-item' + (isTop ? ' top1' : '') + '">'
+    const isTop = r.wins > 0 && r.wins === maxWins;
+    const noWins = r.wins === 0;
+    return '<div class="legend-hof-item' + (isTop ? ' top1' : '') + (noWins ? ' no-wins' : '') + '">'
       + '<span class="legend-hof-rank">#' + (idx + 1) + '</span>'
       + '<span class="legend-hof-name">' + r.name + '</span>'
       + '<span class="legend-hof-part">' + r.participations + '×</span>'
+      + '<span class="legend-hof-wins">' + r.wins + '</span>'
       + '</div>';
   }).join('');
 
@@ -3840,14 +3843,15 @@ function renderLegends() {
   const sorted = LEGENDS.slice().sort((a, b) => b.year - a.year);
   chronik.innerHTML = sorted.map(y => {
     const playersHtml = y.participants.map(p =>
-      '<span class="legend-player">' + p + '</span>'
+      '<span class="legend-player' + (p === y.winner ? ' captain' : '') + '">' + (p === y.winner ? '🏆 ' : '') + p + '</span>'
     ).join('');
     return '<div class="legend-year">'
       + '<div class="legend-year-head">'
       +   '<span class="legend-year-num">' + y.year + '</span>'
       +   '<span class="legend-year-loc">📍 ' + y.location + '</span>'
       + '</div>'
-      + '<div class="legend-side winner">'
+      + (y.winner ? '<div class="legend-side winner"><div class="legend-side-label">🏆 Sieger: ' + y.winner + '</div></div>' : '')
+      + '<div class="legend-side">'
       +   '<div class="legend-side-label">Teilnehmer</div>'
       +   '<div class="legend-players">' + playersHtml + '</div>'
       + '</div>'
