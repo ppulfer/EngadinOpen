@@ -2983,6 +2983,7 @@ async function loadScorecards() {
   } catch (e) {
     scorecardCache = {};
   }
+  renderLeaderboard();
 }
 
 function openScorecard(playerKey) {
