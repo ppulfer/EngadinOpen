@@ -1,0 +1,9 @@
+{
+  "years": [
+    { "year": 2024, "label": "Engadin Open 2024", "status": "past" },
+    { "year": 2025, "label": "Engadin Open 2025", "status": "past" },
+    { "year": 2026, "label": "Engadin Open 2026", "status": "current" },
+    { "year": 2027, "label": "Engadin Open 2027", "status": "future" }
+  ],
+  "defaultYear": 2026
+}

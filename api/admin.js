@@ -6,9 +6,18 @@ const kv = createClient({
 
 export const config = { runtime: 'edge' };
 
+const DEFAULT_YEAR = 2026;
+
+function statsKeyFor(url) {
+  const year = parseInt(new URL(url).searchParams.get('year') || '', 10) || DEFAULT_YEAR;
+  return `${year}_trip_stats`;
+}
+
 export default async function handler(request) {
+  const hkey = statsKeyFor(request.url);
+
   if (request.method === 'GET') {
-    const data = (await kv.hgetall('trip_stats')) || {};
+    const data = (await kv.hgetall(hkey)) || {};
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
@@ -23,7 +32,7 @@ export default async function handler(request) {
       if (isNaN(val) || val < 0) {
         return new Response(JSON.stringify({ error: 'Invalid value' }), { status: 400 });
       }
-      await kv.hset('trip_stats', { [key]: val });
+      await kv.hset(hkey, { [key]: val });
       return new Response(JSON.stringify({ ok: true, key, value: val }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -31,7 +40,7 @@ export default async function handler(request) {
     }
 
     if (action === 'delete') {
-      await kv.hdel('trip_stats', key);
+      await kv.hdel(hkey, key);
       return new Response(JSON.stringify({ ok: true }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -45,7 +54,7 @@ export default async function handler(request) {
       }
       const today = new Date().toISOString().split('T')[0];
       const newKey = `${key}__${today}`;
-      await kv.hset('trip_stats', { [newKey]: val });
+      await kv.hset(hkey, { [newKey]: val });
       return new Response(JSON.stringify({ ok: true, key: newKey, value: val }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

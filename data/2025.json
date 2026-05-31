@@ -1,0 +1,99 @@
+{
+  "year": 2025,
+  "label": "Engadin Open 2025",
+  "status": "past",
+  "roundPar": 72,
+  "roundDates": ["2025-07-17", "2025-07-18", "2025-07-19", "2025-07-20"],
+  "roundLabels": ["R1", "R2", "R3", "R4"],
+  "schedule": {
+    "2025-07-17": { "course": "zuoz", "format": "Strokeplay" },
+    "2025-07-18": { "course": "samedan", "format": "Strokeplay" },
+    "2025-07-19": { "course": "samedan", "format": "Strokeplay" },
+    "2025-07-20": { "course": "zuoz", "format": "Strokeplay Finals 🏆" }
+  },
+  "winner": "Köbi",
+  "players": [
+    { "key": "hartmann",    "name": "Manuel Hartmann",    "hcp": 0, "nickname": "Manu",  "feature": "Hole in One Genius" },
+    { "key": "laenzlinger", "name": "Fabian Länzlinger",  "hcp": 0, "nickname": "Länz",  "feature": "Weit, aber out" },
+    { "key": "koelbener",   "name": "Roman Kölbener",     "hcp": 0, "nickname": "Köbi",  "feature": "Schlägt weiter als er puttet" },
+    { "key": "isaak",       "name": "Michael Isaak",      "hcp": 0, "nickname": "Isaak", "feature": "Birdie oder Bogey" },
+    { "key": "mansour",     "name": "Jens-Malek Mansour", "hcp": 0, "nickname": "Jens",  "feature": "Mehr Birdies auf dem Hemd" },
+    { "key": "pulfer",      "name": "Patrick Pulfer",     "hcp": 0, "nickname": "Pulfer","feature": "OK und Organisator" },
+    { "key": "hodgskin",    "name": "Thomas Hodgskin",    "hcp": 0, "nickname": "Thöme", "feature": "Britischer Import" },
+    { "key": "parli",       "name": "Linard Parli",       "hcp": 0, "nickname": "Parli", "feature": "Hat für alle einen Rat" }
+  ],
+  "statsColors": {
+    "hartmann":    "#e8a838",
+    "laenzlinger": "#e06060",
+    "koelbener":   "#5b9bd5",
+    "isaak":       "#4eb87a",
+    "mansour":     "#b07dd5",
+    "pulfer":      "#cc8855",
+    "hodgskin":    "#5bbccc",
+    "parli":       "#7ab07a"
+  },
+  "courses": [
+    {
+      "id": "zuoz",
+      "name": "Golf Club Zuoz-Madulain",
+      "architect": "Les Furber (2003)",
+      "year": 1904,
+      "par": 72,
+      "length": 5514,
+      "description": "Idyllischer 18-Loch-Platz (2×9) im Oberengadin zwischen Zuoz und Madulain. Auf 1.730 m ü.M. mit traumhafter Bergkulisse und charakteristischen Inn-seitigen Löchern.",
+      "tip": "Hochgebirgslage — Ball fliegt weiter als gewohnt. Fairways schmal, Rough anspruchsvoll. Inn im Spiel auf mehreren Löchern.",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Golf+Club+Zuoz+Madulain",
+      "holes": [
+        { "hole":  1, "par": 4, "length": 329, "si": 16 },
+        { "hole":  2, "par": 5, "length": 411, "si": 18 },
+        { "hole":  3, "par": 4, "length": 302, "si":  2 },
+        { "hole":  4, "par": 3, "length": 144, "si":  6 },
+        { "hole":  5, "par": 4, "length": 313, "si": 14 },
+        { "hole":  6, "par": 4, "length": 314, "si":  8 },
+        { "hole":  7, "par": 5, "length": 491, "si": 12 },
+        { "hole":  8, "par": 3, "length": 170, "si":  4 },
+        { "hole":  9, "par": 4, "length": 257, "si": 10 },
+        { "hole": 10, "par": 4, "length": 284, "si": 17 },
+        { "hole": 11, "par": 4, "length": 278, "si": 11 },
+        { "hole": 12, "par": 4, "length": 320, "si": 15 },
+        { "hole": 13, "par": 5, "length": 433, "si": 13 },
+        { "hole": 14, "par": 3, "length": 139, "si":  9 },
+        { "hole": 15, "par": 4, "length": 367, "si":  3 },
+        { "hole": 16, "par": 3, "length": 176, "si":  5 },
+        { "hole": 17, "par": 5, "length": 449, "si":  1 },
+        { "hole": 18, "par": 4, "length": 337, "si":  7 }
+      ]
+    },
+    {
+      "id": "samedan",
+      "name": "Golf Club Engadin (Samedan)",
+      "architect": "J.P. Gannon (1923)",
+      "year": 1893,
+      "par": 72,
+      "length": 4936,
+      "description": "Einer der ältesten Golfclubs Europas, gegründet 1893. Auf 1.822 m ü.M. — der höchstgelegene Golfplatz der Schweiz. Weite, offene Fairways mit Blick auf Piz Bernina und Piz Corvatsch.",
+      "tip": "Dünne Höhenluft: +10–15% Flugweite einkalkulieren. Morgens oft ruhig, nachmittags Bergwinde. Greens schnell und fest.",
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Golf+Club+Engadin+Samedan",
+      "holes": [
+        { "hole":  1, "par": 4, "length": 289, "si":  4 },
+        { "hole":  2, "par": 5, "length": 356, "si":  2 },
+        { "hole":  3, "par": 5, "length": 402, "si": 10 },
+        { "hole":  4, "par": 4, "length": 254, "si": 18 },
+        { "hole":  5, "par": 4, "length": 282, "si":  8 },
+        { "hole":  6, "par": 4, "length": 294, "si": 12 },
+        { "hole":  7, "par": 3, "length": 135, "si": 14 },
+        { "hole":  8, "par": 4, "length": 306, "si":  6 },
+        { "hole":  9, "par": 4, "length": 273, "si": 16 },
+        { "hole": 10, "par": 3, "length": 154, "si": 11 },
+        { "hole": 11, "par": 4, "length": 275, "si":  7 },
+        { "hole": 12, "par": 4, "length": 325, "si":  1 },
+        { "hole": 13, "par": 5, "length": 381, "si":  9 },
+        { "hole": 14, "par": 4, "length": 307, "si":  3 },
+        { "hole": 15, "par": 3, "length": 101, "si": 17 },
+        { "hole": 16, "par": 4, "length": 288, "si":  5 },
+        { "hole": 17, "par": 3, "length": 113, "si": 15 },
+        { "hole": 18, "par": 5, "length": 401, "si": 13 }
+      ]
+    }
+  ]
+}

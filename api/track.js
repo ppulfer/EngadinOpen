@@ -1,11 +1,13 @@
-import { kv } from '@vercel/kv';
+import { createClient } from '@vercel/kv';
+const kv = createClient({
+  url: process.env.KV_OPEN_KV_REST_API_URL,
+  token: process.env.KV_OPEN_KV_REST_API_TOKEN,
+});
 
 export const config = { runtime: 'edge' };
 
 const VALID_PLAYERS = [
-  'parli','schrafl','hodgskin','pulfer','fzimmermann','teulings',
-  'ruetimann','wieser','laenzlinger','hunter','graf','debrunner',
-  'szimmermann','heule','wyser'
+  'laenzlinger','parli','mansour','koelbener','hartmann','isaak'
 ];
 const VALID_FIELDS = ['beer', 'schirmli', 'balls', 'birdies'];
 

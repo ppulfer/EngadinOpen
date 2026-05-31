@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b1f3a">
-<link rel="icon" type="image/png" href="/icon-192.png">
-<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="icon" type="image/png" href="/open_logo.png">
+<link rel="apple-touch-icon" href="/open_logo.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Engadin Open">
 <title>Engadin Open 2026</title>
@@ -283,6 +284,20 @@ a { color: var(--gold); text-decoration: none; }
 .sched-item.past .sched-title { color: var(--muted); }
 .sched-title { font-weight: 700; margin: 4px 0 2px; font-size: 15px; }
 .sched-meta { color: var(--muted); font-size: 13px; }
+.sched-flights { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.sched-flight {
+  background: rgba(0,0,0,0.18);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.sched-flight-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.sched-flight-label { color: var(--gold); }
+.sched-flight-tee { color: var(--muted); }
+.sched-flight-players { font-size: 13px; color: #f0ede3; }
 
 .check-item {
   display: flex; align-items: center; gap: 10px;
@@ -657,11 +672,35 @@ audio::-webkit-media-controls-panel {
 }
 .lb-head, .lb-row {
   display: grid;
-  grid-template-columns: 20px 1fr 46px 46px 30px 46px;
-  padding: 7px 12px;
+  grid-template-columns: 20px 1fr 38px 32px 32px 32px 32px 36px;
+  padding: 7px 8px;
   align-items: center;
   gap: 2px;
 }
+.lb-rec-dot {
+  display: inline-block; width: 7px; height: 7px;
+  border-radius: 50%; background: #e0444a;
+  margin-right: 4px; vertical-align: middle;
+  box-shadow: 0 0 6px rgba(224,68,74,0.6);
+  animation: lb-rec-blink 1.4s infinite;
+}
+@keyframes lb-rec-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.35; }
+}
+.lb-live { font-weight: 700; font-size: 12px; }
+.lb-rcell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.05;
+  font-size: 12px;
+  font-weight: 600;
+}
+.lb-r-vp { font-size: 12px; font-weight: 700; line-height: 1; }
+.lb-r-netto { font-size: 9px; font-weight: 600; font-style: italic; opacity: 0.85; line-height: 1; margin-top: 1px; }
+.lb-r-thru { color: var(--muted); font-size: 9px; font-weight: 600; line-height: 1; margin-top: 1px; }
 .lb-head {
   background: var(--bg-soft);
   border-bottom: 1px solid var(--border);
@@ -785,11 +824,40 @@ audio::-webkit-media-controls-panel {
 .sc-stat-item { flex: 1; text-align: center; }
 .sc-stat-num { font-size: 20px; font-weight: 700; }
 .sc-stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.sc-table { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.sc-view-toggle {
+  display: flex; gap: 6px; padding: 8px 16px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.sc-view-btn {
+  flex: 1; background: transparent; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 6px 10px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.sc-view-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+.sc-table { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; }
+
+/* Traditional scorecard table view */
+.sc-card-table { padding: 12px; }
+.sc-card-9 { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 12px; }
+.sc-card-9 th, .sc-card-9 td {
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 6px 4px; text-align: center; white-space: nowrap;
+}
+.sc-card-9 th {
+  background: #163258; color: var(--gold);
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 700;
+}
+.sc-card-9 th.sc-card-label, .sc-card-9 td.sc-card-label {
+  text-align: left; background: rgba(0,0,0,0.25); color: var(--muted);
+  font-weight: 700; min-width: 60px;
+}
+.sc-card-9 td.sc-card-total { background: rgba(201,162,39,0.12); color: var(--gold); font-weight: 700; }
+.sc-card-9 td .sc-score-pill { width: 22px; height: 22px; font-size: 12px; }
 .sc-table-head, .sc-hole-row {
   display: grid;
-  grid-template-columns: 28px 28px 1fr 36px 40px 32px;
-  padding: 7px 12px;
+  grid-template-columns: 28px 28px 1fr 44px 40px 32px;
+  padding: 7px 10px;
   align-items: center;
   gap: 4px;
 }
@@ -814,25 +882,48 @@ audio::-webkit-media-controls-panel {
 .sc-hole-row:active { background: rgba(255,255,255,0.04); }
 .sc-hole-row:last-child { border-bottom: none; }
 .sc-h-num, .sc-h-par { font-size: 11px; color: var(--muted); text-align: center; }
-.sc-h-strokes { text-align: center; }
-.sc-h-putts { font-size: 12px; color: var(--muted); text-align: center; }
+.sc-h-score { text-align: center; }
+.sc-h-putts-inline { font-size: 12px; color: var(--muted); margin-left: 2px; }
+.sc-h-lost { text-align: center; font-size: 12px; color: var(--muted); }
 .sc-h-vp { text-align: center; font-size: 12px; font-weight: 600; }
 .sc-h-gir { text-align: center; font-size: 12px; }
 .sc-score-pill {
-  display: inline-block;
-  min-width: 28px;
-  padding: 3px 6px;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 26px; height: 26px;
   font-size: 13px;
   font-weight: 700;
   text-align: center;
-  border: 1px solid transparent;
+  box-sizing: border-box;
+  position: relative;
 }
-.sc-eagle { background: rgba(26,122,58,0.3); border-color: #1a7a3a; color: #4db36a; }
-.sc-birdie { color: #4db36a; }
 .sc-par-score { color: var(--gold); }
-.sc-bogey { color: #d46a5a; }
-.sc-double { background: rgba(212,106,90,0.2); border-color: #d46a5a; color: #d46a5a; }
+/* Birdie: single circle */
+.sc-birdie {
+  color: #4db36a;
+  border: 2px solid #4db36a;
+  border-radius: 50%;
+}
+/* Eagle/Albatross: double circle */
+.sc-eagle {
+  color: #4db36a;
+  border: 2px solid #4db36a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px #4db36a;
+}
+/* Bogey: single square */
+.sc-bogey {
+  color: #d46a5a;
+  border: 2px solid #d46a5a;
+  border-radius: 3px;
+}
+/* Double+ : double square */
+.sc-double {
+  color: #d46a5a;
+  border: 2px solid #d46a5a;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px #d46a5a;
+}
 .sc-empty { color: var(--muted); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 3px 8px; font-size: 12px; display: inline-block; min-width: 28px; text-align: center; }
 .sc-hole-sheet {
   position: fixed;
@@ -857,17 +948,17 @@ audio::-webkit-media-controls-panel {
   font-weight: 700;
   font-size: 16px;
 }
-.sc-hole-sheet-body { display: flex; gap: 20px; margin-bottom: 16px; }
-.sc-stepper-wrap { flex: 1; text-align: center; }
-.sc-stepper-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-.sc-stepper { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.sc-hole-sheet-body { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+.sc-stepper-wrap { display: flex; align-items: center; justify-content: space-between; background: var(--bg-soft); border-radius: 14px; padding: 12px 16px; }
+.sc-stepper-label { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: 0; min-width: 80px; }
+.sc-stepper { display: flex; align-items: center; gap: 20px; }
 .sc-stepper-btn {
-  width: 44px; height: 44px;
+  width: 52px; height: 52px;
   border-radius: 50%;
-  background: var(--bg-soft);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   touch-action: manipulation;
@@ -875,7 +966,8 @@ audio::-webkit-media-controls-panel {
   font-family: inherit;
   line-height: 1;
 }
-.sc-stepper-val { font-size: 28px; font-weight: 700; min-width: 40px; text-align: center; }
+.sc-stepper-btn:active { background: var(--gold); color: var(--bg); }
+.sc-stepper-val { font-size: 32px; font-weight: 700; min-width: 48px; text-align: center; color: var(--gold); }
 .sc-hole-sheet-result {
   text-align: center;
   font-size: 14px;
@@ -2028,7 +2120,202 @@ body.detail-open .notification-center {
 .stat-good { color: #4db36a; font-weight: 700; }
 .stat-bad { color: #c5634d; font-weight: 700; }
 .stats-chart-wrap { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
-.stats-chart-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 12px; }
+.stats-chart-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+.stats-chart-desc { font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.4; }
+
+/* Settings tab */
+.settings-input {
+  background: #0b1f3a; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.3); border-radius: 8px;
+  padding: 10px 12px; font-size: 15px; font-family: inherit; width: 100%;
+  -webkit-appearance: none; appearance: none;
+}
+.settings-input:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
+select.settings-input {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23c9a227' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 10px;
+  padding-right: 36px;
+  cursor: pointer;
+}
+select.settings-input option { background: #0b1f3a; color: #f0ede3; }
+
+/* Player edit cards */
+.set-player-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,162,39,0.15);
+  border-radius: 10px; padding: 14px;
+  margin-bottom: 12px;
+}
+.set-player-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; gap: 8px;
+}
+.set-player-key {
+  font-family: monospace; font-size: 11px; color: var(--muted);
+  background: rgba(0,0,0,0.2); padding: 3px 8px; border-radius: 4px;
+}
+.set-player-actions { display: flex; gap: 6px; }
+.set-field { display: block; margin-bottom: 10px; }
+.set-field:last-child { margin-bottom: 0; }
+.set-field label {
+  display: block; font-size: 11px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600;
+  margin-bottom: 4px;
+}
+.set-field-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.set-field-row .set-field { margin-bottom: 0; }
+
+/* FAQ */
+.faq-col {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  align-items: start;
+  font-size: 13px;
+}
+.faq-col:last-child { border-bottom: none; }
+.faq-h { font-weight: 700; color: var(--gold); font-size: 12px; letter-spacing: 0.3px; }
+.faq-sym {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 13px;
+}
+.faq-sym:last-child { border-bottom: none; }
+
+/* Sub-tabs in Einstellungen */
+.sub-tabs {
+  display: flex; gap: 4px;
+  border-bottom: 1px solid rgba(212,177,74,0.2);
+  margin: 4px 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sub-tabs::-webkit-scrollbar { display: none; }
+.sub-tab {
+  background: transparent; color: var(--muted);
+  border: none; border-bottom: 2px solid transparent;
+  padding: 10px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+  border-radius: 0;
+}
+.sub-tab:hover { color: var(--gold); }
+.sub-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.sub-panel { display: none; }
+.sub-panel.active { display: block; }
+
+/* Flight allocator */
+.flight-block {
+  background: rgba(0,0,0,0.18);
+  border-radius: 8px; padding: 10px;
+  margin-top: 10px;
+}
+.flight-block-head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; flex-wrap: wrap;
+}
+.flight-block-label { font-size: 12px; font-weight: 700; color: var(--gold); }
+.flight-block-tee {
+  background: #0b1f3a; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.25); border-radius: 5px;
+  padding: 4px 8px; font-size: 13px; width: 80px;
+  font-family: inherit; text-align: center;
+}
+.flight-block-del {
+  background: transparent; color: #c5634d; border: none;
+  font-size: 16px; cursor: pointer; padding: 2px 6px;
+  margin-left: auto;
+}
+.flight-players { display: flex; gap: 6px; flex-wrap: wrap; }
+.flight-chip {
+  background: rgba(201,162,39,0.15); color: var(--gold);
+  border: 1px solid rgba(201,162,39,0.3);
+  border-radius: 14px; padding: 4px 10px;
+  font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.flight-chip-x {
+  background: transparent; color: var(--gold); border: none;
+  cursor: pointer; padding: 0; font-size: 14px; line-height: 1;
+}
+.flight-pool-pick {
+  background: rgba(255,255,255,0.05); color: var(--muted);
+  border: 1px dashed rgba(255,255,255,0.15);
+  border-radius: 14px; padding: 4px 10px;
+  font-size: 12px; cursor: pointer;
+  font-family: inherit;
+}
+.flight-pool-pick:hover { color: var(--gold); border-color: var(--gold); }
+.flight-add-btn {
+  background: transparent; color: var(--gold);
+  border: 1px dashed rgba(201,162,39,0.4);
+  padding: 6px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; margin-top: 8px;
+}
+.flight-add-btn:hover { background: rgba(201,162,39,0.08); }
+
+/* Holes editor */
+.set-holes-details { margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
+.set-holes-details summary {
+  cursor: pointer; color: var(--gold); font-weight: 600; font-size: 13px;
+  padding: 4px 0; user-select: none;
+}
+.set-holes-details summary:focus { outline: none; }
+.set-holes-table {
+  width: 100%; border-collapse: collapse; margin-top: 10px;
+  font-size: 13px; table-layout: fixed;
+}
+.set-holes-table th {
+  background: #163258; color: var(--gold);
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 6px 4px; font-weight: 700;
+}
+.set-holes-table td {
+  padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  text-align: center;
+}
+.set-holes-table tr:last-child td { border-bottom: none; }
+.set-hole-num { font-weight: 700; color: var(--muted); font-size: 12px; }
+.set-hole-input {
+  width: 100%;
+  background: #0b1f3a; color: #f0ede3;
+  border: 1px solid rgba(201,162,39,0.25); border-radius: 5px;
+  padding: 6px 2px; font-size: 13px; text-align: center;
+  font-family: inherit; -webkit-appearance: none; appearance: none;
+}
+.set-hole-input:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
+
+/* Schedule + Course cards (share player-card layout) */
+.set-sched-row, .set-course-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,162,39,0.15);
+  border-radius: 10px; padding: 14px;
+  margin-bottom: 12px;
+}
+.set-sched-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.set-sched-label {
+  font-weight: 700; color: var(--gold); font-size: 14px;
+}
+.set-sched-date { color: var(--muted); font-size: 12px; }
+
+/* Action buttons */
+.btn-danger { background: transparent; color: #c5634d; border: 1px solid #c5634d; padding: 8px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; }
+.btn-danger:active, .btn-danger:hover { background: rgba(197,99,77,0.15); }
+.btn-save  { background: #4ea36b; color: #fff; padding: 8px 14px; font-size: 13px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; }
+.btn-save:active, .btn-save:hover { background: #5cb87a; }
+
+@media (max-width: 480px) {
+  .set-player-head { flex-wrap: wrap; }
+  .set-player-actions { width: 100%; justify-content: flex-end; }
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
@@ -2046,13 +2333,7 @@ body.detail-open .notification-center {
   <div class="sub">THE OPEN · ENGADIN EDITION</div>
   <div class="sub" style="margin-top:4px;">16.07. – 19.07.2026</div>
   <div class="hero-leaderboard">
-    <div class="lb-head">
-      <span>#</span><span>Spieler</span>
-      <span style="text-align:right">Brutto</span>
-      <span style="text-align:right">Netto</span>
-      <span style="text-align:center">Thru</span>
-      <span style="text-align:right">Runde</span>
-    </div>
+    <div class="lb-head" id="lbHead"></div>
     <div id="lbRows"></div>
   </div>
 </div>
@@ -2060,68 +2341,25 @@ body.detail-open .notification-center {
 <div class="tabs-wrap">
 <nav class="tabs">
   <button class="tab active" data-tab="info">Info</button>
-  <button class="tab" data-tab="schedule">Programm</button>
   <button class="tab" data-tab="weather">Wetter</button>
   <button class="tab" data-tab="courses">Plätze</button>
   <button class="tab" data-tab="players">Spieler</button>
-
   <button class="tab" data-tab="legends">Legenden</button>
-  <button class="tab" data-tab="stats">📊 Stats</button>
-  <button class="tab" data-tab="contacts">Kontakt</button>
+  <button class="tab" data-tab="stats">Stats</button>
+  <button class="tab" data-tab="faq">FAQ</button>
+  <button class="tab" data-tab="settings">Einstellungen</button>
 </nav>
 </div>
+<div id="yearBanner" style="display:none;background:rgba(91,155,213,0.12);color:#5b9bd5;text-align:center;padding:8px 12px;font-size:12px;font-weight:600;letter-spacing:0.5px;border-bottom:1px solid rgba(91,155,213,0.3);"></div>
 
 <div class="container">
 
 <section id="info" class="active">
   <h2>Trip-Eckdaten</h2>
-  <div class="card">
-    <div class="row"><span class="lbl">Turnier</span><span class="val">Engadin Open 2026</span></div>
-    <div class="row"><span class="lbl">Turnierdaten</span><span class="val">16.– 19.07.2026</span></div>
-    <div class="row"><span class="lbl">Parallel</span><span class="val">The Open Championship 2026</span></div>
-    <div class="row"><span class="lbl">OK</span><span class="val">Linard Parli</span></div>
-    <div class="row"><span class="lbl">Teilnehmer</span><span class="val">6</span></div>
-  </div>
+  <div class="card" id="infoEckdaten">⏳ Lade Event-Daten…</div>
 
-  <h3>💸 Trip-Kasse</h3>
-  <div class="card">
-    <p style="font-size:14px; margin:0 0 12px;">Spesen, Greenfees, Getränke — alles über die gemeinsame Splitwise-Gruppe.</p>
-    <p class="small" style="margin:0;">Link wird vom OK vor dem Turnier geteilt.</p>
-  </div>
-
-  <div class="warn">
-    ⛳ <b>The Open 2026</b> — Royal Troon · 16.–19. Juli 2026 · Wir spielen parallel!
-  </div>
-  <div style="text-align:center; margin-top: 24px;">
-    <a href="/admin.html" style="color: rgba(212,177,74,0.4); font-size: 22px; text-decoration: none; display: inline-block; padding: 12px;">⚙️</a>
-  </div>
-</section>
-
-<section id="schedule">
-  <h2>Programm</h2>
-  <div class="sched-item">
-    <div class="sched-date">DO · 16.07.2026 · 🏌️ Runde 1</div>
-    <div class="sched-title">⛳ Golf Club Zuoz-Madulain · Strokeplay</div>
-    <div class="sched-meta">6 Spieler · Tee-Time TBD</div>
-  </div>
-  <div class="sched-item">
-    <div class="sched-date">FR · 17.07.2026 · 🏌️ Runde 2</div>
-    <div class="sched-title">⛳ Golf Club Engadin Samedan · Strokeplay</div>
-    <div class="sched-meta">6 Spieler · Tee-Time TBD</div>
-  </div>
-  <div class="sched-item">
-    <div class="sched-date">SA · 18.07.2026 · 🏌️ Runde 3</div>
-    <div class="sched-title">⛳ Golf Club Engadin Samedan · Strokeplay</div>
-    <div class="sched-meta">6 Spieler · Tee-Time TBD</div>
-  </div>
-  <div class="sched-item" style="border-left-color: var(--gold-soft); background: linear-gradient(90deg, rgba(201,162,39,0.1) 0%, var(--bg-card) 100%);">
-    <div class="sched-date">SO · 19.07.2026 🏆 FINALE</div>
-    <div class="sched-title">⛳ Golf Club Zuoz-Madulain · Strokeplay Finals</div>
-    <div class="sched-meta">6 Spieler · Tee-Time TBD</div>
-  </div>
-  <div class="warn">
-    Tägliche Paarungs-Auslosung beim Abendessen · <b>Promille-Untergrenze 0.7</b> 🍻
-  </div>
+  <h3>🏌️ Programm</h3>
+  <div id="scheduleList"><div class="card">⏳ Lade Programm…</div></div>
 </section>
 
 <section id="weather">
@@ -2143,18 +2381,6 @@ body.detail-open .notification-center {
   <h2>Teilnehmerfeld</h2>
   <p class="small">6 Spieler · Inaugural Edition 2026</p>
   <div class="player-grid" id="playerGrid"></div>
-</section>
-
-<section id="flights">
-  <h2>Flight-Einteilung</h2>
-  <label>Tag wählen</label>
-  <select id="flightDaySelect">
-    <option value="2026-07-16">Do 16.07. &middot; Zuoz &middot; Strokeplay</option>
-    <option value="2026-07-17">Fr 17.07. &middot; Samedan &middot; Strokeplay</option>
-    <option value="2026-07-18">Sa 18.07. &middot; Samedan &middot; Strokeplay</option>
-    <option value="2026-07-19">So 19.07. &middot; Zuoz &middot; Finals &#x1F3C6;</option>
-  </select>
-  <div id="flightTabContent" style="margin-top:14px;"></div>
 </section>
 
 <section id="results">
@@ -2179,6 +2405,10 @@ body.detail-open .notification-center {
   <div class="sc-round-tabs" id="scRoundTabs"></div>
   <div class="sc-info-bar" id="scInfoBar"></div>
   <div class="sc-stat-bar" id="scStatBar"></div>
+  <div class="sc-view-toggle">
+    <button class="sc-view-btn active" data-view="list" onclick="scSetView('list')">📋 Liste</button>
+    <button class="sc-view-btn"        data-view="card" onclick="scSetView('card')">🪪 Scorecard</button>
+  </div>
   <div class="sc-table" id="scTable"></div>
 </div>
 
@@ -2207,9 +2437,17 @@ body.detail-open .notification-center {
           <button class="sc-stepper-btn" onclick="sheetAdj('putts',1)">+</button>
         </div>
       </div>
+      <div class="sc-stepper-wrap">
+        <div class="sc-stepper-label">💧 Verlorene Bälle</div>
+        <div class="sc-stepper">
+          <button class="sc-stepper-btn" onclick="sheetAdj('lost',-1)">−</button>
+          <span id="sheetLost" class="sc-stepper-val">–</span>
+          <button class="sc-stepper-btn" onclick="sheetAdj('lost',1)">+</button>
+        </div>
+      </div>
     </div>
     <div id="sheetResult" class="sc-hole-sheet-result"></div>
-    <button class="btn" style="width:100%;margin-top:12px;" onclick="saveHoleSheet()">✓ Speichern</button>
+    <button id="sheetSaveBtn" class="btn" style="width:100%;margin-top:12px;" onclick="saveHoleSheet()">✓ Speichern</button>
   </div>
 </div>
 
@@ -2230,23 +2468,124 @@ body.detail-open .notification-center {
   <div class="quick-form" id="flightDetailQuick" style="display:none;"></div>
 </div>
 
-<section id="contacts">
-  <h2>Kontakte</h2>
-  <h3>OK & Organisation</h3>
+<section id="faq">
+  <h2>FAQ</h2>
+  <p class="small" style="color:var(--muted);margin-bottom:14px;">So liest du das Leaderboard.</p>
+
+  <h3>Spalten der Übersicht</h3>
   <div class="card">
-    <div class="row"><span class="lbl">Linard Parli</span><span class="val">Kontaktdaten folgen</span></div>
+    <div class="faq-col"><span class="faq-h">#</span><div>Aktuelle Platzierung. Bei gleichem Netto-Score erhalten Spieler dieselbe Position.</div></div>
+    <div class="faq-col"><span class="faq-h">Spieler</span><div>Spitzname des Teilnehmers.</div></div>
+    <div class="faq-col"><span class="faq-h">Netto</span><div>Summe vs Par minus HCP über alle <b>fertig gespielten</b> Runden (alle 18 Löcher eingegeben). Eine laufende Runde fliesst <i>nicht</i> ins Netto ein.</div></div>
+    <div class="faq-col"><span class="faq-h">R1 – R4</span><div>Ergebnis pro Runde. Drei mögliche Darstellungen:
+      <ul style="margin:6px 0 0 18px;padding:0">
+        <li><b>–</b> Runde noch nicht begonnen</li>
+        <li><b>+3</b> Runde fertig: vs Par für 18 Löcher</li>
+        <li><b>+1 / -1 / L7</b> Runde läuft: vs Par oben, Live-Netto (HCP-pro-Loch) klein in der Mitte, "L7" = aktuell auf Loch 7</li>
+      </ul>
+    </div></div>
+    <div class="faq-col"><span class="faq-h"><span class="lb-rec-dot"></span>Live</span><div>Erscheint nur während einer laufenden Runde. Zeigt die <b>projizierte Live-Position</b> wenn man das aktuelle Loch-Netto in die Gesamtwertung einrechnen würde. Farbcode: <span style="color:#4db36a">grün</span> = würde aufrücken, <span style="color:#d46a5a">rot</span> = würde verlieren, <span style="color:var(--gold)">gold</span> = gleiche Position.</div></div>
   </div>
-  <h3>Notfall</h3>
+
+  <h3>Score-Symbole</h3>
   <div class="card">
-    <div class="row"><span class="lbl">Notruf CH</span><span class="val"><a href="tel:112">112</a></span></div>
-    <div class="row"><span class="lbl">Rega</span><span class="val"><a href="tel:1414">1414</a></span></div>
+    <div class="faq-sym">
+      <span class="sc-score-pill sc-eagle">3</span>
+      <div><b>Eagle / Albatross</b> — 2+ unter Par. Doppelter grüner Kreis.</div>
+    </div>
+    <div class="faq-sym">
+      <span class="sc-score-pill sc-birdie">3</span>
+      <div><b>Birdie</b> — 1 unter Par. Grüner Kreis.</div>
+    </div>
+    <div class="faq-sym">
+      <span class="sc-score-pill sc-par-score">4</span>
+      <div><b>Par</b> — gleich Par. Goldene Zahl, keine Umrandung.</div>
+    </div>
+    <div class="faq-sym">
+      <span class="sc-score-pill sc-bogey">5</span>
+      <div><b>Bogey</b> — 1 über Par. Rotes Quadrat.</div>
+    </div>
+    <div class="faq-sym">
+      <span class="sc-score-pill sc-double">6</span>
+      <div><b>Double Bogey+</b> — 2+ über Par. Doppeltes rotes Quadrat.</div>
+    </div>
   </div>
-  <h3>Praktisches</h3>
+
+  <h3>Wie wird Netto berechnet?</h3>
   <div class="card">
-    <div class="row"><span class="lbl">Währung</span><span class="val">EUR (€)</span></div>
-    <div class="row"><span class="lbl">Zeitzone</span><span class="val">UTC+1 (-1h zur CH)</span></div>
-    <div class="row"><span class="lbl">Stromstecker</span><span class="val">Typ F (CH-Adapter!)</span></div>
-    <div class="row"><span class="lbl">Trinkgeld</span><span class="val">~10% Restaurant</span></div>
+    <p style="margin:0 0 8px">Pro Spieler werden auf Basis des HCP <b>Stroke-Index-Schläge</b> verteilt:</p>
+    <ul style="margin:0 0 8px 18px;padding:0">
+      <li>HCP 1–18: Ein Schlag auf jenen Löchern, deren SI ≤ HCP ist (also den "schwierigsten" Löchern).</li>
+      <li>HCP > 18: Zusätzlich ein zweiter Schlag auf den schwersten Löchern.</li>
+      <li>Netto eines Lochs = Schläge − erhaltene HCP-Schläge auf diesem Loch.</li>
+    </ul>
+    <p class="small" style="color:var(--muted);margin:0">Während der Runde wird das Netto laufend mit den schon gespielten Löchern aktualisiert — immer ganze Zahlen, keine Dezimalstellen.</p>
+  </div>
+
+  <h3>Bedienung</h3>
+  <div class="card">
+    <div class="faq-col"><span class="faq-h">📋 Zeile tippen</span><div>Öffnet die detaillierte Scorecard mit Schlägen, Putts und verlorenen Bällen pro Loch.</div></div>
+    <div class="faq-col"><span class="faq-h">🪪 Scorecard-Ansicht</span><div>In der Detail-Ansicht zwischen "Liste" und "Scorecard" wechseln — letzteres zeigt das klassische 9+9-Layout mit OUT/IN-Summen.</div></div>
+    <div class="faq-col"><span class="faq-h">🗑 Loch löschen</span><div>Im Loch-Eingabe-Sheet die Schläge auf 0 reduzieren → Speichern-Button wechselt zu "Löschen".</div></div>
+    <div class="faq-col"><span class="faq-h">↻ Pull-to-Refresh</span><div>Auf der Übersicht von oben nach unten ziehen, um alle Daten neu zu laden.</div></div>
+  </div>
+
+  <h3>Jahrgang wechseln</h3>
+  <div class="card">
+    <p style="margin:0">In <b>Einstellungen → Jahrgang</b> kannst du zwischen Engadin Open 2024, 2025, 2026 (aktuell) und 2027 wechseln. Spieler, Plätze, Spielplan und Scorecard-Daten werden jeweils für das gewählte Jahr geladen.</p>
+  </div>
+</section>
+
+<section id="settings">
+  <h2>Einstellungen</h2>
+
+  <h3>Jahrgang</h3>
+  <div class="card">
+    <div class="row" style="flex-direction:column;align-items:flex-start;gap:6px;">
+      <span class="lbl">Anzeige-Jahr</span>
+      <div id="yearPicker" style="display:flex;gap:6px;flex-wrap:wrap;width:100%;"></div>
+    </div>
+    <p class="small" style="margin-top:10px;color:var(--muted);">Wechselt zwischen vergangenen Engadin Opens, dem aktuellen Event und kommenden Jahrgängen. Alle Daten und Einstellungen unten gelten für das ausgewählte Jahr.</p>
+  </div>
+
+  <div class="sub-tabs">
+    <button class="sub-tab active" data-subtab="spielplan">🏌️ Spielplan</button>
+    <button class="sub-tab" data-subtab="plaetze">⛳ Plätze</button>
+    <button class="sub-tab" data-subtab="spieler">👥 Spieler</button>
+  </div>
+
+  <div class="sub-panel active" id="sub-spielplan">
+    <div class="card">
+      <p class="small" style="margin:0 0 10px;color:var(--muted);">Pro Runde: Platz, Tee-Time und Flight-Einteilung. Format ist immer Strokeplay.</p>
+      <div id="settingsSchedule"></div>
+      <button class="btn" style="width:100%;margin-top:10px;" onclick="saveSettingsSchedule()">💾 Spielplan speichern</button>
+      <div id="settingsScheduleStatus" class="small" style="margin-top:8px;min-height:18px;"></div>
+    </div>
+  </div>
+
+  <div class="sub-panel" id="sub-plaetze">
+    <div class="card">
+      <p class="small" style="margin:0 0 10px;color:var(--muted);">Pro Platz Name, Par, Beschreibung und Loch-Details anpassen.</p>
+      <div id="settingsCourses"></div>
+      <div id="settingsCoursesStatus" class="small" style="margin-top:8px;min-height:18px;"></div>
+    </div>
+  </div>
+
+  <div class="sub-panel" id="sub-spieler">
+    <div class="card">
+      <div id="settingsPlayersList"></div>
+      <details style="margin-top:14px;">
+        <summary style="cursor:pointer;color:var(--gold);font-weight:600;">➕ Spieler hinzufügen</summary>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+          <input id="newPlKey"  placeholder="key (mueller)"     class="settings-input">
+          <input id="newPlName" placeholder="Vollständiger Name" class="settings-input">
+          <input id="newPlNick" placeholder="Spitzname"          class="settings-input">
+          <input id="newPlHcp"  type="number" step="0.1" placeholder="HCP" class="settings-input">
+        </div>
+        <button class="btn" style="width:100%;margin-top:8px;" onclick="settingsAddPlayer()">Hinzufügen</button>
+      </details>
+      <div id="settingsPlayersStatus" class="small" style="margin-top:8px;min-height:18px;"></div>
+    </div>
   </div>
 </section>
 
@@ -2274,8 +2613,7 @@ body.detail-open .notification-center {
 <div class="toast" id="toast"></div>
 
 <footer>
-  Engadin Open 2026 · The Open Edition<br>
-  Daten lokal · funktioniert offline · Version 2.0
+  Engadin Open 2026 · The Open Edition
 </footer>
 
 <script>
@@ -2286,16 +2624,72 @@ const PHOTOS = {
   laenzlinger: '/photos/laenzlinger.jpg',
   mansour:     '/photos/mansour.jpg',
   parli:       '/photos/parli.jpg',
+  hodgskin:    '/photos/hodgskin.jpg',
+  pulfer:      '/photos/pulfer.jpg',
 };
 
-let PLAYERS = [
-  { key: 'laenzlinger', name: 'Fabian Länzlinger', hcp: 0, nickname: 'Länz',  feature: 'Weit, aber out' },
-  { key: 'parli',       name: 'Linard Parli',       hcp: 0, nickname: 'Parli', feature: 'Hat für alle einen Rat' },
-  { key: 'mansour',     name: 'Jens-Malek Mansour', hcp: 0, nickname: 'Jens',  feature: 'Mehr Birdies auf dem Hemd' },
-  { key: 'koelbener',   name: 'Roman Kölbener',     hcp: 0, nickname: 'Köbi',  feature: 'Schlägt weiter als er puttet' },
-  { key: 'hartmann',    name: 'Manuel Hartmann',    hcp: 0, nickname: 'Manu',  feature: 'Hole in One Genius' },
-  { key: 'isaak',       name: 'Michael Isaak',      hcp: 0, nickname: 'Isaak', feature: 'Birdie oder Bogey' },
-];
+// === YEAR-DYNAMIC EVENT DATA ===
+// Loaded from /data/<year>.json on init / year switch.
+// Years available in /data/manifest.json.
+const APP_STATE = {
+  year: parseInt(localStorage.getItem('eo__year') || '', 10) || null,
+  manifest: null,
+  event: null,
+};
+
+let PLAYERS = [];
+let COURSES = [];
+let SCHEDULE = {};
+let ROUND_DATES = [];
+let ROUND_LABELS = [];
+let ROUND_PAR = 72;
+let STATS_COLORS = {};
+
+async function loadManifest() {
+  try {
+    const res = await fetch('/data/manifest.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('manifest HTTP ' + res.status);
+    APP_STATE.manifest = await res.json();
+  } catch (e) {
+    APP_STATE.manifest = { years: [{ year: 2026, label: 'Engadin Open 2026', status: 'current' }], defaultYear: 2026 };
+  }
+  const years = APP_STATE.manifest.years.map(y => y.year);
+  if (!APP_STATE.year || !years.includes(APP_STATE.year)) {
+    APP_STATE.year = APP_STATE.manifest.defaultYear || years[years.length - 1];
+  }
+}
+
+async function loadEventData(year) {
+  const res = await fetch('/data/' + year + '.json', { cache: 'no-store' });
+  if (!res.ok) throw new Error('event data ' + year + ' HTTP ' + res.status);
+  const data = await res.json();
+  // Overlay KV-stored overrides (schedule + courses) on top of static JSON defaults.
+  let overrides = {};
+  try {
+    const oRes = await fetch('/api/event-overrides?year=' + year, { cache: 'no-store' });
+    if (oRes.ok) overrides = await oRes.json();
+  } catch (_) {}
+  APP_STATE.event = data;
+  APP_STATE.year = data.year;
+  PLAYERS       = data.players || [];
+  COURSES       = (overrides.courses && Array.isArray(overrides.courses)) ? overrides.courses : (data.courses || []);
+  SCHEDULE      = (overrides.schedule && typeof overrides.schedule === 'object') ? overrides.schedule : (data.schedule || {});
+  ROUND_DATES   = data.roundDates || [];
+  ROUND_LABELS  = data.roundLabels || [];
+  ROUND_PAR     = data.roundPar || 72;
+  STATS_COLORS  = data.statsColors || {};
+  rebuildNicknames();
+}
+
+function isCurrentYear() {
+  const ev = APP_STATE.event;
+  return ev && (ev.status === 'current' || ev.year === APP_STATE.manifest?.defaultYear);
+}
+
+function apiUrl(path) {
+  const sep = path.includes('?') ? '&' : '?';
+  return path + sep + 'year=' + APP_STATE.year;
+}
 
 let PLAYER_NICKNAMES = {};
 function rebuildNicknames() {
@@ -2306,15 +2700,15 @@ rebuildNicknames();
 
 async function loadPlayers() {
   try {
-    const res = await fetch('/api/players', { cache: 'no-store' });
+    const res = await fetch(apiUrl('/api/players'), { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     let data = await res.json();
     if (data.length === 0) {
-      await Promise.all(PLAYERS.map(p => fetch('/api/players', {
+      await Promise.all(PLAYERS.map(p => fetch(apiUrl('/api/players'), {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'set', key: p.key, name: p.name, hcp: p.hcp, nickname: p.nickname, feature: p.feature }),
       })));
-      const res2 = await fetch('/api/players', { cache: 'no-store' });
+      const res2 = await fetch(apiUrl('/api/players'), { cache: 'no-store' });
       data = await res2.json();
     }
     if (Array.isArray(data) && data.length > 0) {
@@ -2323,82 +2717,13 @@ async function loadPlayers() {
       renderLeaderboard();
       initPlayerCards();
       initStats();
+      renderSettingsPlayers();
     }
   } catch (e) { /* keep defaults */ }
 }
 
-// === BIRDIEBOOK DATA (wird ergänzt wenn Plätze feststehen) ===
-const COURSES = [
-  {
-    id: 'zuoz',
-    name: 'Golf Club Zuoz-Madulain',
-    architect: 'Les Furber (2003)',
-    year: 1904,
-    par: 72,
-    length: 5514,
-    description: 'Idyllischer 18-Loch-Platz (2×9) im Oberengadin zwischen Zuoz und Madulain. Auf 1.730 m ü.M. mit traumhafter Bergkulisse und charakteristischen Inn-seitigen Löchern.',
-    tip: 'Hochgebirgslage — Ball fliegt weiter als gewohnt. Fairways schmal, Rough anspruchsvoll. Inn im Spiel auf mehreren Löchern.',
-    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Golf+Club+Zuoz+Madulain',
-    holes: [
-      { hole:  1, par: 4, length: 329, si: 16 },
-      { hole:  2, par: 5, length: 411, si: 18 },
-      { hole:  3, par: 4, length: 302, si:  2 },
-      { hole:  4, par: 3, length: 144, si:  6 },
-      { hole:  5, par: 4, length: 313, si: 14 },
-      { hole:  6, par: 4, length: 314, si:  8 },
-      { hole:  7, par: 5, length: 491, si: 12 },
-      { hole:  8, par: 3, length: 170, si:  4 },
-      { hole:  9, par: 4, length: 257, si: 10 },
-      { hole: 10, par: 4, length: 284, si: 17 },
-      { hole: 11, par: 4, length: 278, si: 11 },
-      { hole: 12, par: 4, length: 320, si: 15 },
-      { hole: 13, par: 5, length: 433, si: 13 },
-      { hole: 14, par: 3, length: 139, si:  9 },
-      { hole: 15, par: 4, length: 367, si:  3 },
-      { hole: 16, par: 3, length: 176, si:  5 },
-      { hole: 17, par: 5, length: 449, si:  1 },
-      { hole: 18, par: 4, length: 337, si:  7 }
-    ],
-  },
-  {
-    id: 'samedan',
-    name: 'Golf Club Engadin (Samedan)',
-    architect: 'J.P. Gannon (1923)',
-    year: 1893,
-    par: 72,
-    length: 4936,
-    description: 'Einer der ältesten Golfclubs Europas, gegründet 1893. Auf 1.822 m ü.M. — der höchstgelegene Golfplatz der Schweiz. Weite, offene Fairways mit Blick auf Piz Bernina und Piz Corvatsch.',
-    tip: 'Dünne Höhenluft: +10–15% Flugweite einkalkulieren. Morgens oft ruhig, nachmittags Bergwinde. Greens schnell und fest.',
-    mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Golf+Club+Engadin+Samedan',
-    holes: [
-      { hole:  1, par: 4, length: 289, si:  4 },
-      { hole:  2, par: 5, length: 356, si:  2 },
-      { hole:  3, par: 5, length: 402, si: 10 },
-      { hole:  4, par: 4, length: 254, si: 18 },
-      { hole:  5, par: 4, length: 282, si:  8 },
-      { hole:  6, par: 4, length: 294, si: 12 },
-      { hole:  7, par: 3, length: 135, si: 14 },
-      { hole:  8, par: 4, length: 306, si:  6 },
-      { hole:  9, par: 4, length: 273, si: 16 },
-      { hole: 10, par: 3, length: 154, si: 11 },
-      { hole: 11, par: 4, length: 275, si:  7 },
-      { hole: 12, par: 4, length: 325, si:  1 },
-      { hole: 13, par: 5, length: 381, si:  9 },
-      { hole: 14, par: 4, length: 307, si:  3 },
-      { hole: 15, par: 3, length: 101, si: 17 },
-      { hole: 16, par: 4, length: 288, si:  5 },
-      { hole: 17, par: 3, length: 113, si: 15 },
-      { hole: 18, par: 5, length: 401, si: 13 }
-    ],
-  },
-];
+// COURSES and SCHEDULE are loaded from /data/<year>.json — see loadEventData() above.
 
-const SCHEDULE = {
-  '2026-07-16': { course: 'zuoz',    format: 'Strokeplay' },
-  '2026-07-17': { course: 'samedan', format: 'Strokeplay' },
-  '2026-07-18': { course: 'samedan', format: 'Strokeplay' },
-  '2026-07-19': { course: 'zuoz',    format: 'Strokeplay Finals 🏆' },
-};
 // === BAG / CLUB DATA ===
 const ALL_CLUBS = [
   { id: 'driver', cat: 'Hölzer', icon: '🪵', type: 'Driver',    loft: '10.5°', carry: 210, total: 230 },
@@ -2567,6 +2892,7 @@ function initCourses() {
 
 function initPacklist() {
   const wrap = document.getElementById('packlist');
+  if (!wrap) return;
   wrap.innerHTML = '';
   Object.keys(PACK).forEach(cat => {
     const items = PACK[cat];
@@ -2594,6 +2920,7 @@ function initPacklist() {
 
 function initBingo() {
   const grid = document.getElementById('bingoGrid');
+  if (!grid) return;
   grid.innerHTML = '';
   BINGO_FEATURES.forEach((f, idx) => {
     const cell = document.createElement('div');
@@ -2665,6 +2992,7 @@ function toggleClub(clubId) {
 }
 
 function renderBag() {
+  if (!document.getElementById('bagCount')) return;
   const bag = getBag();
   const inBag = ALL_CLUBS.filter(c => bag.indexOf(c.id) >= 0);
   const distClubs = inBag
@@ -2826,21 +3154,21 @@ let TOTAL_CACHE = {};
 
 async function fetchCloudStats() {
   try {
-    const res = await fetch('/api/stats', { cache: 'no-store' });
+    const res = await fetch(apiUrl('/api/stats'), { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     CLOUD_STATS = data || {};
     TOTAL_CACHE = {};
     migrateOldFormat();
     CLOUD_AVAILABLE = true;
-    // Backup im localStorage
-    localStorage.setItem('eo2026__cloudCache', JSON.stringify(CLOUD_STATS));
-    localStorage.setItem('eo2026__cloudCacheTime', Date.now().toString());
+    // Backup im localStorage (year-scoped)
+    localStorage.setItem('eo2026__cloudCache__' + APP_STATE.year, JSON.stringify(CLOUD_STATS));
+    localStorage.setItem('eo2026__cloudCacheTime__' + APP_STATE.year, Date.now().toString());
     return true;
   } catch (e) {
     CLOUD_AVAILABLE = false;
     // Fallback aus Cache
-    const cached = localStorage.getItem('eo2026__cloudCache');
+    const cached = localStorage.getItem('eo2026__cloudCache__' + APP_STATE.year);
     if (cached) {
       try { CLOUD_STATS = JSON.parse(cached); } catch (_) {}
     }
@@ -2900,9 +3228,7 @@ function getBestDay(playerKey, field) {
 }
 
 // === LEADERBOARD ===
-const ROUND_DATES = ['2026-07-16','2026-07-17','2026-07-18','2026-07-19'];
-const ROUND_LABELS = ['R1','R2','R3','R4'];
-const ROUND_PAR = 72;
+// ROUND_DATES, ROUND_LABELS, ROUND_PAR are loaded from /data/<year>.json — see loadEventData().
 
 function vpLabel(vp) {
   if (vp === null) return '–';
@@ -2921,34 +3247,46 @@ function lbGetScores() {
   const curCourse = COURSES.find(c => c.id === curSched.course);
 
   return PLAYERS.map(p => {
-    // Totals across all rounds
-    let bruttoStrokes = 0, bruttoRounds = 0;
-    ROUND_DATES.forEach(d => {
-      if (d === curDate) return;
-      const v = CLOUD_STATS[p.key + '__score__' + d];
-      if (v !== undefined && v !== null && v !== '') {
-        bruttoStrokes += parseInt(v, 10);
-        bruttoRounds++;
-      }
-    });
-    const bruttoVsPar = bruttoRounds > 0 ? bruttoStrokes - bruttoRounds * ROUND_PAR : null;
     const hcp = p.hcp || 0;
-    const nettoVsPar = bruttoVsPar !== null ? bruttoVsPar - hcp : null;
-
-    // Current round from scorecard
-    const holeData = scorecardCache[p.key + '__' + curDate] || [];
-    let thruCount = 0, curRunningPar = 0, curStrokes = 0;
-    holeData.forEach((h, i) => {
-      if (h?.strokes) {
-        thruCount++;
-        curStrokes += h.strokes;
-        curRunningPar += curCourse?.holes[i]?.par || 4;
-      }
+    const hcpBase = Math.floor(hcp / 18);
+    const hcpExtra = hcp % 18;
+    // Per-round breakdown: { strokes, scoredHoles, parPlayed, vsPar, hcpReceived }
+    const rounds = ROUND_DATES.map(d => {
+      const course = COURSES.find(c => c.id === SCHEDULE[d]?.course);
+      const holes = scorecardCache[p.key + '__' + d] || [];
+      let scoredHoles = 0, strokes = 0, parPlayed = 0, hcpReceived = 0;
+      holes.forEach((h, i) => {
+        if (h?.strokes) {
+          scoredHoles++;
+          strokes += h.strokes;
+          parPlayed += course?.holes[i]?.par || 4;
+          const si = course?.holes[i]?.si || 18;
+          hcpReceived += hcpBase + (si <= hcpExtra ? 1 : 0);
+        }
+      });
+      const vsPar = scoredHoles > 0 ? strokes - parPlayed : null;
+      const vsHcp = vsPar !== null ? vsPar - hcpReceived : null;
+      return { date: d, strokes, scoredHoles, parPlayed, vsPar, hcpReceived, vsHcp };
     });
-    const thru = thruCount === 0 ? null : thruCount === 18 ? 'F' : thruCount;
-    const curVsPar = thruCount > 0 ? curStrokes - curRunningPar : null;
 
-    return { p, bruttoVsPar, nettoVsPar, bruttoStrokes, bruttoRounds, thru, curVsPar };
+    // Current round info kept for live sort + display.
+    const curRound = rounds[curIdx] || { scoredHoles: 0, vsPar: null };
+    const curFinished = curRound.scoredHoles === 18;
+    const thru = curRound.scoredHoles === 0 ? null : curFinished ? 'F' : curRound.scoredHoles;
+    const curVsPar = curRound.vsPar;
+
+    // Totals: only include rounds where all 18 holes are scored (not partial rounds).
+    let bruttoStrokes = 0, bruttoRounds = 0, bruttoPar = 0;
+    rounds.forEach(r => {
+      if (r.scoredHoles !== 18) return;
+      bruttoStrokes += r.strokes;
+      bruttoPar += r.parPlayed;
+      bruttoRounds++;
+    });
+    const bruttoVsPar = bruttoRounds > 0 ? bruttoStrokes - bruttoPar : null;
+    const nettoVsPar = bruttoVsPar !== null ? bruttoVsPar - hcp * bruttoRounds : null;
+
+    return { p, bruttoVsPar, nettoVsPar, bruttoStrokes, bruttoRounds, thru, curVsPar, rounds };
   });
 }
 
@@ -2956,41 +3294,120 @@ function renderLeaderboard() {
   const container = document.getElementById('lbRows');
   if (!container) return;
 
+  const curIdx = getCurrentRoundIdx();
   const rows = lbGetScores();
+  // Sort only by completed-round Netto; partial current round is shown but doesn't change ranking.
+  function _liveSortKey(r) {
+    return r.nettoVsPar;
+  }
   rows.sort((a, b) => {
-    const an = a.nettoVsPar, bn = b.nettoVsPar;
-    if (an === null && bn === null) return 0;
-    if (an === null) return 1;
-    if (bn === null) return -1;
-    if (an !== bn) return an - bn;
+    const ak = a.nettoVsPar, bk = b.nettoVsPar;
+    if (ak === null && bk === null) return 0;
+    if (ak === null) return 1;
+    if (bk === null) return -1;
+    if (ak !== bk) return ak - bk;
     return (a.bruttoVsPar || 0) - (b.bruttoVsPar || 0);
   });
 
-  let posCounter = 0, prevNetto = null;
+  // Show Live column only when at least one player has a started-but-not-finished round.
+  const anyLive = rows.some(r =>
+    r.rounds.some(rd => rd.scoredHoles > 0 && rd.scoredHoles < 18)
+  );
+
+  // Dynamic header: # | Spieler | Netto | R1 | … | Rn [ | Live ]
+  const head = document.getElementById('lbHead');
+  if (head) {
+    head.innerHTML =
+      '<span>#</span><span>Spieler</span>'
+      + '<span style="text-align:right">Netto</span>'
+      + ROUND_LABELS.map(l => `<span style="text-align:center">${l}</span>`).join('')
+      + (anyLive ? '<span style="text-align:center" title="Live-Ranking inkl. HCP-pro-Loch aus laufender Runde"><span class="lb-rec-dot"></span>Live</span>' : '');
+  }
+
+  // Live rank: project each player's netto using SI-based HCP allotment for partial rounds.
+  const liveProjections = rows.map(r => {
+    const base = r.nettoVsPar;
+    const curRound = r.rounds[curIdx];
+    const partial = (r.thru !== null && r.thru !== 'F' && curRound?.vsHcp !== null && curRound?.vsHcp !== undefined)
+      ? curRound.vsHcp
+      : null;
+    if (base === null && partial === null) return { key: r.p.key, score: null };
+    return { key: r.p.key, score: (base || 0) + (partial || 0) };
+  });
+  const liveOrder = liveProjections.slice()
+    .sort((a, b) => {
+      if (a.score === null && b.score === null) return 0;
+      if (a.score === null) return 1;
+      if (b.score === null) return -1;
+      return a.score - b.score;
+    });
+  const liveRanks = {};
+  liveOrder.forEach((p, i) => { liveRanks[p.key] = p.score === null ? null : i + 1; });
+
+  let posCounter = 0, prevKey = null;
   container.innerHTML = rows.map((row, idx) => {
-    const hasData = row.bruttoRounds > 0;
-    if (hasData && row.nettoVsPar !== prevNetto) { posCounter = idx + 1; prevNetto = row.nettoVsPar; }
+    const live = _liveSortKey(row);
+    const hasData = live !== null;
+    if (hasData && live !== prevKey) { posCounter = idx + 1; prevKey = live; }
     const pos = hasData ? posCounter : '–';
     const name = PLAYER_NICKNAMES[row.p.key] || row.p.name;
 
-    const bLabel = vpLabel(row.bruttoVsPar);
-    const bCls = vpCls(row.bruttoVsPar);
     const nLabel = vpLabel(row.nettoVsPar);
     const nCls = vpCls(row.nettoVsPar);
-    const thruStr = row.thru === null ? '–' : row.thru;
-    const rLabel = vpLabel(row.curVsPar);
-    const rCls = vpCls(row.curVsPar);
+
+    const roundCells = ROUND_DATES.map((d, ri) => {
+      const r = row.rounds[ri] || {};
+      if (r.scoredHoles === 18) {
+        return `<span class="lb-cell lb-rcell ${vpCls(r.vsPar)}">${vpLabel(r.vsPar)}</span>`;
+      }
+      if (r.scoredHoles > 0) {
+        const vpStr = r.vsPar !== null ? vpLabel(r.vsPar) : '–';
+        const cls = r.vsPar !== null ? vpCls(r.vsPar) : 'lb-dash';
+        const nettoStr = r.vsHcp !== null ? vpLabel(r.vsHcp) : '–';
+        const nettoCls = r.vsHcp === null ? 'lb-dash' : vpCls(r.vsHcp);
+        return `<span class="lb-cell lb-rcell ${cls}">
+          <span class="lb-r-vp">${vpStr}</span>
+          <span class="lb-r-netto ${nettoCls}" title="Live Netto (Stroke-Index)">${nettoStr}</span>
+          <span class="lb-r-thru">L${r.scoredHoles}</span>
+        </span>`;
+      }
+      return '<span class="lb-cell lb-rcell lb-dash">–</span>';
+    }).join('');
+
+    // Live-Ranking: current live position (with HCP-pro-Loch from partial round folded in)
+    const staticRank = hasData ? posCounter : null;
+    const liveRank = liveRanks[row.p.key];
+    let liveCell = '<span class="lb-cell lb-dash" style="text-align:center">–</span>';
+    if (liveRank !== null) {
+      let cls = 'lb-even';
+      if (staticRank !== null) {
+        if (liveRank < staticRank) cls = 'lb-under';
+        else if (liveRank > staticRank) cls = 'lb-over';
+      }
+      liveCell = `<span class="lb-cell lb-live ${cls}" style="text-align:center">#${liveRank}</span>`;
+    }
 
     const leader = idx === 0 && hasData ? ' lb-leader' : '';
     return `<div class="lb-row${leader}" onclick="openScorecard('${row.p.key}')">
       <span class="lb-pos">${pos}</span>
       <span class="lb-name">${name}</span>
-      <span class="lb-cell ${bCls}" style="text-align:right">${bLabel}</span>
       <span class="lb-cell ${nCls}" style="text-align:right;font-weight:700">${nLabel}</span>
-      <span class="lb-cell lb-dash" style="text-align:center;font-size:11px">${thruStr}</span>
-      <span class="lb-cell ${rCls}" style="text-align:right">${rLabel}</span>
+      ${roundCells}
+      ${anyLive ? liveCell : ''}
     </div>`;
   }).join('');
+  _applyLbGridColumns(anyLive);
+}
+
+function _applyLbGridColumns(includeLive) {
+  const n = ROUND_DATES.length;
+  // 20px pos · 1fr name · netto · per round [ · live ]
+  const nettoW = includeLive ? '38px' : '42px';
+  const roundW = includeLive ? '32px' : '36px';
+  const cols = `20px 1fr ${nettoW} ${Array(n).fill(roundW).join(' ')}` + (includeLive ? ' 36px' : '');
+  document.querySelectorAll('.hero-leaderboard .lb-head, .hero-leaderboard .lb-row').forEach(el => {
+    el.style.gridTemplateColumns = cols;
+  });
 }
 
 function getCurrentRoundIdx() {
@@ -3011,12 +3428,20 @@ let scorecardCache = {};
 let scPlayerKey = null;
 let scRoundIdx = 0;
 let scHoleIdx = null;
+let scView = 'list';
+
+function scSetView(v) {
+  scView = v;
+  document.querySelectorAll('.sc-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  renderScorecardOverlay();
+}
 let _sheetStrokes = 0;
 let _sheetPutts = 0;
+let _sheetLost = 0;
 
 async function loadScorecards() {
   try {
-    const res = await fetch('/api/scores', { cache: 'no-store' });
+    const res = await fetch(apiUrl('/api/scores'), { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     scorecardCache = await res.json();
   } catch (e) {
@@ -3026,16 +3451,66 @@ async function loadScorecards() {
   renderStats();
 }
 
-function openScorecard(playerKey) {
+let _bodyScrollLockCount = 0;
+function lockBodyScroll() {
+  if (_bodyScrollLockCount === 0) {
+    const y = window.scrollY;
+    document.body.dataset.scrollLockY = String(y);
+    document.body.style.position = 'fixed';
+    document.body.style.top = -y + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+  _bodyScrollLockCount++;
+}
+function unlockBodyScroll() {
+  _bodyScrollLockCount = Math.max(0, _bodyScrollLockCount - 1);
+  if (_bodyScrollLockCount === 0) {
+    const y = parseInt(document.body.dataset.scrollLockY || '0', 10);
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    delete document.body.dataset.scrollLockY;
+    window.scrollTo(0, y);
+  }
+}
+
+function getDefaultRoundIdxForPlayer(playerKey) {
+  const today = new Date().toISOString().split('T')[0];
+
+  for (let i = 0; i < ROUND_DATES.length; i++) {
+    const holes = scorecardCache[playerKey + '__' + ROUND_DATES[i]] || [];
+    const scored = holes.filter(h => h?.strokes).length;
+    if (scored > 0 && scored < 18) return i;
+  }
+
+  const todayIdx = ROUND_DATES.indexOf(today);
+  if (todayIdx !== -1) return todayIdx;
+
+  let lastPastIdx = -1;
+  for (let i = 0; i < ROUND_DATES.length; i++) {
+    if (ROUND_DATES[i] <= today) lastPastIdx = i;
+  }
+  if (lastPastIdx !== -1) return lastPastIdx;
+
+  return 0;
+}
+
+function openScorecard(playerKey, roundIdx) {
   scPlayerKey = playerKey;
-  scRoundIdx = 0;
+  scRoundIdx = Number.isInteger(roundIdx) ? roundIdx : getDefaultRoundIdxForPlayer(playerKey);
   document.getElementById('scOverlay').style.display = 'flex';
+  lockBodyScroll();
   renderScorecardOverlay();
 }
 
 function closeScorecard() {
   document.getElementById('scOverlay').style.display = 'none';
   scPlayerKey = null;
+  unlockBodyScroll();
 }
 
 function scSetRound(idx) {
@@ -3066,7 +3541,7 @@ function renderScorecardOverlay() {
   const cacheKey = scPlayerKey + '__' + date;
   const holes = scorecardCache[cacheKey] || [];
 
-  let totalStrokes = 0, totalPutts = 0, playedCount = 0, runningPar = 0;
+  let totalStrokes = 0, totalPutts = 0, totalLost = 0, playedCount = 0, runningPar = 0;
   holes.forEach((h, i) => {
     if (h?.strokes) {
       totalStrokes += h.strokes;
@@ -3074,6 +3549,7 @@ function renderScorecardOverlay() {
       runningPar += course?.holes[i]?.par || 4;
     }
     if (h?.putts) totalPutts += h.putts;
+    if (h?.lostBalls) totalLost += h.lostBalls;
   });
 
   const vsPar = playedCount > 0 ? totalStrokes - runningPar : null;
@@ -3081,10 +3557,28 @@ function renderScorecardOverlay() {
   const vpLabel = vsPar === null ? '–' : (vsPar === 0 ? 'E' : sign + vsPar);
   const vpCls = vsPar === null ? '' : (vsPar < 0 ? 'lb-under' : vsPar > 0 ? 'lb-over' : 'lb-even');
 
+  // Live Netto: vs Par minus HCP strokes allocated by Stroke-Index on holes already played.
+  // Integer-only; for HCP > 18, players get an extra stroke on the hardest holes.
+  const hcp = player.hcp || 0;
+  const hcpBase = Math.floor(hcp / 18);
+  const hcpExtra = hcp % 18;
+  let hcpReceived = 0;
+  holes.forEach((h, i) => {
+    if (!h?.strokes) return;
+    const si = course?.holes[i]?.si || 18;
+    hcpReceived += hcpBase + (si <= hcpExtra ? 1 : 0);
+  });
+  const vsHcp = vsPar !== null ? vsPar - hcpReceived : null;
+  const hSign = vsHcp !== null && vsHcp > 0 ? '+' : '';
+  const hLabel = vsHcp === null ? '–' : (vsHcp === 0 ? 'E' : hSign + vsHcp);
+  const hCls = vsHcp === null ? '' : (vsHcp < 0 ? 'lb-under' : vsHcp > 0 ? 'lb-over' : 'lb-even');
+
   document.getElementById('scStatBar').innerHTML = `
     <div class="sc-stat-item"><div class="sc-stat-num">${playedCount > 0 ? totalStrokes : '–'}</div><div class="sc-stat-lbl">Schläge</div></div>
     <div class="sc-stat-item"><div class="sc-stat-num ${vpCls}">${vpLabel}</div><div class="sc-stat-lbl">vs Par</div></div>
+    <div class="sc-stat-item"><div class="sc-stat-num ${hCls}">${hLabel}</div><div class="sc-stat-lbl">Netto (HCP ${hcp})</div></div>
     <div class="sc-stat-item"><div class="sc-stat-num">${playedCount > 0 ? totalPutts : '–'}</div><div class="sc-stat-lbl">Putts</div></div>
+    <div class="sc-stat-item"><div class="sc-stat-num">${totalLost > 0 ? totalLost : '–'}</div><div class="sc-stat-lbl">💧 Lost</div></div>
     <div class="sc-stat-item"><div class="sc-stat-num">${playedCount}/18</div><div class="sc-stat-lbl">Löcher</div></div>
   `;
 
@@ -3093,12 +3587,17 @@ function renderScorecardOverlay() {
     return;
   }
 
+  if (scView === 'card') {
+    document.getElementById('scTable').innerHTML = renderScorecardTable(course, holes);
+    return;
+  }
+
   document.getElementById('scTable').innerHTML = `
     <div class="sc-table-head">
       <span style="text-align:center">Loch</span>
       <span style="text-align:center">Par</span>
-      <span style="text-align:center">⛳ Schläge</span>
-      <span style="text-align:center">Putts</span>
+      <span style="text-align:center">Score</span>
+      <span style="text-align:center">Lost</span>
       <span style="text-align:center">+/−</span>
       <span style="text-align:center">GIR</span>
     </div>
@@ -3106,9 +3605,10 @@ function renderScorecardOverlay() {
       const hd = holes[i];
       const strokes = hd?.strokes ?? null;
       const putts = hd?.putts ?? null;
-      let strokesHtml, vpHtml, girHtml;
+      const lost = hd?.lostBalls || 0;
+      let scoreHtml, vpHtml, girHtml;
       if (strokes === null) {
-        strokesHtml = '<span class="sc-empty">–</span>';
+        scoreHtml = '<span class="sc-empty">–</span>';
         vpHtml = '<span style="color:var(--muted)">–</span>';
         girHtml = '<span style="color:var(--muted)">–</span>';
       } else {
@@ -3122,22 +3622,90 @@ function renderScorecardOverlay() {
         const vpSign = vp > 0 ? '+' : '';
         const vpStr = vp === 0 ? 'E' : vpSign + vp;
         const vpColor = vp < 0 ? '#4db36a' : vp > 0 ? '#d46a5a' : 'var(--gold)';
-        strokesHtml = `<span class="sc-score-pill ${cls}">${strokes}</span>`;
+        const puttsStr = putts !== null ? `<span class="sc-h-putts-inline">/${putts}</span>` : '';
+        scoreHtml = `<span class="sc-score-pill ${cls}">${strokes}</span>${puttsStr}`;
         vpHtml = `<span style="color:${vpColor}">${vpStr}</span>`;
         const gir = putts !== null && (strokes - putts) <= (h.par - 2);
         girHtml = gir ? '<span style="color:#4db36a">✓</span>' : '<span style="color:var(--muted)">✗</span>';
       }
-      const puttsHtml = putts !== null ? `<span>${putts}</span>` : '<span style="color:var(--muted)">–</span>';
+      const lostHtml = lost > 0
+        ? `<span style="color:#5b9bd5;font-size:12px;font-weight:700;">💧${lost}</span>`
+        : '<span style="color:var(--muted)">–</span>';
       return `<div class="sc-hole-row" onclick="openHoleSheet(${i})">
         <span class="sc-h-num">${h.hole}</span>
         <span class="sc-h-par">${h.par}</span>
-        <span class="sc-h-strokes">${strokesHtml}</span>
-        <span class="sc-h-putts">${puttsHtml}</span>
+        <span class="sc-h-score">${scoreHtml}</span>
+        <span class="sc-h-lost">${lostHtml}</span>
         <span class="sc-h-vp">${vpHtml}</span>
         <span class="sc-h-gir">${girHtml}</span>
       </div>`;
     }).join('')}
   `;
+}
+
+function renderScorecardTable(course, holes) {
+  function nineHtml(startIdx, endLabel) {
+    const nine = course.holes.slice(startIdx, startIdx + 9);
+    const nineHoles = holes.slice(startIdx, startIdx + 9);
+    let parSum = 0, scoreSum = 0, scored = false;
+    let rowH = '<tr><th class="sc-card-label">Loch</th>';
+    let rowSI = '<tr><td class="sc-card-label">SI</td>';
+    let rowLen = '<tr><td class="sc-card-label">Länge</td>';
+    let rowPar = '<tr><td class="sc-card-label">Par</td>';
+    let rowSc = '<tr><td class="sc-card-label">Score</td>';
+    nine.forEach((h, i) => {
+      rowH   += `<th>${h.hole}</th>`;
+      rowSI  += `<td>${h.si ?? ''}</td>`;
+      rowLen += `<td>${h.length ?? ''}</td>`;
+      rowPar += `<td>${h.par}</td>`;
+      parSum += h.par;
+      const hd = nineHoles[i];
+      if (hd?.strokes) {
+        scoreSum += hd.strokes;
+        scored = true;
+        const vp = hd.strokes - h.par;
+        let cls;
+        if (vp <= -2) cls = 'sc-eagle';
+        else if (vp === -1) cls = 'sc-birdie';
+        else if (vp === 0) cls = 'sc-par-score';
+        else if (vp === 1) cls = 'sc-bogey';
+        else cls = 'sc-double';
+        rowSc += `<td><span class="sc-score-pill ${cls}">${hd.strokes}</span></td>`;
+      } else {
+        rowSc += '<td><span style="color:var(--muted)">–</span></td>';
+      }
+    });
+    rowH   += `<th class="sc-card-total">${endLabel}</th></tr>`;
+    rowSI  += '<td></td></tr>';
+    rowLen += '<td></td></tr>';
+    rowPar += `<td class="sc-card-total">${parSum}</td></tr>`;
+    rowSc  += `<td class="sc-card-total">${scored ? scoreSum : '–'}</td></tr>`;
+    return rowH + rowSI + rowLen + rowPar + rowSc;
+  }
+  const totalPar = course.holes.reduce((s, h) => s + h.par, 0);
+  let totalScore = 0, anyScored = false;
+  holes.forEach((hd, i) => { if (hd?.strokes) { totalScore += hd.strokes; anyScored = true; } });
+  const totalsRow = `
+    <table class="sc-card-9" style="margin-top:8px;">
+      <tr>
+        <td class="sc-card-label">Total</td>
+        <td class="sc-card-total" style="width:33%;">Par ${totalPar}</td>
+        <td class="sc-card-total" style="width:33%;">Score ${anyScored ? totalScore : '–'}</td>
+        <td class="sc-card-total" style="width:34%;">${anyScored ? _vpStr(totalScore - totalPar) : '–'}</td>
+      </tr>
+    </table>`;
+  return '<div class="sc-card-table">'
+    + '<table class="sc-card-9"><tbody>' + nineHtml(0, 'OUT') + '</tbody></table>'
+    + (course.holes.length > 9
+        ? '<table class="sc-card-9"><tbody>' + nineHtml(9, 'IN')  + '</tbody></table>'
+        : '')
+    + totalsRow
+    + '</div>';
+}
+
+function _vpStr(vp) {
+  if (vp === 0) return 'E';
+  return (vp > 0 ? '+' : '') + vp;
 }
 
 function openHoleSheet(holeIdx) {
@@ -3150,16 +3718,21 @@ function openHoleSheet(holeIdx) {
   const hd = (scorecardCache[cacheKey] || [])[holeIdx];
   _sheetStrokes = hd?.strokes || 0;
   _sheetPutts = hd?.putts || 0;
+  _sheetLost = hd?.lostBalls || 0;
   document.getElementById('sheetHoleLabel').textContent = `Loch ${hole?.hole || holeIdx + 1} · Par ${hole?.par || '?'}`;
   document.getElementById('sheetStrokes').textContent = _sheetStrokes || '–';
   document.getElementById('sheetPutts').textContent = _sheetPutts || '–';
+  document.getElementById('sheetLost').textContent = _sheetLost || '–';
   updateSheetResult(hole);
+  _updateSheetSaveButton();
   document.getElementById('scHoleSheet').style.display = 'flex';
+  lockBodyScroll();
 }
 
 function closeHoleSheet() {
   document.getElementById('scHoleSheet').style.display = 'none';
   scHoleIdx = null;
+  unlockBodyScroll();
 }
 
 function sheetAdj(field, delta) {
@@ -3168,13 +3741,25 @@ function sheetAdj(field, delta) {
   const course = COURSES.find(c => c.id === sched.course);
   const hole = course?.holes[scHoleIdx];
   if (field === 'strokes') {
-    _sheetStrokes = Math.max(1, _sheetStrokes + delta);
-  } else {
+    _sheetStrokes = Math.max(0, _sheetStrokes + delta);
+    if (_sheetStrokes === 0) { _sheetPutts = 0; _sheetLost = 0; }
+    else _sheetPutts = Math.min(_sheetPutts, _sheetStrokes);
+  } else if (field === 'putts') {
     _sheetPutts = Math.max(0, Math.min(_sheetStrokes || 10, _sheetPutts + delta));
+  } else if (field === 'lost') {
+    _sheetLost = Math.max(0, _sheetLost + delta);
   }
   document.getElementById('sheetStrokes').textContent = _sheetStrokes || '–';
   document.getElementById('sheetPutts').textContent = _sheetPutts || '–';
+  document.getElementById('sheetLost').textContent = _sheetLost || '–';
   updateSheetResult(hole);
+  _updateSheetSaveButton();
+}
+
+function _updateSheetSaveButton() {
+  const btn = document.getElementById('sheetSaveBtn');
+  if (!btn) return;
+  btn.textContent = _sheetStrokes === 0 ? '🗑 Löschen' : '✓ Speichern';
 }
 
 function updateSheetResult(hole) {
@@ -3192,17 +3777,20 @@ function updateSheetResult(hole) {
   else label = `+${vp} über Par`;
   const gir = _sheetPutts > 0 && (_sheetStrokes - _sheetPutts) <= (par - 2);
   const girStr = _sheetPutts > 0 ? (gir ? ' · GIR ✓' : ' · GIR ✗') : '';
+  const lostStr = _sheetLost > 0 ? ` · 💧${_sheetLost}` : '';
   const sign = vp > 0 ? '+' : '';
-  el.textContent = `${label} (${vp === 0 ? 'E' : sign + vp})${girStr}`;
+  el.textContent = `${label} (${vp === 0 ? 'E' : sign + vp})${girStr}${lostStr}`;
 }
 
 async function saveHoleSheet() {
-  if (scHoleIdx === null || !_sheetStrokes) { closeHoleSheet(); return; }
+  if (scHoleIdx === null) { closeHoleSheet(); return; }
   const date = ROUND_DATES[scRoundIdx];
   const cacheKey = scPlayerKey + '__' + date;
   if (!scorecardCache[cacheKey]) scorecardCache[cacheKey] = [];
   while (scorecardCache[cacheKey].length < 18) scorecardCache[cacheKey].push(null);
-  scorecardCache[cacheKey][scHoleIdx] = { strokes: _sheetStrokes, putts: _sheetPutts };
+  scorecardCache[cacheKey][scHoleIdx] = _sheetStrokes === 0
+    ? null
+    : { strokes: _sheetStrokes, putts: _sheetPutts, lostBalls: _sheetLost };
 
   const totalStrokes = scorecardCache[cacheKey].reduce((sum, h) => sum + (h?.strokes || 0), 0);
   CLOUD_STATS[scPlayerKey + '__score__' + date] = totalStrokes;
@@ -3211,7 +3799,7 @@ async function saveHoleSheet() {
   renderScorecardOverlay();
 
   try {
-    await fetch('/api/scores', {
+    await fetch(apiUrl('/api/scores'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ player: scPlayerKey, date, holes: scorecardCache[cacheKey] }),
@@ -3308,30 +3896,39 @@ function playSound(type) {
 }
 
 async function loadWeather(force) {
-  const cache = localStorage.getItem('eo2026__weather');
-  const cacheTime = parseInt(localStorage.getItem('eo2026__weatherTime') || '0',10);
+  const wrap = document.getElementById('weatherContent');
+  if (!wrap) return;
+  const cacheKey = 'eo2026__weather7d';
+  const cacheTimeKey = 'eo2026__weather7dTime';
+  const cache = localStorage.getItem(cacheKey);
+  const cacheTime = parseInt(localStorage.getItem(cacheTimeKey) || '0', 10);
   const fresh = (Date.now() - cacheTime) < 6 * 3600 * 1000;
   let data = null;
-  // Wenn force = true, zeigen wir während dem Laden einen "Lade..."-Indikator
-  if (force) {
-    const wrap = document.getElementById('weatherContent');
-    if (wrap && cache) {
-      try { data = JSON.parse(cache); renderWeather(data, true); } catch(e) {}
-    }
-  } else if (cache) {
-    try { data = JSON.parse(cache); renderWeather(data, !fresh); } catch(e) {}
+  if (cache) {
+    try { data = JSON.parse(cache); renderWeather(data, !fresh); } catch (e) {}
+  } else {
+    wrap.innerHTML = '<div class="card">⏳ Lade Wetterdaten…</div>';
   }
   try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=46.53&longitude=9.88&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise&start_date=2026-07-16&end_date=2026-07-19&timezone=Europe%2FZurich');
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=46.53&longitude=9.88'
+      + '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,weather_code,sunrise'
+      + '&forecast_days=7&timezone=Europe%2FZurich';
+    const res = await fetch(url);
     if (res.ok) {
       data = await res.json();
-      localStorage.setItem('eo2026__weather', JSON.stringify(data));
-      localStorage.setItem('eo2026__weatherTime', Date.now().toString());
-      renderWeather(data, false);
+      if (data && data.daily && data.daily.time && data.daily.time.length) {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(cacheTimeKey, Date.now().toString());
+        renderWeather(data, false);
+      } else {
+        wrap.innerHTML = '<div class="card" style="text-align:center;color:var(--muted)">Keine Wetterdaten.</div>';
+      }
+    } else {
+      throw new Error('HTTP ' + res.status);
     }
   } catch (e) {
     if (!data) {
-      document.getElementById('weatherContent').innerHTML = '<div class="warn">Wetter nicht verfügbar (offline und kein Cache).</div>';
+      wrap.innerHTML = '<div class="warn">Wetter nicht verfügbar (offline oder API-Fehler).</div>';
     }
   }
 }
@@ -3348,12 +3945,15 @@ function weatherIcon(code) {
   return '❓';
 }
 
-const COURSE_BY_DAY = {
-  '2026-07-16': 'Zuoz',
-  '2026-07-17': 'Samedan',
-  '2026-07-18': 'Samedan',
-  '2026-07-19': 'Zuoz 🏆',
-};
+function _courseLabelForDate(date) {
+  const sched = SCHEDULE[date];
+  if (!sched?.course) return '';
+  const c = COURSES.find(x => x.id === sched.course);
+  const name = c ? c.name.split(' ').slice(-1)[0].replace(/[()]/g, '') : sched.course;
+  const finalIdx = ROUND_DATES.indexOf(date);
+  const isFinal = finalIdx === ROUND_DATES.length - 1;
+  return name + (isFinal ? ' 🏆' : '');
+}
 
 function renderWeather(data, cached) {
   if (!data || !data.daily) return;
@@ -3375,11 +3975,11 @@ function renderWeather(data, cached) {
       '<div class="weather-temp">' + high + '°/' + low + '°</div>' +
       '<div class="weather-meta">💨 ' + wind + ' km/h</div>' +
       '<div class="weather-meta">☔ ' + rain + '% · 🌅 ' + sunrise + '</div>' +
-      '<div class="weather-meta" style="color:var(--gold); margin-top:6px; font-weight:700;">' + (COURSE_BY_DAY[d] || '') + '</div>' +
+      '<div class="weather-meta" style="color:var(--gold); margin-top:6px; font-weight:700;">' + (_courseLabelForDate(d)) + '</div>' +
       '</div>';
   });
   html += '</div>';
-  const cacheTime = parseInt(localStorage.getItem('eo2026__weatherTime') || '0',10);
+  const cacheTime = parseInt(localStorage.getItem('eo2026__weather7dTime') || '0', 10);
   const minutes = Math.floor((Date.now() - cacheTime) / 60000);
   let timeText = '';
   if (cacheTime > 0) {
@@ -3418,6 +4018,76 @@ function parseDate(dateStr) {
   const month = parseInt(match[2], 10);
   const year = match[3] ? parseInt(match[3], 10) : 2026;
   return new Date(year, month - 1, day);
+}
+
+const _WEEKDAY_DE = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
+
+function renderInfoEckdaten() {
+  const el = document.getElementById('infoEckdaten');
+  if (!el) return;
+  const ev = APP_STATE.event || {};
+  const dates = ROUND_DATES;
+  let dateRange = '–';
+  if (dates.length) {
+    const first = dates[0];
+    const last = dates[dates.length - 1];
+    const [, fm, fd] = first.split('-');
+    const [ly, lm, ld] = last.split('-');
+    dateRange = `${fd}.${fm}.–${ld}.${lm}.${ly}`;
+  }
+  el.innerHTML =
+    '<div class="row"><span class="lbl">Turnier</span><span class="val">' + (ev.label || 'Engadin Open') + '</span></div>' +
+    '<div class="row"><span class="lbl">Daten</span><span class="val">' + dateRange + '</span></div>' +
+    '<div class="row"><span class="lbl">Status</span><span class="val">' + (ev.status === 'current' ? '🟢 Aktuelles Event' : ev.status === 'past' ? '📦 Archiv' : '🔮 Vorschau') + '</span></div>' +
+    '<div class="row"><span class="lbl">Teilnehmer</span><span class="val">' + PLAYERS.length + '</span></div>' +
+    (ev.winner ? '<div class="row"><span class="lbl">Sieger</span><span class="val">🏆 ' + ev.winner + '</span></div>' : '');
+}
+
+function renderSchedule() {
+  const list = document.getElementById('scheduleList');
+  if (!list) return;
+  if (!ROUND_DATES || !ROUND_DATES.length) {
+    list.innerHTML = '<div class="card" style="color:var(--muted)">Kein Programm verfügbar.</div>';
+    return;
+  }
+  const finalIdx = ROUND_DATES.length - 1;
+  list.innerHTML = ROUND_DATES.map((d, ri) => {
+    const sched = SCHEDULE[d] || {};
+    const course = COURSES.find(c => c.id === sched.course);
+    const [yy, mm, dd] = d.split('-');
+    const dt = new Date(parseInt(yy, 10), parseInt(mm, 10) - 1, parseInt(dd, 10));
+    const wd = _WEEKDAY_DE[dt.getDay()];
+    const dateStr = `${wd} · ${dd}.${mm}.${yy}`;
+    const isFinal = ri === finalIdx;
+    const roundLabel = isFinal ? '🏆 FINALE' : `🏌️ Runde ${ri + 1}`;
+    const courseName = course?.name || (sched.course ? sched.course : 'Platz TBD');
+    const format = sched.format || (isFinal ? 'Strokeplay Finals' : 'Strokeplay');
+    const flights = Array.isArray(sched.flights) && sched.flights.length ? sched.flights : null;
+    const finalStyle = isFinal
+      ? ' style="border-left-color: var(--gold-soft); background: linear-gradient(90deg, rgba(201,162,39,0.1) 0%, var(--bg-card) 100%);"'
+      : '';
+    let flightsHtml = '';
+    if (flights) {
+      flightsHtml = '<div class="sched-flights">' + flights.map((f, fi) => {
+        const tee = f.teeTime ? `🕐 ${f.teeTime}` : '🕐 TBD';
+        const players = (f.players || []).map(pk => {
+          const p = PLAYERS.find(x => x.key === pk);
+          return p ? (p.nickname || p.name) : pk;
+        });
+        const playersStr = players.length ? players.join(' · ') : '–';
+        return `<div class="sched-flight"><div class="sched-flight-head"><span class="sched-flight-label">Flight ${fi + 1}</span><span class="sched-flight-tee">${tee}</span></div><div class="sched-flight-players">${playersStr}</div></div>`;
+      }).join('') + '</div>';
+    } else {
+      flightsHtml = '<div class="sched-meta">' + PLAYERS.length + ' Spieler · Tee-Time TBD</div>';
+    }
+    return `
+      <div class="sched-item"${finalStyle}>
+        <div class="sched-date">${dateStr} · ${roundLabel}</div>
+        <div class="sched-title">⛳ ${courseName} · ${format}</div>
+        ${flightsHtml}
+      </div>`;
+  }).join('');
+  markPastScheduleItems();
 }
 
 function markPastScheduleItems() {
@@ -3470,7 +4140,8 @@ function refreshAll() {
   initPacklist();
   initBingo();
   renderBag();
-  markPastScheduleItems();
+  renderInfoEckdaten();
+  renderSchedule();
   markPastInfoItems();
 }
 
@@ -3589,13 +4260,14 @@ function matchScoreLabel(score) {
 }
 
 async function loadAllResults() {
-  try { const s = localStorage.getItem('eo2026__resultsCache'); if (s) Object.assign(resultsCache, JSON.parse(s)); } catch(e) {}
+  resultsCache = {};
+  try { const s = localStorage.getItem('eo2026__resultsCache__' + APP_STATE.year); if (s) Object.assign(resultsCache, JSON.parse(s)); } catch(e) {}
   try {
-    const res = await fetch('/api/results');
+    const res = await fetch(apiUrl('/api/results'));
     if (res.ok) {
       const data = await res.json();
       Object.entries(data).forEach(([k, v]) => { resultsCache[k] = v; });
-      try { localStorage.setItem('eo2026__resultsCache', JSON.stringify(resultsCache)); } catch(e) {}
+      try { localStorage.setItem('eo2026__resultsCache__' + APP_STATE.year, JSON.stringify(resultsCache)); } catch(e) {}
     }
   } catch(e) {}
 }
@@ -3761,16 +4433,16 @@ function openFlightDetail(date, flightId, mi) {
 
   document.getElementById('flightDetailHoles').scrollTop = 0;
   document.getElementById('flightDetailOverlay').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
   document.body.classList.add('detail-open');
+  lockBodyScroll();
   renderHoleList();
   setDetailMode('detail');
 }
 
 function closeFlightDetail() {
   document.getElementById('flightDetailOverlay').style.display = 'none';
-  document.body.style.overflow = '';
   document.body.classList.remove('detail-open');
+  unlockBodyScroll();
 }
 
 function renderHoleList() {
@@ -3834,7 +4506,7 @@ async function saveFlightResult() {
   const matchKey = detailMatchIdx !== null ? `__${detailMatchIdx}` : '';
   const cacheKey = getResultKey(detailDate, detailFlightId, detailMatchIdx);
   try {
-    await fetch('/api/results', {
+    await fetch(apiUrl('/api/results'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ date: detailDate, flightId: detailFlightId, matchKey, holes: detailHoles }),
@@ -3847,10 +4519,10 @@ document.getElementById('flightDetailClose').addEventListener('click', closeFlig
 
 // === Legends (Hall of Fame seit 2012) ===
 const LEGENDS = [
-  { year: 2022, location: "Zuoz / Samedan", winner: "Parli",  participants: ["Pulfer","Manu","Parli","T. Hodgskin","Länz","Jens","Köbi","Kohli","Auer","J. Hodgskin"] },
+  { year: 2022, location: "Zuoz / Samedan", winner: "Parli",  participants: ["Pulfer","Manu","Parli","Thöme","Länz","Jens","Köbi","Kohli","Auer","Justine"] },
   { year: 2023, location: "Zuoz / Samedan", winner: "Manu",   participants: ["Pulfer","Manu","Jens","Auer","Parli","Länz","Kohli","Sutter","Köbi"] },
-  { year: 2024, location: "Zuoz / Samedan", winner: "Isaak",  participants: ["Pulfer","Länz","Isaak","Manu","T. Hodgskin","Köbi","Jens"] },
-  { year: 2025, location: "Zuoz / Samedan", winner: "Köbi",   participants: ["Manu","Länz","Köbi","Isaak","Jens","Pulfer","T. Hodgskin","Parli"] },
+  { year: 2024, location: "Zuoz / Samedan", winner: "Isaak",  participants: ["Pulfer","Länz","Isaak","Manu","Thöme","Köbi","Jens"] },
+  { year: 2025, location: "Zuoz / Samedan", winner: "Köbi",   participants: ["Manu","Länz","Köbi","Isaak","Jens","Pulfer","Thöme","Parli"] },
 ];
 
 function renderLegends() {
@@ -3904,21 +4576,22 @@ let statsRound = 'all';
 let statsPlayer = 'all';
 let _statsCharts = {};
 
-const STATS_COLORS = {
-  hartmann:    '#e8a838',
-  isaak:       '#4eb87a',
-  koelbener:   '#5b9bd5',
-  laenzlinger: '#e06060',
-  mansour:     '#b07dd5',
-  parli:       '#5bbccc',
-};
+// STATS_COLORS is loaded from /data/<year>.json — see loadEventData().
 
 function calcStats(playerKey, dates) {
-  let strokes = 0, putts = 0, holesPlayed = 0, totalPar = 0;
-  let gir = 0, onePutts = 0, threePutts = 0;
-  let birdieOrBetter = 0, pars = 0, bogeys = 0, doubles = 0;
+  let strokes = 0, putts = 0, lostBalls = 0, holesPlayed = 0, totalPar = 0;
+  let gir = 0, onePutts = 0, twoPutts = 0, threePutts = 0, fourPuttsPlus = 0;
+  let puttsCounted = 0;
+  let scramblingChances = 0, scramblingSaves = 0;
+  let birdieOrBetter = 0, pars = 0, bogeys = 0, doubles = 0, triplesPlus = 0;
   let par3diff = 0, par3n = 0, par4diff = 0, par4n = 0, par5diff = 0, par5n = 0;
   let front9s = 0, front9p = 0, front9n = 0, back9s = 0, back9p = 0, back9n = 0;
+  let hcpReceived = 0;
+
+  const player = PLAYERS.find(p => p.key === playerKey);
+  const hcp = player?.hcp || 0;
+  const hcpBase = Math.floor(hcp / 18);
+  const hcpExtra = hcp % 18;
 
   dates.forEach(date => {
     const holes = scorecardCache[playerKey + '__' + date] || [];
@@ -3929,15 +4602,30 @@ function calcStats(playerKey, dates) {
       const par = course.holes[i]?.par || 4;
       const s = h.strokes;
       const p = h.putts ?? 0;
-      strokes += s; putts += p; holesPlayed++; totalPar += par;
+      strokes += s; putts += p; lostBalls += (h.lostBalls || 0); holesPlayed++; totalPar += par;
+      const si = course.holes[i]?.si || 18;
+      hcpReceived += hcpBase + (si <= hcpExtra ? 1 : 0);
       const diff = s - par;
       if (diff <= -1) birdieOrBetter++;
       else if (diff === 0) pars++;
       else if (diff === 1) bogeys++;
-      else doubles++;
-      if (p === 1) onePutts++;
-      if (p >= 3) threePutts++;
-      if (h.putts != null && (s - p) <= (par - 2)) gir++;
+      else if (diff === 2) doubles++;
+      else triplesPlus++;
+      if (h.putts != null) {
+        puttsCounted++;
+        if (p === 1) onePutts++;
+        else if (p === 2) twoPutts++;
+        else if (p === 3) threePutts++;
+        else if (p >= 4) fourPuttsPlus++;
+      }
+      if (h.putts != null) {
+        const isGir = (s - p) <= (par - 2);
+        if (isGir) gir++;
+        else {
+          scramblingChances++;
+          if (diff <= 0) scramblingSaves++;
+        }
+      }
       if (par === 3) { par3diff += diff; par3n++; }
       else if (par === 4) { par4diff += diff; par4n++; }
       else { par5diff += diff; par5n++; }
@@ -3947,19 +4635,45 @@ function calcStats(playerKey, dates) {
   });
 
   if (holesPlayed === 0) return null;
+  const scoreToPar = strokes - totalPar;
   return {
-    holesPlayed, strokes, scoreToPar: strokes - totalPar,
+    holesPlayed, strokes, lostBalls, scoreToPar,
+    hcpReceived, scoreToHcp: scoreToPar - hcpReceived,
     avgPutts: putts / holesPlayed,
     girPct: Math.round(gir / holesPlayed * 100),
-    onePuttPct: Math.round(onePutts / holesPlayed * 100),
-    threePuttPct: Math.round(threePutts / holesPlayed * 100),
-    birdieOrBetter, pars, bogeys, doubles,
+    scramblingPct: scramblingChances > 0 ? Math.round(scramblingSaves / scramblingChances * 100) : null,
+    onePuttPct:        puttsCounted > 0 ? Math.round(onePutts       / puttsCounted * 100) : null,
+    twoPuttPct:        puttsCounted > 0 ? Math.round(twoPutts       / puttsCounted * 100) : null,
+    threePuttPct:      puttsCounted > 0 ? Math.round(threePutts     / puttsCounted * 100) : null,
+    fourPuttPlusPct:   puttsCounted > 0 ? Math.round(fourPuttsPlus  / puttsCounted * 100) : null,
+    threePuttsCount:   puttsCounted > 0 ? threePutts + fourPuttsPlus : null,
+    birdieOrBetter, pars, bogeys, doubles, triplesPlus,
     par3avg: par3n > 0 ? par3diff / par3n : null,
     par4avg: par4n > 0 ? par4diff / par4n : null,
     par5avg: par5n > 0 ? par5diff / par5n : null,
     front9: front9n > 0 ? front9s - front9p : null,
     back9: back9n > 0 ? back9s - back9p : null,
   };
+}
+
+function cumulativeNettoAfterRound(playerKey, hcp, maxRoundIdx) {
+  let totalStrokes = 0, rounds = 0;
+  for (let i = 0; i <= maxRoundIdx; i++) {
+    const v = CLOUD_STATS[playerKey + '__score__' + ROUND_DATES[i]];
+    if (v !== undefined && v !== '') { totalStrokes += parseInt(v, 10); rounds++; }
+  }
+  if (rounds === 0) return null;
+  return totalStrokes - rounds * ROUND_PAR - hcp * rounds;
+}
+
+function cumulativeBruttoAfterRound(playerKey, maxRoundIdx) {
+  let totalStrokes = 0, rounds = 0;
+  for (let i = 0; i <= maxRoundIdx; i++) {
+    const v = CLOUD_STATS[playerKey + '__score__' + ROUND_DATES[i]];
+    if (v !== undefined && v !== '') { totalStrokes += parseInt(v, 10); rounds++; }
+  }
+  if (rounds === 0) return null;
+  return totalStrokes - rounds * ROUND_PAR;
 }
 
 function _sfmt(val, dec = 0) {
@@ -3987,7 +4701,7 @@ function initStats() {
     + PLAYERS.map(p => `<button class="stats-filter-btn" data-val="${p.key}" style="border-left:3px solid ${STATS_COLORS[p.key]||'#888'}">${p.nickname}</button>`).join('');
 
   sec.innerHTML = `
-    <h2>📊 Statistiken</h2>
+    <h2>Statistiken</h2>
     <div class="stats-filters">
       <div class="stats-filter-label">Runde</div>
       <div class="stats-filter-row" id="statsRoundFilter">${roundBtns}</div>
@@ -4026,6 +4740,7 @@ function renderStats() {
   const sections = [
     { title: 'Score', rows: [
       { label: 'Score vs Par',      key: 'scoreToPar',     fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
+      { label: 'Score vs HCP (Netto)', key: 'scoreToHcp',  fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
       { label: 'Gesamtschläge',     key: 'strokes',        fmt: v => _sfmt(v),       cls: () => '' },
       { label: 'Gespielte Löcher',  key: 'holesPlayed',    fmt: v => _sfmt(v),       cls: () => '' },
       { label: 'Front 9 vs Par',    key: 'front9',         fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
@@ -4035,7 +4750,8 @@ function renderStats() {
       { label: 'Birdie o. besser',  key: 'birdieOrBetter', fmt: v => _sfmt(v),       cls: v => _scls(v, false) },
       { label: 'Pars',              key: 'pars',           fmt: v => _sfmt(v),       cls: () => '' },
       { label: 'Bogeys',            key: 'bogeys',         fmt: v => _sfmt(v),       cls: v => _scls(v) },
-      { label: 'Double+',           key: 'doubles',        fmt: v => _sfmt(v),       cls: v => _scls(v) },
+      { label: 'Doubles',           key: 'doubles',        fmt: v => _sfmt(v),       cls: v => _scls(v) },
+      { label: 'Triple+',           key: 'triplesPlus',    fmt: v => _sfmt(v),       cls: v => _scls(v) },
     ]},
     { title: 'Par-Performance', rows: [
       { label: 'Par 3 Ø vs Par',    key: 'par3avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
@@ -4045,10 +4761,17 @@ function renderStats() {
     { title: 'Putting', rows: [
       { label: 'Ø Putts / Loch',    key: 'avgPutts',       fmt: v => _sfmt(v, 2),    cls: v => _scls(v) },
       { label: '1-Putt %',          key: 'onePuttPct',     fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
+      { label: '2-Putt %',          key: 'twoPuttPct',     fmt: v => _sfmt(v) + '%', cls: () => '' },
       { label: '3-Putt %',          key: 'threePuttPct',   fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
+      { label: '4-Putt+ %',         key: 'fourPuttPlusPct',fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
+      { label: 'Unnötige Putts',    key: 'threePuttsCount',fmt: v => _sfmt(v),       cls: v => _scls(v) },
     ]},
     { title: 'GIR', rows: [
       { label: 'GIR %',             key: 'girPct',         fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
+      { label: 'Scrambling %',      key: 'scramblingPct',  fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
+    ]},
+    { title: 'Verlorene Bälle', rows: [
+      { label: '💧 Total',          key: 'lostBalls',      fmt: v => _sfmt(v),       cls: v => _scls(v) },
     ]},
   ];
 
@@ -4080,6 +4803,108 @@ function _destroyChart(id) {
   if (_statsCharts[id]) { try { _statsCharts[id].destroy(); } catch(_) {} delete _statsCharts[id]; }
 }
 
+function _linReg(points) {
+  const n = points.length;
+  if (n < 2) return null;
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+  points.forEach(p => { sumX += p.x; sumY += p.y; sumXY += p.x * p.y; sumXX += p.x * p.x; });
+  const denom = n * sumXX - sumX * sumX;
+  if (denom === 0) return null;
+  const slope = (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+  return { slope, intercept };
+}
+
+function _stdDev(values) {
+  if (values.length < 2) return null;
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;
+  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function _buildRankingChart(canvasId, players, roundsWithScores, _passthrough, scoreFn) {
+  const finalRoundIdx = ROUND_DATES.indexOf(roundsWithScores[roundsWithScores.length - 1]);
+  const finalScores = {};
+  players.forEach(p => { finalScores[p.key] = scoreFn(p.key, p.hcp || 0, finalRoundIdx); });
+  const sorted = players.filter(p => finalScores[p.key] !== null)
+    .sort((a, b) => (finalScores[a.key] ?? 999) - (finalScores[b.key] ?? 999));
+
+  const roundColors = ['#e05050', '#e8a838', '#4eb87a', '#5b9bd5'];
+  const datasets = roundsWithScores.map((d, i) => {
+    const rIdx = ROUND_DATES.indexOf(d);
+    const isFinal = i === roundsWithScores.length - 1;
+    const color = roundColors[i % roundColors.length];
+    return {
+      label: 'Nach R' + (i + 1),
+      data: sorted.map(p => scoreFn(p.key, p.hcp || 0, rIdx)),
+      borderColor: color,
+      backgroundColor: 'transparent',
+      borderWidth: isFinal ? 3 : 2,
+      borderDash: isFinal ? [] : [6, 4],
+      pointStyle: isFinal ? 'circle' : 'rectRounded',
+      pointRadius: isFinal ? 6 : 4,
+      pointBackgroundColor: color,
+      tension: 0.15, spanGaps: true,
+      _isFinal: isFinal,
+      _color: color,
+    };
+  });
+
+  const finalDataset = datasets[datasets.length - 1];
+  const finalLabelsPlugin = {
+    id: 'finalLabels_' + canvasId,
+    afterDraw(chart) {
+      const ctx = chart.ctx;
+      const meta = chart.getDatasetMeta(datasets.length - 1);
+      meta.data.forEach((pt, i) => {
+        const val = finalDataset.data[i];
+        if (val === null) return;
+        const text = (val > 0 ? '+' : '') + val;
+        ctx.save();
+        ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+        const tw = ctx.measureText(text).width;
+        const bw = tw + 12, bh = 22, r = 3;
+        const bx = pt.x - bw / 2, by = pt.y - bh / 2 - 18;
+        ctx.fillStyle = '#f3ead2';
+        ctx.strokeStyle = finalDataset._color;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(bx + r, by); ctx.lineTo(bx + bw - r, by);
+        ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
+        ctx.lineTo(bx + bw, by + bh - r);
+        ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - r, by + bh);
+        ctx.lineTo(bx + r, by + bh);
+        ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - r);
+        ctx.lineTo(bx, by + r);
+        ctx.quadraticCurveTo(bx, by, bx + r, by);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#0b1f3a';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(text, pt.x, by + bh / 2);
+        ctx.restore();
+      });
+    }
+  };
+
+  return new Chart(document.getElementById(canvasId), {
+    type: 'line',
+    plugins: [finalLabelsPlugin],
+    data: { labels: sorted.map(p => p.nickname), datasets },
+    options: {
+      responsive: true,
+      layout: { padding: { top: 30 } },
+      plugins: {
+        legend: { labels: { color: '#f0ede3', font: { family: 'system-ui', size: 11 } } },
+      },
+      scales: {
+        x: { position: 'top', ticks: { color: '#f3ead2', font: { weight: '700', size: 12 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#8fa0b8', callback: v => (v > 0 ? '+' : '') + v }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      },
+    }
+  });
+}
+
 function _renderStatsCharts(players, dates, statsMap) {
   const wrap = document.getElementById('statsCharts');
   if (!wrap) return;
@@ -4088,15 +4913,86 @@ function _renderStatsCharts(players, dates, statsMap) {
     players.some(p => (scorecardCache[p.key + '__' + d] || []).some(h => h?.strokes))
   ).length > 1;
 
+  const roundsWithScores = ROUND_DATES.filter(d =>
+    players.some(p => { const v = CLOUD_STATS[p.key + '__score__' + d]; return v !== undefined && v !== ''; })
+  );
+  const hasRankingData = players.length > 1 && roundsWithScores.length >= 1;
+
+  const rCount = roundsWithScores.length;
+  const rWord = rCount > 1 ? 'Runden' : 'Runde';
+
   let html = '';
-  if (hasMultiRound) html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Score-Verlauf pro Runde</div><canvas id="chartVerlauf" height="160"></canvas></div>`;
-  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Scoring-Verteilung</div><canvas id="chartScoring" height="160"></canvas></div>`;
-  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Par 3 / 4 / 5 Performance (Ø vs Par)</div><canvas id="chartPar" height="160"></canvas></div>`;
-  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">GIR %</div><canvas id="chartGir" height="120"></canvas></div>`;
-  html += `<div class="stats-chart-wrap"><div class="stats-chart-title">Ø Putts pro Loch</div><canvas id="chartPutts" height="120"></canvas></div>`;
+  if (hasRankingData) {
+    html += `<div class="stats-chart-wrap">
+      <div class="stats-chart-title">Rangliste nach ${rCount} ${rWord} (Nettowertung)</div>
+      <div class="stats-chart-desc">Kumulierte Netto-Differenz zum Par (Brutto − HCP). Spieler sind nach Stand der letzten gespielten Runde sortiert. Niedrigster Wert = beste Platzierung.</div>
+      <canvas id="chartRanking" height="220"></canvas>
+    </div>`;
+    html += `<div class="stats-chart-wrap">
+      <div class="stats-chart-title">Rangliste nach ${rCount} ${rWord} (Bruttowertung)</div>
+      <div class="stats-chart-desc">Kumulierte Brutto-Differenz zum Par (ohne HCP-Berücksichtigung). Reine Schlagleistung pro Spieler.</div>
+      <canvas id="chartRankingBrutto" height="220"></canvas>
+    </div>`;
+  }
+  if (hasMultiRound) html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Score-Verlauf pro Runde</div>
+    <div class="stats-chart-desc">Brutto vs Par pro einzelne Runde — zeigt Tagesform und Schwankungen.</div>
+    <canvas id="chartVerlauf" height="160"></canvas>
+  </div>`;
+  if (hasMultiRound) html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Form-Trend</div>
+    <div class="stats-chart-desc">Lineare Trendlinie pro Spieler über alle gespielten Runden. Slope-Wert in Klammern: negativ = Form verbessert sich (weniger Schläge), positiv = Form verschlechtert sich.</div>
+    <canvas id="chartTrend" height="180"></canvas>
+  </div>`;
+  if (hasMultiRound) html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Konsistenz</div>
+    <div class="stats-chart-desc">Standardabweichung der Rundenscores (Brutto vs Par). Niedrigerer Wert = stabilere Leistung über alle Runden.</div>
+    <canvas id="chartConsistency" height="140"></canvas>
+  </div>`;
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Scoring-Verteilung</div>
+    <div class="stats-chart-desc">Verteilung der Loch-Ergebnisse: Birdie+, Par, Bogey, Double, Triple+. Hoher grüner/blauer Anteil = stabile Runden.</div>
+    <canvas id="chartScoring" height="160"></canvas>
+  </div>`;
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Par 3 / 4 / 5 Performance (Ø vs Par)</div>
+    <div class="stats-chart-desc">Durchschnittliche Abweichung zum Par, aufgeteilt nach Loch-Länge. Zeigt Stärken/Schwächen pro Loch-Typ.</div>
+    <canvas id="chartPar" height="160"></canvas>
+  </div>`;
+
+  const coursesInScope = [];
+  const seenCourses = new Set();
+  dates.forEach(d => {
+    const cid = SCHEDULE[d]?.course;
+    if (cid && !seenCourses.has(cid)) { seenCourses.add(cid); coursesInScope.push(cid); }
+  });
+  coursesInScope.forEach(cid => {
+    const course = COURSES.find(c => c.id === cid);
+    if (!course) return;
+    html += `<div class="stats-chart-wrap">
+      <div class="stats-chart-title">Lochschwierigkeit · ${course.name}</div>
+      <div class="stats-chart-desc">Ø Schläge über Par pro Loch (alle Spieler & Runden auf diesem Platz). Positiv (rot) = schwer, negativ (grün) = leicht. Auf jedem Balken steht der offizielle Stroke-Index (SI 1 = schwerstes Loch laut Scorecard) — Vergleich zwischen gefühlter und offizieller Schwierigkeit.</div>
+      <canvas id="chartHoleDiff_${cid}" height="160"></canvas>
+    </div>`;
+  });
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">GIR %</div>
+    <div class="stats-chart-desc">Greens in Regulation: Anteil der Löcher, bei denen das Grün in Par-minus-2 Schlägen erreicht wurde.</div>
+    <canvas id="chartGir" height="120"></canvas>
+  </div>`;
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Ø Putts pro Loch</div>
+    <div class="stats-chart-desc">Durchschnittliche Anzahl Putts pro gespieltem Loch. Niedriger = besser (Richtwert: ~1.8–2.0).</div>
+    <canvas id="chartPutts" height="120"></canvas>
+  </div>`;
   wrap.innerHTML = html;
 
   Object.keys(_statsCharts).forEach(k => _destroyChart(k));
+
+  if (hasRankingData) {
+    _statsCharts.ranking        = _buildRankingChart('chartRanking',        players, roundsWithScores, p => p, (pk, hcp, idx) => cumulativeNettoAfterRound(pk, hcp, idx));
+    _statsCharts.rankingBrutto  = _buildRankingChart('chartRankingBrutto',  players, roundsWithScores, p => p, (pk, _hcp, idx) => cumulativeBruttoAfterRound(pk, idx));
+  }
 
   const baseOpts = {
     responsive: true,
@@ -4110,18 +5006,82 @@ function _renderStatsCharts(players, dates, statsMap) {
   const pColors = players.map(p => STATS_COLORS[p.key] || '#888');
 
   if (hasMultiRound) {
+    const perPlayerRoundScores = players.map(p =>
+      ROUND_DATES.map(d => { const s = calcStats(p.key, [d]); return s ? s.scoreToPar : null; })
+    );
+
     _statsCharts.verlauf = new Chart(document.getElementById('chartVerlauf'), {
       type: 'line',
       data: {
         labels: ROUND_DATES.map((_, i) => 'R' + (i + 1)),
         datasets: players.map((p, pi) => ({
           label: p.nickname,
-          data: ROUND_DATES.map(d => { const s = calcStats(p.key, [d]); return s ? s.scoreToPar : null; }),
+          data: perPlayerRoundScores[pi],
           borderColor: pColors[pi], backgroundColor: pColors[pi] + '33',
           tension: 0.3, spanGaps: true, pointRadius: 5,
         }))
       },
       options: { ...baseOpts }
+    });
+
+    const trendDatasets = [];
+    players.forEach((p, pi) => {
+      const scores = perPlayerRoundScores[pi];
+      const points = scores.map((v, i) => v !== null ? { x: i, y: v } : null).filter(Boolean);
+      const reg = _linReg(points);
+      const slopeLabel = reg ? ` (${reg.slope > 0 ? '↗ +' : reg.slope < 0 ? '↘ ' : '→ '}${reg.slope.toFixed(1)}/Rd)` : '';
+      trendDatasets.push({
+        label: p.nickname + slopeLabel,
+        data: scores,
+        borderColor: pColors[pi] + '55', backgroundColor: 'transparent',
+        borderWidth: 1, pointRadius: 3, pointBackgroundColor: pColors[pi],
+        spanGaps: true, tension: 0,
+      });
+      if (reg) {
+        trendDatasets.push({
+          label: '__trend_' + p.key,
+          data: ROUND_DATES.map((_, i) => +(reg.slope * i + reg.intercept).toFixed(2)),
+          borderColor: pColors[pi], backgroundColor: 'transparent',
+          borderWidth: 2, borderDash: [6, 4], pointRadius: 0,
+          tension: 0,
+        });
+      }
+    });
+
+    _statsCharts.trend = new Chart(document.getElementById('chartTrend'), {
+      type: 'line',
+      data: {
+        labels: ROUND_DATES.map((_, i) => 'R' + (i + 1)),
+        datasets: trendDatasets,
+      },
+      options: {
+        ...baseOpts,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#f0ede3', font: { family: 'system-ui', size: 11 },
+              filter: item => !item.text.startsWith('__trend_'),
+            }
+          }
+        }
+      }
+    });
+
+    const stdDevs = players.map((p, pi) => {
+      const vals = perPlayerRoundScores[pi].filter(v => v !== null);
+      return _stdDev(vals);
+    });
+    _statsCharts.consistency = new Chart(document.getElementById('chartConsistency'), {
+      type: 'bar',
+      data: {
+        labels: pNames,
+        datasets: [{
+          label: 'σ Brutto vs Par',
+          data: stdDevs.map(v => v !== null ? +v.toFixed(2) : null),
+          backgroundColor: pColors,
+        }]
+      },
+      options: { ...baseOpts, plugins: { legend: { display: false } } }
     });
   }
 
@@ -4133,7 +5093,8 @@ function _renderStatsCharts(players, dates, statsMap) {
         { label: 'Birdie+', data: players.map(p => statsMap[p.key]?.birdieOrBetter ?? 0), backgroundColor: '#4db36a' },
         { label: 'Par',     data: players.map(p => statsMap[p.key]?.pars ?? 0),            backgroundColor: '#5b9bd5' },
         { label: 'Bogey',   data: players.map(p => statsMap[p.key]?.bogeys ?? 0),          backgroundColor: '#e8a838' },
-        { label: 'Double+', data: players.map(p => statsMap[p.key]?.doubles ?? 0),         backgroundColor: '#c5634d' },
+        { label: 'Double',  data: players.map(p => statsMap[p.key]?.doubles ?? 0),         backgroundColor: '#c5634d' },
+        { label: 'Triple+', data: players.map(p => statsMap[p.key]?.triplesPlus ?? 0),     backgroundColor: '#7a1f1f' },
       ]
     },
     options: { ...baseOpts, scales: { x: { ...baseOpts.scales.x, stacked: true }, y: { ...baseOpts.scales.y, stacked: true } } }
@@ -4150,6 +5111,77 @@ function _renderStatsCharts(players, dates, statsMap) {
       }))
     },
     options: { ...baseOpts }
+  });
+
+  coursesInScope.forEach(cid => {
+    const course = COURSES.find(c => c.id === cid);
+    if (!course) return;
+    const datesForCourse = dates.filter(d => SCHEDULE[d]?.course === cid);
+    const holeDiffs = new Array(18).fill(0);
+    const holeCounts = new Array(18).fill(0);
+    datesForCourse.forEach(d => {
+      players.forEach(p => {
+        const holes = scorecardCache[p.key + '__' + d] || [];
+        holes.forEach((h, i) => {
+          if (!h?.strokes) return;
+          const par = course.holes[i]?.par || 4;
+          holeDiffs[i] += h.strokes - par;
+          holeCounts[i]++;
+        });
+      });
+    });
+    const avgDiffs = holeDiffs.map((sum, i) => holeCounts[i] > 0 ? +(sum / holeCounts[i]).toFixed(2) : null);
+    const sis = course.holes.map(h => h.si);
+    const labels = course.holes.map(h => `${h.hole} (P${h.par})`);
+    const barColors = avgDiffs.map(v => v === null ? '#666' : v > 0.5 ? '#c5634d' : v > 0 ? '#e8a838' : v < -0.2 ? '#4db36a' : '#5b9bd5');
+
+    const siLabelsPlugin = {
+      id: 'siLabels_' + cid,
+      afterDatasetsDraw(chart) {
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+        const yZero = chart.scales.y.getPixelForValue(0);
+        meta.data.forEach((bar, i) => {
+          const si = sis[i];
+          if (si == null) return;
+          const val = avgDiffs[i];
+          const text = 'SI ' + si;
+          ctx.save();
+          ctx.font = '700 10px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#0b1f3a';
+          if (val === null || Math.abs(bar.y - yZero) < 14) {
+            ctx.textBaseline = 'bottom';
+            ctx.fillStyle = '#f0ede3';
+            ctx.fillText(text, bar.x, yZero - 2);
+          } else if (val > 0) {
+            ctx.textBaseline = 'top';
+            ctx.fillText(text, bar.x, bar.y + 3);
+          } else {
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(text, bar.x, bar.y - 3);
+          }
+          ctx.restore();
+        });
+      }
+    };
+
+    _statsCharts['holeDiff_' + cid] = new Chart(document.getElementById('chartHoleDiff_' + cid), {
+      type: 'bar',
+      plugins: [siLabelsPlugin],
+      data: {
+        labels,
+        datasets: [{ label: 'Ø vs Par', data: avgDiffs, backgroundColor: barColors }],
+      },
+      options: {
+        ...baseOpts,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ...baseOpts.scales.x, ticks: { ...baseOpts.scales.x.ticks, font: { size: 10 } } },
+          y: { ...baseOpts.scales.y, ticks: { ...baseOpts.scales.y.ticks, callback: v => (v > 0 ? '+' : '') + v } },
+        }
+      }
+    });
   });
 
   _statsCharts.gir = new Chart(document.getElementById('chartGir'), {
@@ -4172,26 +5204,482 @@ function _renderStatsCharts(players, dates, statsMap) {
 }
 
 // === START ===
-try { const _c = localStorage.getItem('eo2026__cloudCache'); if (_c) CLOUD_STATS = JSON.parse(_c); } catch (_) {}
-loadPlayers();
-initTabs();
-initPlayerCards();
-initStats();
-initCourses();
-renderLegends();
-renderLeaderboard();
-loadAllResults();
-loadScorecards();
-loadFlightsTab();
-initPacklist();
-initBingo();
-renderBag();
-markPastScheduleItems();
-markPastInfoItems();
-updateCountdown();
-setInterval(updateCountdown, 60000);
-loadWeather();
-fetchCloudStats().then(() => refreshAllStatsUI());
+
+async function bootApp() {
+  await loadManifest();
+  try {
+    await loadEventData(APP_STATE.year);
+  } catch (e) {
+    console.error('Failed to load event data for', APP_STATE.year, e);
+    document.body.innerHTML = '<div style="padding:24px;color:#e06060;font-family:system-ui">Event-Daten für ' + APP_STATE.year + ' konnten nicht geladen werden. Bitte später erneut versuchen.</div>';
+    return;
+  }
+  try {
+    const _c = localStorage.getItem('eo2026__cloudCache__' + APP_STATE.year);
+    if (_c) CLOUD_STATS = JSON.parse(_c);
+  } catch (_) {}
+  initTabs();
+  initSettingsSubtabs();
+  renderYearBanner();
+  loadPlayers();
+  initPlayerCards();
+  initStats();
+  initCourses();
+  renderLegends();
+  renderLeaderboard();
+  loadAllResults();
+  loadScorecards();
+  initPacklist();
+  initBingo();
+  renderBag();
+  renderInfoEckdaten();
+  renderSchedule();
+  markPastInfoItems();
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
+  loadWeather();
+  fetchCloudStats().then(() => refreshAllStatsUI());
+}
+
+async function switchYear(year) {
+  if (year === APP_STATE.year) return;
+  try {
+    await loadEventData(year);
+  } catch (e) {
+    toast && toast('Daten für ' + year + ' nicht verfügbar');
+    return;
+  }
+  localStorage.setItem('eo__year', String(year));
+  CLOUD_STATS = {};
+  try {
+    const _c = localStorage.getItem('eo2026__cloudCache__' + APP_STATE.year);
+    if (_c) CLOUD_STATS = JSON.parse(_c);
+  } catch (_) {}
+  renderYearBanner();
+  loadPlayers();
+  initPlayerCards();
+  initStats();
+  initCourses();
+  renderLegends();
+  renderLeaderboard();
+  loadAllResults();
+  loadScorecards();
+  renderInfoEckdaten();
+  renderSchedule();
+  markPastInfoItems();
+  updateCountdown();
+  fetchCloudStats().then(() => refreshAllStatsUI());
+}
+
+function renderYearBanner() {
+  const el = document.getElementById('yearBanner');
+  if (el) {
+    const ev = APP_STATE.event;
+    if (!ev || ev.status === 'current') {
+      el.style.display = 'none';
+    } else {
+      const tag = ev.status === 'past' ? 'Archiv · ' : (ev.status === 'future' ? 'Vorschau · ' : '');
+      el.textContent = tag + ev.label + (ev.winner ? ' · 🏆 ' + ev.winner : '');
+      el.style.display = 'block';
+    }
+  }
+  renderYearPicker();
+}
+
+function renderYearPicker() {
+  const wrap = document.getElementById('yearPicker');
+  if (!wrap || !APP_STATE.manifest) return;
+  wrap.innerHTML = APP_STATE.manifest.years.map(y => {
+    const active = y.year === APP_STATE.year;
+    const statusIcon = y.status === 'current' ? '🟢' : y.status === 'future' ? '🔮' : '📦';
+    return '<button class="stats-filter-btn' + (active ? ' active' : '') + '" data-year="' + y.year + '" style="flex:1;min-width:80px;">'
+      + statusIcon + ' ' + y.year + '</button>';
+  }).join('');
+  wrap.querySelectorAll('button').forEach(b => {
+    b.onclick = () => switchYear(parseInt(b.dataset.year, 10));
+  });
+  renderSettingsPlayers();
+  renderSettingsSchedule();
+  renderSettingsCourses();
+}
+
+// === SETTINGS · Spieler verwalten ===
+function renderSettingsPlayers() {
+  const list = document.getElementById('settingsPlayersList');
+  if (!list) return;
+  if (!PLAYERS.length) { list.innerHTML = '<p class="small" style="color:var(--muted)">Keine Spieler.</p>'; return; }
+  list.innerHTML = PLAYERS.map(p => {
+    const safeName = (p.name || '').replace(/'/g, "\\'");
+    return `
+    <div class="set-player-card" data-key="${p.key}">
+      <div class="set-player-head">
+        <span class="set-player-key">${p.key}</span>
+        <div class="set-player-actions">
+          <button class="btn-save"   onclick="settingsSavePlayer('${p.key}')">💾 Speichern</button>
+          <button class="btn-danger" onclick="settingsDeletePlayer('${p.key}', '${safeName}')">🗑</button>
+        </div>
+      </div>
+      <div class="set-field">
+        <label>Vollständiger Name</label>
+        <input class="settings-input" data-field="name" value="${p.name || ''}" placeholder="z.B. Manuel Hartmann">
+      </div>
+      <div class="set-field-row">
+        <div class="set-field" style="flex:1;">
+          <label>Spitzname</label>
+          <input class="settings-input" data-field="nickname" value="${p.nickname || ''}" placeholder="z.B. Manu">
+        </div>
+        <div class="set-field" style="width:80px;">
+          <label>HCP</label>
+          <input class="settings-input" data-field="hcp" type="number" step="0.1" value="${p.hcp ?? 0}" style="text-align:center;" inputmode="decimal">
+        </div>
+      </div>
+      <div class="set-field">
+        <label>Tagline</label>
+        <input class="settings-input" data-field="feature" value="${p.feature || ''}" placeholder="kurze Beschreibung">
+      </div>
+    </div>
+    `;
+  }).join('');
+}
+
+function _getPlayerRowFields(key) {
+  const row = document.querySelector('.set-player-card[data-key="' + key + '"]');
+  if (!row) return null;
+  const f = (n) => row.querySelector('[data-field="' + n + '"]')?.value || '';
+  return { name: f('name').trim(), nickname: f('nickname').trim(), feature: f('feature').trim(), hcp: parseFloat(f('hcp')) || 0 };
+}
+
+function _setPlayersStatus(msg, color) {
+  const el = document.getElementById('settingsPlayersStatus');
+  if (!el) return;
+  el.textContent = msg; el.style.color = color || 'var(--muted)';
+  setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
+}
+
+async function settingsSavePlayer(key) {
+  const fields = _getPlayerRowFields(key);
+  if (!fields || !fields.name) { _setPlayersStatus('Name fehlt', '#c5634d'); return; }
+  try {
+    await fetch(apiUrl('/api/players'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set', key, ...fields }),
+    });
+    _setPlayersStatus('✓ Gespeichert', '#4db36a');
+    await loadPlayers();
+    renderSettingsPlayers();
+    initPlayerCards();
+    renderLeaderboard();
+  } catch (e) { _setPlayersStatus('Fehler: ' + e.message, '#c5634d'); }
+}
+
+async function settingsDeletePlayer(key, name) {
+  if (!confirm(`Spieler "${name}" wirklich löschen? Scores bleiben in der Datenbank.`)) return;
+  try {
+    await fetch(apiUrl('/api/players'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', key }),
+    });
+    _setPlayersStatus('✓ Gelöscht', '#4db36a');
+    await loadPlayers();
+    renderSettingsPlayers();
+    initPlayerCards();
+    renderLeaderboard();
+  } catch (e) { _setPlayersStatus('Fehler: ' + e.message, '#c5634d'); }
+}
+
+async function settingsAddPlayer() {
+  const key = (document.getElementById('newPlKey').value || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  const name = (document.getElementById('newPlName').value || '').trim();
+  const nick = (document.getElementById('newPlNick').value || '').trim();
+  const hcp = parseFloat(document.getElementById('newPlHcp').value) || 0;
+  if (!key || !name) { _setPlayersStatus('Key und Name sind pflicht', '#c5634d'); return; }
+  try {
+    await fetch(apiUrl('/api/players'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set', key, name, nickname: nick || name.split(' ')[0], hcp, feature: '' }),
+    });
+    document.getElementById('newPlKey').value = '';
+    document.getElementById('newPlName').value = '';
+    document.getElementById('newPlNick').value = '';
+    document.getElementById('newPlHcp').value = '';
+    _setPlayersStatus('✓ Hinzugefügt', '#4db36a');
+    await loadPlayers();
+    renderSettingsPlayers();
+    initPlayerCards();
+    renderLeaderboard();
+  } catch (e) { _setPlayersStatus('Fehler: ' + e.message, '#c5634d'); }
+}
+
+// === SETTINGS · Sub-tabs ===
+function initSettingsSubtabs() {
+  document.querySelectorAll('.sub-tab').forEach(btn => {
+    btn.onclick = () => {
+      const name = btn.dataset.subtab;
+      document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === 'sub-' + name));
+    };
+  });
+}
+
+// === SETTINGS · Spielplan + Tee Times + Flights ===
+function renderSettingsSchedule() {
+  const wrap = document.getElementById('settingsSchedule');
+  if (!wrap) return;
+  if (!ROUND_DATES.length) { wrap.innerHTML = '<p class="small" style="color:var(--muted)">Keine Runden.</p>'; return; }
+  wrap.innerHTML = ROUND_DATES.map((d, ri) => {
+    const sched = SCHEDULE[d] || {};
+    const lbl = ROUND_LABELS[ri] || ('R' + (ri + 1));
+    const dateLbl = d.slice(5).replace('-', '.');
+    const courseOptions = COURSES.map(c => {
+      const sel = c.id === sched.course ? ' selected' : '';
+      return `<option value="${c.id}"${sel}>${c.name}</option>`;
+    }).join('');
+    const flights = Array.isArray(sched.flights) && sched.flights.length
+      ? sched.flights
+      : [{ teeTime: sched.teeTime || '', players: PLAYERS.map(p => p.key) }];
+    return `
+    <div class="set-sched-row" data-date="${d}">
+      <div class="set-sched-head">
+        <span class="set-sched-label">${lbl}</span>
+        <span class="set-sched-date">${dateLbl}</span>
+      </div>
+      <div class="set-field">
+        <label>Platz</label>
+        <select class="settings-input" data-field="course">
+          <option value="">– wählen –</option>
+          ${courseOptions}
+        </select>
+      </div>
+      <div class="set-field">
+        <label>Flights &amp; Tee-Times</label>
+        <div class="flights-wrap" data-date="${d}">
+          ${flights.map((f, fi) => renderFlightBlock(d, fi, f)).join('')}
+        </div>
+        <button type="button" class="flight-add-btn" onclick="settingsAddFlight('${d}')">+ Flight hinzufügen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderFlightBlock(date, fi, flight) {
+  const used = new Set(flight.players || []);
+  const unassigned = PLAYERS.filter(p => !used.has(p.key));
+  return `
+    <div class="flight-block" data-fi="${fi}">
+      <div class="flight-block-head">
+        <span class="flight-block-label">Flight ${fi + 1}</span>
+        <input type="time" class="flight-block-tee" data-field="teeTime" value="${flight.teeTime || ''}">
+        <button type="button" class="flight-block-del" onclick="settingsDelFlight('${date}', ${fi})" title="Flight entfernen">✕</button>
+      </div>
+      <div class="flight-players" data-fi="${fi}">
+        ${(flight.players || []).map(pk => {
+          const p = PLAYERS.find(x => x.key === pk);
+          if (!p) return '';
+          return `<span class="flight-chip" data-pk="${pk}">${p.nickname || p.name}<button type="button" class="flight-chip-x" onclick="settingsRemoveFromFlight('${date}', ${fi}, '${pk}')">×</button></span>`;
+        }).join('')}
+        ${unassigned.length ? unassigned.map(p =>
+          `<button type="button" class="flight-pool-pick" onclick="settingsAddToFlight('${date}', ${fi}, '${p.key}')">+ ${p.nickname || p.name}</button>`
+        ).join('') : ''}
+      </div>
+    </div>`;
+}
+
+function _readScheduleFromUI() {
+  const out = {};
+  const isFinalIdx = ROUND_DATES.length - 1;
+  document.querySelectorAll('.set-sched-row').forEach((row, idx) => {
+    const d = row.dataset.date;
+    if (!d) return;
+    const course = row.querySelector('[data-field="course"]')?.value || '';
+    const format = idx === isFinalIdx ? 'Strokeplay Finals 🏆' : 'Strokeplay';
+    const flights = Array.from(row.querySelectorAll('.flight-block')).map(fb => {
+      const teeTime = fb.querySelector('[data-field="teeTime"]')?.value || '';
+      const players = Array.from(fb.querySelectorAll('.flight-chip')).map(c => c.dataset.pk);
+      return { teeTime, players };
+    });
+    out[d] = { course, format, flights };
+  });
+  return out;
+}
+
+function _rerenderScheduleForDate(date) {
+  const updatedSched = _readScheduleFromUI();
+  SCHEDULE = updatedSched;
+  renderSettingsSchedule();
+}
+
+function settingsAddFlight(date) {
+  const updated = _readScheduleFromUI();
+  if (!updated[date]) updated[date] = { course: '', format: 'Strokeplay', flights: [] };
+  if (!Array.isArray(updated[date].flights)) updated[date].flights = [];
+  updated[date].flights.push({ teeTime: '', players: [] });
+  SCHEDULE = updated;
+  renderSettingsSchedule();
+}
+
+function settingsDelFlight(date, fi) {
+  const updated = _readScheduleFromUI();
+  if (!updated[date] || !Array.isArray(updated[date].flights)) return;
+  if (updated[date].flights.length <= 1) return;
+  updated[date].flights.splice(fi, 1);
+  SCHEDULE = updated;
+  renderSettingsSchedule();
+}
+
+function settingsAddToFlight(date, fi, pk) {
+  const updated = _readScheduleFromUI();
+  if (!updated[date]) return;
+  // remove from any other flight first
+  updated[date].flights.forEach(f => { f.players = (f.players || []).filter(x => x !== pk); });
+  if (!Array.isArray(updated[date].flights[fi].players)) updated[date].flights[fi].players = [];
+  updated[date].flights[fi].players.push(pk);
+  SCHEDULE = updated;
+  renderSettingsSchedule();
+}
+
+function settingsRemoveFromFlight(date, fi, pk) {
+  const updated = _readScheduleFromUI();
+  if (!updated[date]?.flights?.[fi]) return;
+  updated[date].flights[fi].players = updated[date].flights[fi].players.filter(x => x !== pk);
+  SCHEDULE = updated;
+  renderSettingsSchedule();
+}
+
+async function saveSettingsSchedule() {
+  const status = document.getElementById('settingsScheduleStatus');
+  status.textContent = 'Speichern…'; status.style.color = 'var(--muted)';
+  const newSchedule = _readScheduleFromUI();
+  try {
+    await fetch(apiUrl('/api/event-overrides'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ schedule: newSchedule }),
+    });
+    SCHEDULE = newSchedule;
+    APP_STATE.event.schedule = newSchedule;
+    renderSchedule();
+    renderLeaderboard();
+    status.textContent = '✓ Gespeichert'; status.style.color = '#4db36a';
+    setTimeout(() => { status.textContent = ''; }, 3000);
+  } catch (e) {
+    status.textContent = 'Fehler: ' + e.message; status.style.color = '#c5634d';
+  }
+}
+
+// === SETTINGS · Plätze ===
+function renderSettingsCourses() {
+  const wrap = document.getElementById('settingsCourses');
+  if (!wrap) return;
+  if (!COURSES.length) { wrap.innerHTML = '<p class="small" style="color:var(--muted)">Keine Plätze.</p>'; return; }
+  wrap.innerHTML = COURSES.map(c => `
+    <div class="set-course-card" data-cid="${c.id}">
+      <div class="set-player-head">
+        <span class="set-player-key">${c.id}</span>
+        <div class="set-player-actions">
+          <button class="btn-save" onclick="saveSettingsCourse('${c.id}')">💾 Speichern</button>
+        </div>
+      </div>
+      <div class="set-field">
+        <label>Name</label>
+        <input class="settings-input" data-field="name" value="${(c.name || '').replace(/"/g, '&quot;')}">
+      </div>
+      <div class="set-field-row">
+        <div class="set-field" style="flex:1;">
+          <label>Architekt</label>
+          <input class="settings-input" data-field="architect" value="${(c.architect || '').replace(/"/g, '&quot;')}">
+        </div>
+        <div class="set-field" style="width:80px;">
+          <label>Par</label>
+          <input class="settings-input" data-field="par" type="number" inputmode="numeric" value="${c.par || 72}" style="text-align:center;">
+        </div>
+      </div>
+      <div class="set-field-row">
+        <div class="set-field" style="flex:1;">
+          <label>Gegründet</label>
+          <input class="settings-input" data-field="year" type="number" inputmode="numeric" value="${c.year || ''}">
+        </div>
+        <div class="set-field" style="flex:1;">
+          <label>Länge (m)</label>
+          <input class="settings-input" data-field="length" type="number" inputmode="numeric" value="${c.length || ''}">
+        </div>
+      </div>
+      <div class="set-field">
+        <label>Beschreibung</label>
+        <textarea class="settings-input" data-field="description" rows="2" style="resize:vertical;">${c.description || ''}</textarea>
+      </div>
+      <div class="set-field">
+        <label>Tipp</label>
+        <textarea class="settings-input" data-field="tip" rows="2" style="resize:vertical;">${c.tip || ''}</textarea>
+      </div>
+      <div class="set-field">
+        <label>Maps URL</label>
+        <input class="settings-input" data-field="mapsUrl" value="${(c.mapsUrl || '').replace(/"/g, '&quot;')}">
+      </div>
+      <details class="set-holes-details">
+        <summary>🕳 Löcher bearbeiten (${(c.holes || []).length})</summary>
+        <table class="set-holes-table">
+          <thead><tr><th>#</th><th>Par</th><th>Länge (m)</th><th>SI</th></tr></thead>
+          <tbody>
+            ${(c.holes || []).map((h, i) => `
+              <tr data-hole="${i}">
+                <td class="set-hole-num">${h.hole || (i + 1)}</td>
+                <td><input class="set-hole-input" data-field="par"    type="number" inputmode="numeric" min="3" max="6"   value="${h.par || ''}"></td>
+                <td><input class="set-hole-input" data-field="length" type="number" inputmode="numeric" min="50" max="700" value="${h.length || ''}"></td>
+                <td><input class="set-hole-input" data-field="si"     type="number" inputmode="numeric" min="1" max="18"  value="${h.si || ''}"></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </details>
+    </div>
+  `).join('');
+}
+
+async function saveSettingsCourse(cid) {
+  const status = document.getElementById('settingsCoursesStatus');
+  status.textContent = 'Speichern…'; status.style.color = 'var(--muted)';
+  const row = document.querySelector('.set-course-card[data-cid="' + cid + '"]');
+  if (!row) return;
+  const f = (n) => row.querySelector('[data-field="' + n + '"]')?.value || '';
+  const existing = COURSES.find(c => c.id === cid);
+  const holes = Array.from(row.querySelectorAll('.set-holes-table tbody tr')).map((tr, i) => {
+    const hf = (n) => tr.querySelector('[data-field="' + n + '"]')?.value || '';
+    const base = (existing?.holes || [])[i] || {};
+    return {
+      hole: base.hole || (i + 1),
+      par:    parseInt(hf('par'),    10) || base.par || 4,
+      length: parseInt(hf('length'), 10) || base.length || 0,
+      si:     parseInt(hf('si'),     10) || base.si || (i + 1),
+    };
+  });
+  const updated = {
+    ...existing,
+    name: f('name').trim(),
+    architect: f('architect').trim(),
+    par: parseInt(f('par'), 10) || 72,
+    year: parseInt(f('year'), 10) || existing?.year,
+    length: parseInt(f('length'), 10) || existing?.length,
+    description: f('description').trim(),
+    tip: f('tip').trim(),
+    mapsUrl: f('mapsUrl').trim(),
+    holes,
+  };
+  const newCourses = COURSES.map(c => c.id === cid ? updated : c);
+  try {
+    await fetch(apiUrl('/api/event-overrides'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ courses: newCourses }),
+    });
+    COURSES = newCourses;
+    APP_STATE.event.courses = newCourses;
+    initCourses();
+    status.textContent = '✓ Gespeichert'; status.style.color = '#4db36a';
+    setTimeout(() => { status.textContent = ''; }, 3000);
+  } catch (e) {
+    status.textContent = 'Fehler: ' + e.message; status.style.color = '#c5634d';
+  }
+}
+
+bootApp();
 
 async function manualRefresh() {
   await Promise.allSettled([
@@ -4226,9 +5714,15 @@ setInterval(() => {
     pulled = 0;
   }
 
+  function _overlayOpen() {
+    return document.body.classList.contains('detail-open')
+      || document.getElementById('scOverlay')?.style.display === 'flex'
+      || document.getElementById('scHoleSheet')?.style.display === 'flex';
+  }
+
   document.addEventListener('touchstart', (e) => {
     if (refreshing) return;
-    if (document.body.classList.contains('detail-open')) { startY = null; return; }
+    if (_overlayOpen()) { startY = null; return; }
     if (window.scrollY > 0) { startY = null; return; }
     startY = e.touches[0].clientY;
     pulled = 0;
@@ -4236,7 +5730,7 @@ setInterval(() => {
 
   document.addEventListener('touchmove', (e) => {
     if (refreshing || startY === null) return;
-    if (document.body.classList.contains('detail-open')) { startY = null; return; }
+    if (_overlayOpen()) { startY = null; return; }
     pulled = e.touches[0].clientY - startY;
     if (pulled <= 0) {
       indicator.style.transform = '';

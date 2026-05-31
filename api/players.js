@@ -6,9 +6,18 @@ const kv = createClient({
 
 export const config = { runtime: 'edge' };
 
+const DEFAULT_YEAR = 2026;
+
+function resolveKey(url) {
+  const year = parseInt(new URL(url).searchParams.get('year') || '', 10) || DEFAULT_YEAR;
+  return { year, hkey: `${year}_trip_players` };
+}
+
 export default async function handler(request) {
+  const { hkey } = resolveKey(request.url);
+
   if (request.method === 'GET') {
-    const all = (await kv.hgetall('trip_players')) || {};
+    const all = (await kv.hgetall(hkey)) || {};
     const players = Object.entries(all).map(([key, v]) => {
       const p = typeof v === 'string' ? JSON.parse(v) : v;
       return { key, ...p };
@@ -32,7 +41,7 @@ export default async function handler(request) {
         nickname: nickname || name.split(' ')[0],
         feature: feature || '',
       };
-      await kv.hset('trip_players', { [key]: JSON.stringify(player) });
+      await kv.hset(hkey, { [key]: JSON.stringify(player) });
       return new Response(JSON.stringify({ ok: true, key, ...player }), {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -40,7 +49,7 @@ export default async function handler(request) {
 
     if (action === 'delete') {
       if (!key) return new Response(JSON.stringify({ error: 'key required' }), { status: 400 });
-      await kv.hdel('trip_players', key);
+      await kv.hdel(hkey, key);
       return new Response(JSON.stringify({ ok: true }), {
         headers: { 'Content-Type': 'application/json' },
       });

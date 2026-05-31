@@ -1,13 +1,21 @@
-import { kv } from '@vercel/kv';
+import { createClient } from '@vercel/kv';
+const kv = createClient({
+  url: process.env.KV_OPEN_KV_REST_API_URL,
+  token: process.env.KV_OPEN_KV_REST_API_TOKEN,
+});
 
 export const config = { runtime: 'edge' };
 
+const DEFAULT_YEAR = 2026;
+
 export default async function handler(request) {
   const url = new URL(request.url);
+  const year = parseInt(url.searchParams.get('year') || '', 10) || DEFAULT_YEAR;
+  const hkey = `${year}_trip_results`;
 
   if (request.method === 'GET') {
     const date = url.searchParams.get('date');
-    const all = (await kv.hgetall('trip_results')) || {};
+    const all = (await kv.hgetall(hkey)) || {};
     const parsed = {};
     Object.entries(all).forEach(([k, v]) => {
       parsed[k] = typeof v === 'string' ? JSON.parse(v) : v;
@@ -34,7 +42,7 @@ export default async function handler(request) {
       return new Response(JSON.stringify({ error: 'invalid' }), { status: 400 });
     }
     const key = `${date}__${flightId}${matchKey || ''}`;
-    await kv.hset('trip_results', { [key]: JSON.stringify({ holes }) });
+    await kv.hset(hkey, { [key]: JSON.stringify({ holes }) });
     return new Response(JSON.stringify({ ok: true }), {
       headers: { 'Content-Type': 'application/json' },
     });

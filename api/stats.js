@@ -1,6 +1,12 @@
-import { kv } from '@vercel/kv';
+import { createClient } from '@vercel/kv';
+const kv = createClient({
+  url: process.env.KV_OPEN_KV_REST_API_URL,
+  token: process.env.KV_OPEN_KV_REST_API_TOKEN,
+});
 
 export const config = { runtime: 'edge' };
+
+const DEFAULT_YEAR = 2026;
 
 export default async function handler(request) {
   if (request.method !== 'GET') {
@@ -10,9 +16,11 @@ export default async function handler(request) {
     });
   }
 
+  const year = parseInt(new URL(request.url).searchParams.get('year') || '', 10) || DEFAULT_YEAR;
+  const hkey = `${year}_trip_stats`;
+
   try {
-    // Hole alle Daten als Hash unter "trip_stats"
-    const data = (await kv.hgetall('trip_stats')) || {};
+    const data = (await kv.hgetall(hkey)) || {};
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: {

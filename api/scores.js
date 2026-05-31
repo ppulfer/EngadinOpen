@@ -6,9 +6,22 @@ const kv = createClient({
 
 export const config = { runtime: 'edge' };
 
+const DEFAULT_YEAR = 2026;
+
+function resolveKeys(url) {
+  const year = parseInt(new URL(url).searchParams.get('year') || '', 10) || DEFAULT_YEAR;
+  return {
+    year,
+    cardsKey: `${year}_trip_scorecards`,
+    statsKey: `${year}_trip_stats`,
+  };
+}
+
 export default async function handler(request) {
+  const { cardsKey, statsKey } = resolveKeys(request.url);
+
   if (request.method === 'GET') {
-    const all = (await kv.hgetall('trip_scorecards')) || {};
+    const all = (await kv.hgetall(cardsKey)) || {};
     const parsed = {};
     Object.entries(all).forEach(([k, v]) => {
       parsed[k] = typeof v === 'string' ? JSON.parse(v) : v;
@@ -23,10 +36,13 @@ export default async function handler(request) {
     if (!player || !date || !Array.isArray(holes)) {
       return new Response(JSON.stringify({ error: 'invalid' }), { status: 400 });
     }
-    await kv.hset('trip_scorecards', { [`${player}__${date}`]: JSON.stringify(holes) });
+    await kv.hset(cardsKey, { [`${player}__${date}`]: JSON.stringify(holes) });
     const totalStrokes = holes.reduce((sum, h) => sum + (h?.strokes || 0), 0);
+    const scoreField = `${player}__score__${date}`;
     if (totalStrokes > 0) {
-      await kv.hset('trip_stats', { [`${player}__score__${date}`]: totalStrokes });
+      await kv.hset(statsKey, { [scoreField]: totalStrokes });
+    } else {
+      await kv.hdel(statsKey, scoreField);
     }
     return new Response(JSON.stringify({ ok: true, totalStrokes }), {
       headers: { 'Content-Type': 'application/json' },
