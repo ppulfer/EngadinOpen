@@ -407,6 +407,14 @@ label { display: block; color: var(--muted); font-size: 11px; margin: 12px 0 4px
 .player-name { font-weight: 700; color: var(--gold); font-size: 13px; line-height: 1.2; }
 .player-hcp { font-size: 11px; color: var(--muted); margin: 4px 0; }
 .player-feature { font-size: 11px; font-style: italic; line-height: 1.3; }
+.player-guest-badge {
+  display: inline-block; margin-top: 6px;
+  font-size: 10px; font-style: normal; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--muted); background: rgba(143,160,184,0.15);
+  border: 1px solid rgba(143,160,184,0.3);
+  border-radius: 999px; padding: 2px 8px;
+}
 
 .meter {
   height: 14px; background: var(--bg-soft); border-radius: 999px;
@@ -701,6 +709,7 @@ audio::-webkit-media-controls-panel {
 .lb-r-vp { font-size: 12px; font-weight: 700; line-height: 1; }
 .lb-r-netto { font-size: 9px; font-weight: 600; font-style: italic; opacity: 0.85; line-height: 1; margin-top: 1px; }
 .lb-r-thru { color: var(--muted); font-size: 9px; font-weight: 600; line-height: 1; margin-top: 1px; }
+.lb-rcell-winner { border: 1px solid var(--gold); border-radius: 4px; }
 .lb-head {
   background: var(--bg-soft);
   border-bottom: 1px solid var(--border);
@@ -753,6 +762,12 @@ audio::-webkit-media-controls-panel {
 .hero-leaderboard .lb-row:last-child { border-bottom: none; }
 .lb-row { cursor: pointer; }
 .lb-row:active { background: rgba(255,255,255,0.08); }
+.lb-guest-divider {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 8px 0 4px; border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
 
 /* === SCORECARD OVERLAY === */
 .sc-overlay {
@@ -2582,6 +2597,9 @@ select.settings-input option { background: #0b1f3a; color: #f0ede3; }
           <input id="newPlNick" placeholder="Spitzname"          class="settings-input">
           <input id="newPlHcp"  type="number" step="0.1" placeholder="HCP" class="settings-input">
         </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--muted);cursor:pointer;">
+          <input id="newPlGuest" type="checkbox"> Gastspieler (kein Ranking)
+        </label>
         <button class="btn" style="width:100%;margin-top:8px;" onclick="settingsAddPlayer()">Hinzufügen</button>
       </details>
       <div id="settingsPlayersStatus" class="small" style="margin-top:8px;min-height:18px;"></div>
@@ -2817,7 +2835,8 @@ function initPlayerCards() {
       '<div class="player-photo" style="background-image: url(\'' + photoUrl + '\');"></div>' +
       '<div class="player-name">' + p.name + '</div>' +
       '<div class="player-hcp">HCP ' + p.hcp + '</div>' +
-      '<div class="player-feature">' + p.feature + '</div>';
+      '<div class="player-feature">' + p.feature + '</div>' +
+      (p.guest ? '<div><span class="player-guest-badge">Gast</span></div>' : '');
     grid.appendChild(el);
   });
 }
@@ -3295,26 +3314,28 @@ function renderLeaderboard() {
   if (!container) return;
 
   const curIdx = getCurrentRoundIdx();
-  const rows = lbGetScores();
-  // Sort only by completed-round Netto; partial current round is shown but doesn't change ranking.
-  function _liveSortKey(r) {
-    return r.nettoVsPar;
-  }
-  rows.sort((a, b) => {
-    const ak = a.nettoVsPar, bk = b.nettoVsPar;
-    if (ak === null && bk === null) return 0;
-    if (ak === null) return 1;
-    if (bk === null) return -1;
-    if (ak !== bk) return ak - bk;
-    return (a.bruttoVsPar || 0) - (b.bruttoVsPar || 0);
-  });
+  const allRows = lbGetScores();
 
-  // Show Live column only when at least one player has a started-but-not-finished round.
-  const anyLive = rows.some(r =>
+  const regularRows = allRows.filter(r => !r.p.guest);
+  const guestRows   = allRows.filter(r => r.p.guest);
+
+  function _sortRows(rows) {
+    rows.sort((a, b) => {
+      const ak = a.nettoVsPar, bk = b.nettoVsPar;
+      if (ak === null && bk === null) return 0;
+      if (ak === null) return 1;
+      if (bk === null) return -1;
+      if (ak !== bk) return ak - bk;
+      return (a.bruttoVsPar || 0) - (b.bruttoVsPar || 0);
+    });
+  }
+  _sortRows(regularRows);
+  _sortRows(guestRows);
+
+  const anyLive = allRows.some(r =>
     r.rounds.some(rd => rd.scoredHoles > 0 && rd.scoredHoles < 18)
   );
 
-  // Dynamic header: # | Spieler | Netto | R1 | … | Rn [ | Live ]
   const head = document.getElementById('lbHead');
   if (head) {
     head.innerHTML =
@@ -3324,41 +3345,52 @@ function renderLeaderboard() {
       + (anyLive ? '<span style="text-align:center" title="Live-Ranking inkl. HCP-pro-Loch aus laufender Runde"><span class="lb-rec-dot"></span>Live</span>' : '');
   }
 
-  // Live rank: project each player's netto using SI-based HCP allotment for partial rounds.
-  const liveProjections = rows.map(r => {
+  // Live rank computed only for regular (ranked) players.
+  const liveProjections = regularRows.map(r => {
     const base = r.nettoVsPar;
     const curRound = r.rounds[curIdx];
     const partial = (r.thru !== null && r.thru !== 'F' && curRound?.vsHcp !== null && curRound?.vsHcp !== undefined)
-      ? curRound.vsHcp
-      : null;
+      ? curRound.vsHcp : null;
     if (base === null && partial === null) return { key: r.p.key, score: null };
     return { key: r.p.key, score: (base || 0) + (partial || 0) };
   });
-  const liveOrder = liveProjections.slice()
-    .sort((a, b) => {
-      if (a.score === null && b.score === null) return 0;
-      if (a.score === null) return 1;
-      if (b.score === null) return -1;
-      return a.score - b.score;
-    });
+  const liveOrder = liveProjections.slice().sort((a, b) => {
+    if (a.score === null && b.score === null) return 0;
+    if (a.score === null) return 1;
+    if (b.score === null) return -1;
+    return a.score - b.score;
+  });
   const liveRanks = {};
   liveOrder.forEach((p, i) => { liveRanks[p.key] = p.score === null ? null : i + 1; });
 
-  let posCounter = 0, prevKey = null;
-  container.innerHTML = rows.map((row, idx) => {
-    const live = _liveSortKey(row);
-    const hasData = live !== null;
-    if (hasData && live !== prevKey) { posCounter = idx + 1; prevKey = live; }
-    const pos = hasData ? posCounter : '–';
-    const name = PLAYER_NICKNAMES[row.p.key] || row.p.name;
+  // Per-round best netto: best vsHcp among all players who finished that round.
+  const roundBestNetto = ROUND_DATES.map((_, ri) => {
+    let best = null;
+    allRows.forEach(r => {
+      const rd = r.rounds[ri] || {};
+      if (rd.scoredHoles === 18 && rd.vsHcp !== null) {
+        if (best === null || rd.vsHcp < best) best = rd.vsHcp;
+      }
+    });
+    return best;
+  });
 
+  function _rowHtml(row, pos, staticRank) {
+    const name = PLAYER_NICKNAMES[row.p.key] || row.p.name;
     const nLabel = vpLabel(row.nettoVsPar);
     const nCls = vpCls(row.nettoVsPar);
 
     const roundCells = ROUND_DATES.map((d, ri) => {
       const r = row.rounds[ri] || {};
       if (r.scoredHoles === 18) {
-        return `<span class="lb-cell lb-rcell ${vpCls(r.vsPar)}">${vpLabel(r.vsPar)}</span>`;
+        const vpStr = vpLabel(r.vsPar);
+        const nettoStr = r.vsHcp !== null ? vpLabel(r.vsHcp) : '–';
+        const nettoCls = r.vsHcp === null ? 'lb-dash' : vpCls(r.vsHcp);
+        const winnerCls = (r.vsHcp !== null && r.vsHcp === roundBestNetto[ri]) ? ' lb-rcell-winner' : '';
+        return `<span class="lb-cell lb-rcell${winnerCls}">
+          <span class="lb-r-vp ${vpCls(r.vsPar)}">${vpStr}</span>
+          <span class="lb-r-netto ${nettoCls}">${nettoStr}</span>
+        </span>`;
       }
       if (r.scoredHoles > 0) {
         const vpStr = r.vsPar !== null ? vpLabel(r.vsPar) : '–';
@@ -3374,11 +3406,9 @@ function renderLeaderboard() {
       return '<span class="lb-cell lb-rcell lb-dash">–</span>';
     }).join('');
 
-    // Live-Ranking: current live position (with HCP-pro-Loch from partial round folded in)
-    const staticRank = hasData ? posCounter : null;
-    const liveRank = liveRanks[row.p.key];
     let liveCell = '<span class="lb-cell lb-dash" style="text-align:center">–</span>';
-    if (liveRank !== null) {
+    const liveRank = liveRanks[row.p.key];
+    if (liveRank !== null && liveRank !== undefined) {
       let cls = 'lb-even';
       if (staticRank !== null) {
         if (liveRank < staticRank) cls = 'lb-under';
@@ -3387,15 +3417,33 @@ function renderLeaderboard() {
       liveCell = `<span class="lb-cell lb-live ${cls}" style="text-align:center">#${liveRank}</span>`;
     }
 
-    const leader = idx === 0 && hasData ? ' lb-leader' : '';
-    return `<div class="lb-row${leader}" onclick="openScorecard('${row.p.key}')">
+    return `<div class="lb-row" onclick="openScorecard('${row.p.key}')">
       <span class="lb-pos">${pos}</span>
       <span class="lb-name">${name}</span>
       <span class="lb-cell ${nCls}" style="text-align:right;font-weight:700">${nLabel}</span>
       ${roundCells}
       ${anyLive ? liveCell : ''}
     </div>`;
+  }
+
+  let posCounter = 0, prevNetto = null;
+  const regularHtml = regularRows.map((row, idx) => {
+    const hasData = row.nettoVsPar !== null;
+    if (hasData && row.nettoVsPar !== prevNetto) { posCounter = idx + 1; prevNetto = row.nettoVsPar; }
+    const pos = hasData ? posCounter : '–';
+    const staticRank = hasData ? posCounter : null;
+    const html = _rowHtml(row, pos, staticRank);
+    return idx === 0 && hasData
+      ? html.replace('<div class="lb-row"', '<div class="lb-row lb-leader"')
+      : html;
   }).join('');
+
+  const guestDivider = guestRows.length > 0
+    ? '<div class="lb-guest-divider">Gäste</div>'
+    : '';
+  const guestHtml = guestRows.map(row => _rowHtml(row, '–', null)).join('');
+
+  container.innerHTML = regularHtml + guestDivider + guestHtml;
   _applyLbGridColumns(anyLive);
 }
 
@@ -4577,6 +4625,13 @@ let statsPlayer = 'all';
 let _statsCharts = {};
 
 // STATS_COLORS is loaded from /data/<year>.json — see loadEventData().
+const _GUEST_COLOR_PALETTE = ['#a0c4a0', '#a0b4d0', '#c4a0c4', '#c4b4a0', '#a0c4c4', '#c0c080'];
+function _playerColor(key) {
+  if (STATS_COLORS[key]) return STATS_COLORS[key];
+  const guestKeys = PLAYERS.filter(p => p.guest && !STATS_COLORS[p.key]).map(p => p.key);
+  const idx = guestKeys.indexOf(key);
+  return idx >= 0 ? _GUEST_COLOR_PALETTE[idx % _GUEST_COLOR_PALETTE.length] : '#888';
+}
 
 function calcStats(playerKey, dates) {
   let strokes = 0, putts = 0, lostBalls = 0, holesPlayed = 0, totalPar = 0;
@@ -4698,7 +4753,7 @@ function initStats() {
   const roundBtns = `<button class="stats-filter-btn active" data-val="all">Alle</button>`
     + ROUND_LABELS.map((l, i) => `<button class="stats-filter-btn" data-val="${i}">${l.split(' ')[0]}</button>`).join('');
   const playerBtns = `<button class="stats-filter-btn active" data-val="all">Alle</button>`
-    + PLAYERS.map(p => `<button class="stats-filter-btn" data-val="${p.key}" style="border-left:3px solid ${STATS_COLORS[p.key]||'#888'}">${p.nickname}</button>`).join('');
+    + PLAYERS.map(p => `<button class="stats-filter-btn" data-val="${p.key}" style="border-left:3px solid ${_playerColor(p.key)}">${p.nickname}</button>`).join('');
 
   sec.innerHTML = `
     <h2>Statistiken</h2>
@@ -4777,7 +4832,7 @@ function renderStats() {
 
   let html = '<div class="stats-table-wrap"><table class="stats-table"><thead><tr><th>Statistik</th>';
   players.forEach(p => {
-    html += `<th style="color:${STATS_COLORS[p.key]||'var(--gold)'}">${p.nickname}</th>`;
+    html += `<th style="color:${_playerColor(p.key)}">${p.nickname}</th>`;
   });
   html += '</tr></thead><tbody>';
   sections.forEach(sec => {
@@ -5003,7 +5058,7 @@ function _renderStatsCharts(players, dates, statsMap) {
     }
   };
   const pNames = players.map(p => p.nickname);
-  const pColors = players.map(p => STATS_COLORS[p.key] || '#888');
+  const pColors = players.map(p => _playerColor(p.key));
 
   if (hasMultiRound) {
     const perPlayerRoundScores = players.map(p =>
@@ -5337,6 +5392,9 @@ function renderSettingsPlayers() {
         <label>Tagline</label>
         <input class="settings-input" data-field="feature" value="${p.feature || ''}" placeholder="kurze Beschreibung">
       </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--muted);cursor:pointer;">
+        <input type="checkbox" data-field="guest" ${p.guest ? 'checked' : ''}> Gastspieler (kein Ranking)
+      </label>
     </div>
     `;
   }).join('');
@@ -5346,7 +5404,8 @@ function _getPlayerRowFields(key) {
   const row = document.querySelector('.set-player-card[data-key="' + key + '"]');
   if (!row) return null;
   const f = (n) => row.querySelector('[data-field="' + n + '"]')?.value || '';
-  return { name: f('name').trim(), nickname: f('nickname').trim(), feature: f('feature').trim(), hcp: parseFloat(f('hcp')) || 0 };
+  const guest = !!(row.querySelector('[data-field="guest"]')?.checked);
+  return { name: f('name').trim(), nickname: f('nickname').trim(), feature: f('feature').trim(), hcp: parseFloat(f('hcp')) || 0, guest };
 }
 
 function _setPlayersStatus(msg, color) {
@@ -5392,16 +5451,18 @@ async function settingsAddPlayer() {
   const name = (document.getElementById('newPlName').value || '').trim();
   const nick = (document.getElementById('newPlNick').value || '').trim();
   const hcp = parseFloat(document.getElementById('newPlHcp').value) || 0;
+  const guest = !!(document.getElementById('newPlGuest')?.checked);
   if (!key || !name) { _setPlayersStatus('Key und Name sind pflicht', '#c5634d'); return; }
   try {
     await fetch(apiUrl('/api/players'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'set', key, name, nickname: nick || name.split(' ')[0], hcp, feature: '' }),
+      body: JSON.stringify({ action: 'set', key, name, nickname: nick || name.split(' ')[0], hcp, feature: '', guest }),
     });
     document.getElementById('newPlKey').value = '';
     document.getElementById('newPlName').value = '';
     document.getElementById('newPlNick').value = '';
     document.getElementById('newPlHcp').value = '';
+    if (document.getElementById('newPlGuest')) document.getElementById('newPlGuest').checked = false;
     _setPlayersStatus('✓ Hinzugefügt', '#4db36a');
     await loadPlayers();
     renderSettingsPlayers();

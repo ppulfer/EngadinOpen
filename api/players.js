@@ -33,13 +33,14 @@ export default async function handler(request) {
     const { action, key } = body;
 
     if (action === 'set') {
-      const { name, hcp, nickname, feature } = body;
+      const { name, hcp, nickname, feature, guest } = body;
       if (!key || !name) return new Response(JSON.stringify({ error: 'key and name required' }), { status: 400 });
       const player = {
         name,
         hcp: parseFloat(hcp) || 0,
         nickname: nickname || name.split(' ')[0],
         feature: feature || '',
+        guest: !!guest,
       };
       await kv.hset(hkey, { [key]: JSON.stringify(player) });
       return new Response(JSON.stringify({ ok: true, key, ...player }), {
