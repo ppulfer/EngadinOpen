@@ -709,7 +709,6 @@ audio::-webkit-media-controls-panel {
 .lb-r-vp { font-size: 12px; font-weight: 700; line-height: 1; }
 .lb-r-netto { font-size: 9px; font-weight: 600; font-style: italic; opacity: 0.85; line-height: 1; margin-top: 1px; }
 .lb-r-thru { color: var(--muted); font-size: 9px; font-weight: 600; line-height: 1; margin-top: 1px; }
-.lb-rcell-winner { border: 1px solid var(--gold); border-radius: 4px; }
 .lb-head {
   background: var(--bg-soft);
   border-bottom: 1px solid var(--border);
@@ -3309,6 +3308,23 @@ function lbGetScores() {
   });
 }
 
+function _guestPotentialRank(guestRow, regularRows) {
+  const playedIdxs = guestRow.rounds
+    .map((r, i) => r.scoredHoles === 18 ? i : null)
+    .filter(i => i !== null);
+  if (playedIdxs.length === 0) return null;
+
+  const guestNetto = playedIdxs.reduce((s, ri) => s + (guestRow.rounds[ri].vsHcp ?? 0), 0);
+
+  let rank = 1;
+  regularRows.forEach(r => {
+    if (!playedIdxs.every(ri => r.rounds[ri]?.scoredHoles === 18)) return;
+    const playerNetto = playedIdxs.reduce((s, ri) => s + (r.rounds[ri].vsHcp ?? 0), 0);
+    if (playerNetto < guestNetto) rank++;
+  });
+  return rank;
+}
+
 function renderLeaderboard() {
   const container = document.getElementById('lbRows');
   if (!container) return;
@@ -3363,18 +3379,6 @@ function renderLeaderboard() {
   const liveRanks = {};
   liveOrder.forEach((p, i) => { liveRanks[p.key] = p.score === null ? null : i + 1; });
 
-  // Per-round best netto: best vsHcp among all players who finished that round.
-  const roundBestNetto = ROUND_DATES.map((_, ri) => {
-    let best = null;
-    allRows.forEach(r => {
-      const rd = r.rounds[ri] || {};
-      if (rd.scoredHoles === 18 && rd.vsHcp !== null) {
-        if (best === null || rd.vsHcp < best) best = rd.vsHcp;
-      }
-    });
-    return best;
-  });
-
   function _rowHtml(row, pos, staticRank) {
     const name = PLAYER_NICKNAMES[row.p.key] || row.p.name;
     const nLabel = vpLabel(row.nettoVsPar);
@@ -3386,8 +3390,7 @@ function renderLeaderboard() {
         const vpStr = vpLabel(r.vsPar);
         const nettoStr = r.vsHcp !== null ? vpLabel(r.vsHcp) : '–';
         const nettoCls = r.vsHcp === null ? 'lb-dash' : vpCls(r.vsHcp);
-        const winnerCls = (r.vsHcp !== null && r.vsHcp === roundBestNetto[ri]) ? ' lb-rcell-winner' : '';
-        return `<span class="lb-cell lb-rcell${winnerCls}">
+        return `<span class="lb-cell lb-rcell">
           <span class="lb-r-vp ${vpCls(r.vsPar)}">${vpStr}</span>
           <span class="lb-r-netto ${nettoCls}">${nettoStr}</span>
         </span>`;
@@ -3441,7 +3444,11 @@ function renderLeaderboard() {
   const guestDivider = guestRows.length > 0
     ? '<div class="lb-guest-divider">Gäste</div>'
     : '';
-  const guestHtml = guestRows.map(row => _rowHtml(row, '–', null)).join('');
+  const guestHtml = guestRows.map(row => {
+    const pr = _guestPotentialRank(row, regularRows);
+    const pos = pr !== null ? `(${pr})` : '–';
+    return _rowHtml(row, pos, null);
+  }).join('');
 
   container.innerHTML = regularHtml + guestDivider + guestHtml;
   _applyLbGridColumns(anyLive);
