@@ -4708,7 +4708,7 @@ function calcStats(playerKey, dates) {
     twoPuttPct:        puttsCounted > 0 ? Math.round(twoPutts       / puttsCounted * 100) : null,
     threePuttPct:      puttsCounted > 0 ? Math.round(threePutts     / puttsCounted * 100) : null,
     fourPuttPlusPct:   puttsCounted > 0 ? Math.round(fourPuttsPlus  / puttsCounted * 100) : null,
-    threePuttsCount:   puttsCounted > 0 ? threePutts + fourPuttsPlus : null,
+    unnoetigePutts:    puttsCounted > 0 ? putts - (0.45 * gir + 22.5 * holesPlayed / 18) : null,
     birdieOrBetter, pars, bogeys, doubles, triplesPlus,
     par3avg: par3n > 0 ? par3diff / par3n : null,
     par4avg: par4n > 0 ? par4diff / par4n : null,
@@ -4826,7 +4826,7 @@ function renderStats() {
       { label: '2-Putt %',          key: 'twoPuttPct',     fmt: v => _sfmt(v) + '%', cls: () => '' },
       { label: '3-Putt %',          key: 'threePuttPct',   fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
       { label: '4-Putt+ %',         key: 'fourPuttPlusPct',fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
-      { label: 'Unnötige Putts',    key: 'threePuttsCount',fmt: v => _sfmt(v),       cls: v => _scls(v) },
+      { label: 'Unnötige Putts',    key: 'unnoetigePutts', fmt: v => _sparfmt(v, 1), cls: v => _scls(v) },
     ]},
     { title: 'GIR', rows: [
       { label: 'GIR %',             key: 'girPct',         fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
