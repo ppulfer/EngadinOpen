@@ -2275,19 +2275,27 @@ select.settings-input option { background: #0b1f3a; color: #f0ede3; }
   font-family: inherit; margin-top: 8px;
 }
 .flight-add-btn:hover { background: rgba(201,162,39,0.08); }
-.unplayable-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
-.unplayable-toggle {
-  background: rgba(255,255,255,0.05); color: var(--muted);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px; min-width: 30px; padding: 5px 0; text-align: center;
-  font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+.hole-cfg-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.hole-cfg {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px; padding: 5px 4px; width: 48px;
 }
-.unplayable-toggle:hover { border-color: var(--gold); }
-.unplayable-toggle.active {
-  background: rgba(224,68,74,0.18); color: #e0444a; border-color: #e0444a;
-  text-decoration: line-through;
+.hole-cfg-num { font-size: 11px; font-weight: 700; color: var(--muted); }
+.hole-cfg-par {
+  width: 38px; text-align: center; font-size: 13px; font-family: inherit;
+  background: rgba(0,0,0,0.25); color: var(--text); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px; padding: 2px 0;
 }
+.hole-cfg-par:disabled { opacity: 0.4; }
+.hole-cfg-x {
+  background: transparent; border: none; cursor: pointer; font-size: 12px;
+  line-height: 1; padding: 1px 4px; border-radius: 4px; color: #4db36a;
+}
+.hole-cfg.unpl { background: rgba(224,68,74,0.14); border-color: #e0444a; }
+.hole-cfg.unpl .hole-cfg-num { color: #e0444a; }
 .sc-hole-unplayable { opacity: 0.55; cursor: default; }
+.sc-par-mod { color: var(--gold); font-weight: 700; }
 
 /* Holes editor */
 .set-holes-details { margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
@@ -2735,12 +2743,19 @@ function playableHoleCount(date) {
   for (let i = 0; i < total; i++) if (!skip.has(i)) n++;
   return n;
 }
-// Par summed over the playable holes of a round (72 for a full round).
+// Effective par of a hole for a round — a per-round override wins over the course par.
+function holePar(date, i, course) {
+  const ov = SCHEDULE[date]?.parOverrides;
+  if (ov && ov[i] != null) return ov[i];
+  const c = course || COURSES.find(x => x.id === SCHEDULE[date]?.course);
+  return c?.holes[i]?.par ?? 4;
+}
+// Par summed over the playable holes of a round (72 for a full, unmodified round).
 function playedRoundPar(date) {
   const course = COURSES.find(c => c.id === SCHEDULE[date]?.course);
   if (!course) return ROUND_PAR;
   const skip = unplayableSet(date);
-  return course.holes.reduce((sum, h, i) => skip.has(i) ? sum : sum + (h.par || 0), 0);
+  return course.holes.reduce((sum, h, i) => skip.has(i) ? sum : sum + holePar(date, i, course), 0);
 }
 
 let PLAYER_NICKNAMES = {};
@@ -3315,7 +3330,7 @@ function lbGetScores() {
         if (h?.strokes) {
           scoredHoles++;
           strokes += h.strokes;
-          parPlayed += course?.holes[i]?.par || 4;
+          parPlayed += holePar(d, i, course);
           const si = course?.holes[i]?.si || 18;
           hcpReceived += hcpBase + (si <= hcpExtra ? 1 : 0);
         }
@@ -3531,6 +3546,7 @@ function scSetView(v) {
 let _sheetStrokes = 0;
 let _sheetPutts = 0;
 let _sheetLost = 0;
+let _sheetPar = 4;
 
 async function loadScorecards() {
   try {
@@ -3643,7 +3659,7 @@ function renderScorecardOverlay() {
     if (h?.strokes) {
       totalStrokes += h.strokes;
       playedCount++;
-      runningPar += course?.holes[i]?.par || 4;
+      runningPar += holePar(date, i, course);
     }
     if (h?.putts) totalPutts += h.putts;
     if (h?.lostBalls) totalLost += h.lostBalls;
@@ -3686,7 +3702,7 @@ function renderScorecardOverlay() {
   }
 
   if (scView === 'card') {
-    document.getElementById('scTable').innerHTML = renderScorecardTable(course, holes, skip);
+    document.getElementById('scTable').innerHTML = renderScorecardTable(course, holes, skip, date);
     return;
   }
 
@@ -3708,6 +3724,8 @@ function renderScorecardOverlay() {
         </div>`;
       }
       const hd = holes[i];
+      const hp = holePar(date, i, course);
+      const parChanged = hp !== h.par;
       const strokes = hd?.strokes ?? null;
       const putts = hd?.putts ?? null;
       const lost = hd?.lostBalls || 0;
@@ -3717,7 +3735,7 @@ function renderScorecardOverlay() {
         vpHtml = '<span style="color:var(--muted)">–</span>';
         girHtml = '<span style="color:var(--muted)">–</span>';
       } else {
-        const vp = strokes - h.par;
+        const vp = strokes - hp;
         let cls;
         if (vp <= -2) cls = 'sc-eagle';
         else if (vp === -1) cls = 'sc-birdie';
@@ -3730,7 +3748,7 @@ function renderScorecardOverlay() {
         const puttsStr = putts !== null ? `<span class="sc-h-putts-inline">/${putts}</span>` : '';
         scoreHtml = `<span class="sc-score-pill ${cls}">${strokes}</span>${puttsStr}`;
         vpHtml = `<span style="color:${vpColor}">${vpStr}</span>`;
-        const gir = putts !== null && (strokes - putts) <= (h.par - 2);
+        const gir = putts !== null && (strokes - putts) <= (hp - 2);
         girHtml = gir ? '<span style="color:#4db36a">✓</span>' : '<span style="color:var(--muted)">✗</span>';
       }
       const lostHtml = lost > 0
@@ -3738,7 +3756,7 @@ function renderScorecardOverlay() {
         : '<span style="color:var(--muted)">–</span>';
       return `<div class="sc-hole-row" onclick="openHoleSheet(${i})">
         <span class="sc-h-num">${h.hole}</span>
-        <span class="sc-h-par">${h.par}</span>
+        <span class="sc-h-par${parChanged ? ' sc-par-mod' : ''}"${parChanged ? ` title="Original Par ${h.par}"` : ''}>${hp}</span>
         <span class="sc-h-score">${scoreHtml}</span>
         <span class="sc-h-lost">${lostHtml}</span>
         <span class="sc-h-vp">${vpHtml}</span>
@@ -3748,7 +3766,7 @@ function renderScorecardOverlay() {
   `;
 }
 
-function renderScorecardTable(course, holes, skip) {
+function renderScorecardTable(course, holes, skip, date) {
   skip = skip || new Set();
   function nineHtml(startIdx, endLabel) {
     const nine = course.holes.slice(startIdx, startIdx + 9);
@@ -3760,21 +3778,23 @@ function renderScorecardTable(course, holes, skip) {
     let rowPar = '<tr><td class="sc-card-label">Par</td>';
     let rowSc = '<tr><td class="sc-card-label">Score</td>';
     nine.forEach((h, i) => {
+      const gi = startIdx + i;
       rowH   += `<th>${h.hole}</th>`;
       rowSI  += `<td>${h.si ?? ''}</td>`;
       rowLen += `<td>${h.length ?? ''}</td>`;
-      if (skip.has(startIdx + i)) {
+      if (skip.has(gi)) {
         rowPar += '<td style="color:var(--muted)">–</td>';
         rowSc  += '<td><span style="color:var(--muted)" title="unspielbar">🚫</span></td>';
         return;
       }
-      rowPar += `<td>${h.par}</td>`;
-      parSum += h.par;
+      const hp = holePar(date, gi, course);
+      rowPar += `<td${hp !== h.par ? ' class="sc-par-mod" title="Original Par ' + h.par + '"' : ''}>${hp}</td>`;
+      parSum += hp;
       const hd = nineHoles[i];
       if (hd?.strokes) {
         scoreSum += hd.strokes;
         scored = true;
-        const vp = hd.strokes - h.par;
+        const vp = hd.strokes - hp;
         let cls;
         if (vp <= -2) cls = 'sc-eagle';
         else if (vp === -1) cls = 'sc-birdie';
@@ -3793,7 +3813,7 @@ function renderScorecardTable(course, holes, skip) {
     rowSc  += `<td class="sc-card-total">${scored ? scoreSum : '–'}</td></tr>`;
     return rowH + rowSI + rowLen + rowPar + rowSc;
   }
-  const totalPar = course.holes.reduce((s, h, i) => skip.has(i) ? s : s + h.par, 0);
+  const totalPar = course.holes.reduce((s, h, i) => skip.has(i) ? s : s + holePar(date, i, course), 0);
   let totalScore = 0, anyScored = false;
   holes.forEach((hd, i) => { if (!skip.has(i) && hd?.strokes) { totalScore += hd.strokes; anyScored = true; } });
   const totalsRow = `
@@ -3831,7 +3851,9 @@ function openHoleSheet(holeIdx) {
   _sheetStrokes = hd?.strokes || 0;
   _sheetPutts = hd?.putts || 0;
   _sheetLost = hd?.lostBalls || 0;
-  document.getElementById('sheetHoleLabel').textContent = `Loch ${hole?.hole || holeIdx + 1} · Par ${hole?.par || '?'}`;
+  _sheetPar = holePar(date, holeIdx, course);
+  const parStr = _sheetPar !== (hole?.par ?? _sheetPar) ? `${_sheetPar} (orig. ${hole?.par})` : (_sheetPar || '?');
+  document.getElementById('sheetHoleLabel').textContent = `Loch ${hole?.hole || holeIdx + 1} · Par ${parStr}`;
   document.getElementById('sheetStrokes').textContent = _sheetStrokes || '–';
   document.getElementById('sheetPutts').textContent = _sheetPutts || '–';
   document.getElementById('sheetLost').textContent = _sheetLost || '–';
@@ -3877,7 +3899,7 @@ function _updateSheetSaveButton() {
 function updateSheetResult(hole) {
   const el = document.getElementById('sheetResult');
   if (!el || !_sheetStrokes) { if (el) el.textContent = ''; return; }
-  const par = hole?.par || 4;
+  const par = _sheetPar || hole?.par || 4;
   const vp = _sheetStrokes - par;
   let label;
   if (vp <= -3) label = 'Albatross 🦅🦅';
@@ -4722,7 +4744,7 @@ function calcStats(playerKey, dates) {
     holes.forEach((h, i) => {
       if (skip.has(i)) return;
       if (!h || !h.strokes) return;
-      const par = course.holes[i]?.par || 4;
+      const par = holePar(date, i, course);
       const s = h.strokes;
       const p = h.putts ?? 0;
       rStrokes += s; rHoles++;
@@ -5368,7 +5390,7 @@ function _renderStatsCharts(players, dates, statsMap) {
         holes.forEach((h, i) => {
           if (skip.has(i)) return;
           if (!h?.strokes) return;
-          const par = course.holes[i]?.par || 4;
+          const par = holePar(d, i, course);
           holeDiffs[i] += h.strokes - par;
           holeCounts[i]++;
         });
@@ -5689,10 +5711,17 @@ function renderSettingsSchedule() {
       : [{ teeTime: sched.teeTime || '', players: PLAYERS.map(p => p.key) }];
     const selCourse = COURSES.find(c => c.id === sched.course);
     const unplayable = new Set(Array.isArray(sched.unplayableHoles) ? sched.unplayableHoles : []);
+    const parOv = (sched.parOverrides && typeof sched.parOverrides === 'object') ? sched.parOverrides : {};
     const holeToggles = selCourse
-      ? selCourse.holes.map((h, i) =>
-          `<button type="button" class="unplayable-toggle${unplayable.has(i) ? ' active' : ''}" data-hole="${i}" onclick="this.classList.toggle('active')">${h.hole}</button>`
-        ).join('')
+      ? selCourse.holes.map((h, i) => {
+          const isUn = unplayable.has(i);
+          const par = parOv[i] ?? h.par;
+          return `<div class="hole-cfg${isUn ? ' unpl' : ''}" data-hole="${i}" data-defpar="${h.par}">
+            <span class="hole-cfg-num">${h.hole}</span>
+            <input class="hole-cfg-par" type="number" min="3" max="6" value="${par}"${isUn ? ' disabled' : ''}>
+            <button type="button" class="hole-cfg-x" title="unspielbar umschalten" onclick="_toggleUnplayableCell(this)">${isUn ? '🚫' : '✓'}</button>
+          </div>`;
+        }).join('')
       : '<span class="small" style="color:var(--muted)">Erst Platz wählen</span>';
     return `
     <div class="set-sched-row" data-date="${d}">
@@ -5708,8 +5737,8 @@ function renderSettingsSchedule() {
         </select>
       </div>
       <div class="set-field">
-        <label>Unspielbare Löcher</label>
-        <div class="unplayable-wrap" data-date="${d}">${holeToggles}</div>
+        <label>Löcher · Par anpassen / unspielbar (🚫)</label>
+        <div class="hole-cfg-wrap" data-date="${d}">${holeToggles}</div>
       </div>
       <div class="set-field">
         <label>Flights &amp; Tee-Times</label>
@@ -5758,9 +5787,16 @@ function _readScheduleFromUI() {
       const players = Array.from(fb.querySelectorAll('.flight-chip')).map(c => c.dataset.pk);
       return { teeTime, players };
     });
-    const unplayableHoles = Array.from(row.querySelectorAll('.unplayable-toggle.active'))
-      .map(b => parseInt(b.dataset.hole, 10));
-    out[d] = { course, format, flights, unplayableHoles };
+    const unplayableHoles = [];
+    const parOverrides = {};
+    row.querySelectorAll('.hole-cfg').forEach(cell => {
+      const idx = parseInt(cell.dataset.hole, 10);
+      if (cell.classList.contains('unpl')) { unplayableHoles.push(idx); return; }
+      const def = parseInt(cell.dataset.defpar, 10);
+      const val = parseInt(cell.querySelector('.hole-cfg-par')?.value, 10);
+      if (!isNaN(val) && val !== def) parOverrides[idx] = val;
+    });
+    out[d] = { course, format, flights, unplayableHoles, parOverrides };
   });
   return out;
 }
@@ -5769,6 +5805,15 @@ function _rerenderScheduleForDate(date) {
   const updatedSched = _readScheduleFromUI();
   SCHEDULE = updatedSched;
   renderSettingsSchedule();
+}
+
+function _toggleUnplayableCell(btn) {
+  const cell = btn.closest('.hole-cfg');
+  if (!cell) return;
+  const un = cell.classList.toggle('unpl');
+  btn.textContent = un ? '🚫' : '✓';
+  const inp = cell.querySelector('.hole-cfg-par');
+  if (inp) inp.disabled = un;
 }
 
 function settingsAddFlight(date) {
