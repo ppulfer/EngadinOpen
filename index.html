@@ -4642,7 +4642,7 @@ function _playerColor(key) {
 
 function calcStats(playerKey, dates) {
   let strokes = 0, putts = 0, lostBalls = 0, holesPlayed = 0, totalPar = 0;
-  let gir = 0, onePutts = 0, twoPutts = 0, threePutts = 0, fourPuttsPlus = 0;
+  let gir = 0, chipIns = 0, onePutts = 0, twoPutts = 0, threePutts = 0, fourPuttsPlus = 0;
   let puttsCounted = 0;
   let scramblingChances = 0, scramblingSaves = 0;
   let birdieOrBetter = 0, pars = 0, bogeys = 0, doubles = 0, triplesPlus = 0;
@@ -4655,15 +4655,18 @@ function calcStats(playerKey, dates) {
   const hcpBase = Math.floor(hcp / 18);
   const hcpExtra = hcp % 18;
 
+  const roundStrokes = [];
   dates.forEach(date => {
     const holes = scorecardCache[playerKey + '__' + date] || [];
     const course = COURSES.find(c => c.id === SCHEDULE[date]?.course);
     if (!course) return;
+    let rStrokes = 0, rHoles = 0;
     holes.forEach((h, i) => {
       if (!h || !h.strokes) return;
       const par = course.holes[i]?.par || 4;
       const s = h.strokes;
       const p = h.putts ?? 0;
+      rStrokes += s; rHoles++;
       strokes += s; putts += p; lostBalls += (h.lostBalls || 0); holesPlayed++; totalPar += par;
       const si = course.holes[i]?.si || 18;
       hcpReceived += hcpBase + (si <= hcpExtra ? 1 : 0);
@@ -4675,7 +4678,8 @@ function calcStats(playerKey, dates) {
       else triplesPlus++;
       if (h.putts != null) {
         puttsCounted++;
-        if (p === 1) onePutts++;
+        if (p === 0) chipIns++;
+        else if (p === 1) onePutts++;
         else if (p === 2) twoPutts++;
         else if (p === 3) threePutts++;
         else if (p >= 4) fourPuttsPlus++;
@@ -4694,22 +4698,28 @@ function calcStats(playerKey, dates) {
       if (i < 9) { front9s += s; front9p += par; front9n++; }
       else { back9s += s; back9p += par; back9n++; }
     });
+    if (rHoles > 0) roundStrokes.push(rStrokes);
   });
 
   if (holesPlayed === 0) return null;
   const scoreToPar = strokes - totalPar;
+  const numRounds = roundStrokes.length;
   return {
-    holesPlayed, strokes, lostBalls, scoreToPar,
+    holesPlayed, strokes, lostBalls, scoreToPar, hcp, numRounds,
     hcpReceived, scoreToHcp: scoreToPar - hcpReceived,
+    nettoStrokes: strokes - hcpReceived,
+    gespieltesHcp: numRounds ? scoreToPar / numRounds : null,
+    avgScore: numRounds ? strokes / numRounds : null,
+    highScore: numRounds ? Math.max(...roundStrokes) : null,
+    lowScore: numRounds ? Math.min(...roundStrokes) : null,
+    avgScoreToPar: numRounds ? scoreToPar / numRounds : null,
     avgPutts: putts / holesPlayed,
-    girPct: Math.round(gir / holesPlayed * 100),
-    scramblingPct: scramblingChances > 0 ? Math.round(scramblingSaves / scramblingChances * 100) : null,
-    onePuttPct:        puttsCounted > 0 ? Math.round(onePutts       / puttsCounted * 100) : null,
-    twoPuttPct:        puttsCounted > 0 ? Math.round(twoPutts       / puttsCounted * 100) : null,
-    threePuttPct:      puttsCounted > 0 ? Math.round(threePutts     / puttsCounted * 100) : null,
-    fourPuttPlusPct:   puttsCounted > 0 ? Math.round(fourPuttsPlus  / puttsCounted * 100) : null,
+    putts,
+    girCount: gir,
+    scrambleCount: scramblingSaves,
+    chipIns, onePutts, twoPutts, threePuttPlus: threePutts + fourPuttsPlus,
     unnoetigePutts:    puttsCounted > 0 ? putts - (0.45 * gir + 22.5 * holesPlayed / 18) : null,
-    birdieOrBetter, pars, bogeys, doubles, triplesPlus,
+    birdieOrBetter, pars, bogeys, doubleBogeyPlus: doubles + triplesPlus,
     par3avg: par3n > 0 ? par3diff / par3n : null,
     par4avg: par4n > 0 ? par4diff / par4n : null,
     par5avg: par5n > 0 ? par5diff / par5n : null,
@@ -4796,41 +4806,53 @@ function renderStats() {
 
   const dates = statsRound === 'all' ? ROUND_DATES : [ROUND_DATES[parseInt(statsRound)]];
   const players = statsPlayer === 'all' ? PLAYERS : PLAYERS.filter(p => p.key === statsPlayer);
+
   const statsMap = {};
-  players.forEach(p => { statsMap[p.key] = calcStats(p.key, dates); });
+  PLAYERS.forEach(p => { statsMap[p.key] = calcStats(p.key, dates); });
+
+  const ranked = PLAYERS.filter(p => statsMap[p.key] != null)
+    .sort((a, b) => statsMap[a.key].scoreToHcp - statsMap[b.key].scoreToHcp);
+  ranked.forEach((p, i) => { statsMap[p.key].rang = i + 1; });
 
   const sections = [
-    { title: 'Score', rows: [
-      { label: 'Score vs Par',      key: 'scoreToPar',     fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
-      { label: 'Score vs HCP (Netto)', key: 'scoreToHcp',  fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
-      { label: 'Gesamtschläge',     key: 'strokes',        fmt: v => _sfmt(v),       cls: () => '' },
+    { title: 'Netto', rows: [
+      { label: 'Rang',              key: 'rang',           fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Gewähltes HCP',     key: 'hcp',            fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Gespieltes HCP',    key: 'gespieltesHcp',  fmt: v => _sfmt(v, 2),    cls: () => '' },
+      { label: 'Schläge Netto',     key: 'nettoStrokes',   fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Schläge Netto über Par', key: 'scoreToHcp', fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
+    ]},
+    { title: 'Schläge', rows: [
+      { label: 'Schläge',           key: 'strokes',        fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Schläge über Par',  key: 'scoreToPar',     fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
+      { label: 'High Score',        key: 'highScore',      fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Low Score',         key: 'lowScore',       fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Avg Score',         key: 'avgScore',       fmt: v => _sfmt(v, 2),    cls: () => '' },
       { label: 'Gespielte Löcher',  key: 'holesPlayed',    fmt: v => _sfmt(v),       cls: () => '' },
-      { label: 'Front 9 vs Par',    key: 'front9',         fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
-      { label: 'Back 9 vs Par',     key: 'back9',          fmt: v => _sparfmt(v, 0), cls: v => _scls(v) },
     ]},
     { title: 'Scoring-Verteilung', rows: [
-      { label: 'Birdie o. besser',  key: 'birdieOrBetter', fmt: v => _sfmt(v),       cls: v => _scls(v, false) },
+      { label: 'Birdies',           key: 'birdieOrBetter', fmt: v => _sfmt(v),       cls: v => _scls(v, false) },
       { label: 'Pars',              key: 'pars',           fmt: v => _sfmt(v),       cls: () => '' },
-      { label: 'Bogeys',            key: 'bogeys',         fmt: v => _sfmt(v),       cls: v => _scls(v) },
-      { label: 'Doubles',           key: 'doubles',        fmt: v => _sfmt(v),       cls: v => _scls(v) },
-      { label: 'Triple+',           key: 'triplesPlus',    fmt: v => _sfmt(v),       cls: v => _scls(v) },
+      { label: 'Bogeys',            key: 'bogeys',         fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Double Bogey +',    key: 'doubleBogeyPlus',fmt: v => _sfmt(v),       cls: v => _scls(v) },
     ]},
     { title: 'Par-Performance', rows: [
-      { label: 'Par 3 Ø vs Par',    key: 'par3avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
-      { label: 'Par 4 Ø vs Par',    key: 'par4avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
-      { label: 'Par 5 Ø vs Par',    key: 'par5avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
+      { label: 'Par 3 Perf',        key: 'par3avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
+      { label: 'Par 4 Perf',        key: 'par4avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
+      { label: 'Par 5 Perf',        key: 'par5avg',        fmt: v => _sparfmt(v),    cls: v => _scls(v) },
     ]},
     { title: 'Putting', rows: [
+      { label: 'Putts',             key: 'putts',          fmt: v => _sfmt(v),       cls: () => '' },
       { label: 'Ø Putts / Loch',    key: 'avgPutts',       fmt: v => _sfmt(v, 2),    cls: v => _scls(v) },
-      { label: '1-Putt %',          key: 'onePuttPct',     fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
-      { label: '2-Putt %',          key: 'twoPuttPct',     fmt: v => _sfmt(v) + '%', cls: () => '' },
-      { label: '3-Putt %',          key: 'threePuttPct',   fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
-      { label: '4-Putt+ %',         key: 'fourPuttPlusPct',fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
+      { label: 'Chip in',           key: 'chipIns',        fmt: v => _sfmt(v),       cls: () => '' },
+      { label: '1 Put',             key: 'onePutts',       fmt: v => _sfmt(v),       cls: () => '' },
+      { label: '2 Put',             key: 'twoPutts',       fmt: v => _sfmt(v),       cls: () => '' },
+      { label: '3+ Put',            key: 'threePuttPlus',  fmt: v => _sfmt(v),       cls: () => '' },
       { label: 'Unnötige Putts',    key: 'unnoetigePutts', fmt: v => _sparfmt(v, 1), cls: v => _scls(v) },
     ]},
-    { title: 'GIR', rows: [
-      { label: 'GIR %',             key: 'girPct',         fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
-      { label: 'Scrambling %',      key: 'scramblingPct',  fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
+    { title: 'GIR & Scramble', rows: [
+      { label: 'GIR',               key: 'girCount',       fmt: v => _sfmt(v),       cls: () => '' },
+      { label: 'Scramble',          key: 'scrambleCount',  fmt: v => _sfmt(v),       cls: () => '' },
     ]},
     { title: 'Verlorene Bälle', rows: [
       { label: '💧 Total',          key: 'lostBalls',      fmt: v => _sfmt(v),       cls: v => _scls(v) },
@@ -5038,8 +5060,8 @@ function _renderStatsCharts(players, dates, statsMap) {
     </div>`;
   });
   html += `<div class="stats-chart-wrap">
-    <div class="stats-chart-title">GIR %</div>
-    <div class="stats-chart-desc">Greens in Regulation: Anteil der Löcher, bei denen das Grün in Par-minus-2 Schlägen erreicht wurde.</div>
+    <div class="stats-chart-title">GIR (Grüns)</div>
+    <div class="stats-chart-desc">Greens in Regulation: Anzahl der Löcher, bei denen das Grün in Par-minus-2 Schlägen erreicht wurde.</div>
     <canvas id="chartGir" height="120"></canvas>
   </div>`;
   html += `<div class="stats-chart-wrap">
@@ -5152,11 +5174,10 @@ function _renderStatsCharts(players, dates, statsMap) {
     data: {
       labels: pNames,
       datasets: [
-        { label: 'Birdie+', data: players.map(p => statsMap[p.key]?.birdieOrBetter ?? 0), backgroundColor: '#4db36a' },
-        { label: 'Par',     data: players.map(p => statsMap[p.key]?.pars ?? 0),            backgroundColor: '#5b9bd5' },
-        { label: 'Bogey',   data: players.map(p => statsMap[p.key]?.bogeys ?? 0),          backgroundColor: '#e8a838' },
-        { label: 'Double',  data: players.map(p => statsMap[p.key]?.doubles ?? 0),         backgroundColor: '#c5634d' },
-        { label: 'Triple+', data: players.map(p => statsMap[p.key]?.triplesPlus ?? 0),     backgroundColor: '#7a1f1f' },
+        { label: 'Birdies',       data: players.map(p => statsMap[p.key]?.birdieOrBetter ?? 0),  backgroundColor: '#4db36a' },
+        { label: 'Pars',          data: players.map(p => statsMap[p.key]?.pars ?? 0),            backgroundColor: '#5b9bd5' },
+        { label: 'Bogeys',        data: players.map(p => statsMap[p.key]?.bogeys ?? 0),          backgroundColor: '#e8a838' },
+        { label: 'Double Bogey +',data: players.map(p => statsMap[p.key]?.doubleBogeyPlus ?? 0), backgroundColor: '#c5634d' },
       ]
     },
     options: { ...baseOpts, scales: { x: { ...baseOpts.scales.x, stacked: true }, y: { ...baseOpts.scales.y, stacked: true } } }
@@ -5250,7 +5271,7 @@ function _renderStatsCharts(players, dates, statsMap) {
     type: 'bar',
     data: {
       labels: pNames,
-      datasets: [{ label: 'GIR %', data: players.map(p => statsMap[p.key]?.girPct ?? null), backgroundColor: pColors }]
+      datasets: [{ label: 'GIR (Grüns)', data: players.map(p => statsMap[p.key]?.girCount ?? null), backgroundColor: pColors }]
     },
     options: { ...baseOpts, plugins: { legend: { display: false } } }
   });
