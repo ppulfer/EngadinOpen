@@ -4642,7 +4642,7 @@ function _playerColor(key) {
 
 function calcStats(playerKey, dates) {
   let strokes = 0, putts = 0, lostBalls = 0, holesPlayed = 0, totalPar = 0;
-  let gir = 0, onePutts = 0, twoPutts = 0, threePutts = 0, fourPuttsPlus = 0;
+  let gir = 0, chipIns = 0, onePutts = 0, twoPutts = 0, threePutts = 0, fourPuttsPlus = 0;
   let puttsCounted = 0;
   let scramblingChances = 0, scramblingSaves = 0;
   let birdieOrBetter = 0, pars = 0, bogeys = 0, doubles = 0, triplesPlus = 0;
@@ -4678,7 +4678,8 @@ function calcStats(playerKey, dates) {
       else triplesPlus++;
       if (h.putts != null) {
         puttsCounted++;
-        if (p === 1) onePutts++;
+        if (p === 0) chipIns++;
+        else if (p === 1) onePutts++;
         else if (p === 2) twoPutts++;
         else if (p === 3) threePutts++;
         else if (p >= 4) fourPuttsPlus++;
@@ -4716,7 +4717,7 @@ function calcStats(playerKey, dates) {
     putts,
     girCount: gir,
     scrambleCount: scramblingSaves,
-    onePutts, twoPutts, threePuttPlus: threePutts + fourPuttsPlus,
+    chipIns, onePutts, twoPutts, threePuttPlus: threePutts + fourPuttsPlus,
     unnoetigePutts:    puttsCounted > 0 ? putts - (0.45 * gir + 22.5 * holesPlayed / 18) : null,
     birdieOrBetter, pars, bogeys, doubleBogeyPlus: doubles + triplesPlus,
     par3avg: par3n > 0 ? par3diff / par3n : null,
@@ -4843,6 +4844,7 @@ function renderStats() {
     { title: 'Putting', rows: [
       { label: 'Putts',             key: 'putts',          fmt: v => _sfmt(v),       cls: () => '' },
       { label: 'Ø Putts / Loch',    key: 'avgPutts',       fmt: v => _sfmt(v, 2),    cls: v => _scls(v) },
+      { label: 'Chip in',           key: 'chipIns',        fmt: v => _sfmt(v),       cls: () => '' },
       { label: '1 Put',             key: 'onePutts',       fmt: v => _sfmt(v),       cls: () => '' },
       { label: '2 Put',             key: 'twoPutts',       fmt: v => _sfmt(v),       cls: () => '' },
       { label: '3+ Put',            key: 'threePuttPlus',  fmt: v => _sfmt(v),       cls: () => '' },
