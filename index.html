@@ -5776,8 +5776,8 @@ function renderFlightBlock(date, fi, flight) {
       <div class="flight-players" data-fi="${fi}">
         ${(flight.players || []).map(pk => {
           const p = PLAYERS.find(x => x.key === pk);
-          if (!p) return '';
-          return `<span class="flight-chip" data-pk="${pk}">${p.nickname || p.name}<button type="button" class="flight-chip-x" onclick="settingsRemoveFromFlight('${date}', ${fi}, '${pk}')">×</button></span>`;
+          const label = p ? (p.nickname || p.name) : pk;
+          return `<span class="flight-chip" data-pk="${pk}">${label}<button type="button" class="flight-chip-x" onclick="settingsRemoveFromFlight('${date}', ${fi}, '${pk}')">×</button></span>`;
         }).join('')}
         ${unassigned.length ? unassigned.map(p =>
           `<button type="button" class="flight-pool-pick" onclick="settingsAddToFlight('${date}', ${fi}, '${p.key}')">+ ${p.nickname || p.name}</button>`
