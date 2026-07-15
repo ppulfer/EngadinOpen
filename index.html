@@ -4173,6 +4173,15 @@ function renderInfoEckdaten() {
     (ev.winner ? '<div class="row"><span class="lbl">Sieger</span><span class="val">🏆 ' + ev.winner + '</span></div>' : '');
 }
 
+function _teeMinutes(t) {
+  const m = (typeof t === 'string' ? t : '').match(/^(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : Infinity;
+}
+
+function sortFlightsByTeeTime(flights) {
+  return flights.slice().sort((a, b) => _teeMinutes(a.teeTime) - _teeMinutes(b.teeTime));
+}
+
 function renderSchedule() {
   const list = document.getElementById('scheduleList');
   if (!list) return;
@@ -4198,7 +4207,7 @@ function renderSchedule() {
       : '';
     let flightsHtml = '';
     if (flights) {
-      flightsHtml = '<div class="sched-flights">' + flights.map((f, fi) => {
+      flightsHtml = '<div class="sched-flights">' + sortFlightsByTeeTime(flights).map((f, fi) => {
         const tee = f.teeTime ? `🕐 ${f.teeTime}` : '🕐 TBD';
         const players = (f.players || []).map(pk => {
           const p = PLAYERS.find(x => x.key === pk);
@@ -5744,7 +5753,7 @@ function renderSettingsSchedule() {
       <div class="set-field">
         <label>Flights &amp; Tee-Times</label>
         <div class="flights-wrap" data-date="${d}">
-          ${flights.map((f, fi) => renderFlightBlock(d, fi, f)).join('')}
+          ${sortFlightsByTeeTime(flights).map((f, fi) => renderFlightBlock(d, fi, f)).join('')}
         </div>
         <button type="button" class="flight-add-btn" onclick="settingsAddFlight('${d}')">+ Flight hinzufügen</button>
       </div>
