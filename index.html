@@ -2275,6 +2275,19 @@ select.settings-input option { background: #0b1f3a; color: #f0ede3; }
   font-family: inherit; margin-top: 8px;
 }
 .flight-add-btn:hover { background: rgba(201,162,39,0.08); }
+.unplayable-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+.unplayable-toggle {
+  background: rgba(255,255,255,0.05); color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px; min-width: 30px; padding: 5px 0; text-align: center;
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.unplayable-toggle:hover { border-color: var(--gold); }
+.unplayable-toggle.active {
+  background: rgba(224,68,74,0.18); color: #e0444a; border-color: #e0444a;
+  text-decoration: line-through;
+}
+.sc-hole-unplayable { opacity: 0.55; cursor: default; }
 
 /* Holes editor */
 .set-holes-details { margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
@@ -2706,6 +2719,28 @@ function isCurrentYear() {
 function apiUrl(path) {
   const sep = path.includes('?') ? '&' : '?';
   return path + sep + 'year=' + APP_STATE.year;
+}
+
+// Holes (0-based indices) marked "unspielbar" for a round — excluded everywhere.
+function unplayableSet(date) {
+  const arr = SCHEDULE[date]?.unplayableHoles;
+  return new Set(Array.isArray(arr) ? arr : []);
+}
+// Number of playable holes in a round (course length minus unplayable).
+function playableHoleCount(date) {
+  const course = COURSES.find(c => c.id === SCHEDULE[date]?.course);
+  const total = course?.holes.length || 18;
+  const skip = unplayableSet(date);
+  let n = 0;
+  for (let i = 0; i < total; i++) if (!skip.has(i)) n++;
+  return n;
+}
+// Par summed over the playable holes of a round (72 for a full round).
+function playedRoundPar(date) {
+  const course = COURSES.find(c => c.id === SCHEDULE[date]?.course);
+  if (!course) return ROUND_PAR;
+  const skip = unplayableSet(date);
+  return course.holes.reduce((sum, h, i) => skip.has(i) ? sum : sum + (h.par || 0), 0);
 }
 
 let PLAYER_NICKNAMES = {};
@@ -3272,8 +3307,11 @@ function lbGetScores() {
     const rounds = ROUND_DATES.map(d => {
       const course = COURSES.find(c => c.id === SCHEDULE[d]?.course);
       const holes = scorecardCache[p.key + '__' + d] || [];
+      const skip = unplayableSet(d);
+      const playable = playableHoleCount(d);
       let scoredHoles = 0, strokes = 0, parPlayed = 0, hcpReceived = 0;
       holes.forEach((h, i) => {
+        if (skip.has(i)) return;
         if (h?.strokes) {
           scoredHoles++;
           strokes += h.strokes;
@@ -3284,19 +3322,19 @@ function lbGetScores() {
       });
       const vsPar = scoredHoles > 0 ? strokes - parPlayed : null;
       const vsHcp = vsPar !== null ? vsPar - hcpReceived : null;
-      return { date: d, strokes, scoredHoles, parPlayed, vsPar, hcpReceived, vsHcp };
+      return { date: d, strokes, scoredHoles, playable, parPlayed, vsPar, hcpReceived, vsHcp };
     });
 
     // Current round info kept for live sort + display.
-    const curRound = rounds[curIdx] || { scoredHoles: 0, vsPar: null };
-    const curFinished = curRound.scoredHoles === 18;
+    const curRound = rounds[curIdx] || { scoredHoles: 0, playable: 18, vsPar: null };
+    const curFinished = curRound.playable > 0 && curRound.scoredHoles === curRound.playable;
     const thru = curRound.scoredHoles === 0 ? null : curFinished ? 'F' : curRound.scoredHoles;
     const curVsPar = curRound.vsPar;
 
-    // Totals: only include rounds where all 18 holes are scored (not partial rounds).
+    // Totals: only include rounds where all playable holes are scored (not partial rounds).
     let bruttoStrokes = 0, bruttoRounds = 0, bruttoPar = 0;
     rounds.forEach(r => {
-      if (r.scoredHoles !== 18) return;
+      if (r.playable === 0 || r.scoredHoles !== r.playable) return;
       bruttoStrokes += r.strokes;
       bruttoPar += r.parPlayed;
       bruttoRounds++;
@@ -3310,7 +3348,7 @@ function lbGetScores() {
 
 function _guestPotentialRank(guestRow, regularRows) {
   const playedIdxs = guestRow.rounds
-    .map((r, i) => r.scoredHoles === 18 ? i : null)
+    .map((r, i) => (r.playable > 0 && r.scoredHoles === r.playable) ? i : null)
     .filter(i => i !== null);
   if (playedIdxs.length === 0) return null;
 
@@ -3318,7 +3356,7 @@ function _guestPotentialRank(guestRow, regularRows) {
 
   let rank = 1;
   regularRows.forEach(r => {
-    if (!playedIdxs.every(ri => r.rounds[ri]?.scoredHoles === 18)) return;
+    if (!playedIdxs.every(ri => { const rr = r.rounds[ri]; return rr && rr.playable > 0 && rr.scoredHoles === rr.playable; })) return;
     const playerNetto = playedIdxs.reduce((s, ri) => s + (r.rounds[ri].vsHcp ?? 0), 0);
     if (playerNetto < guestNetto) rank++;
   });
@@ -3349,7 +3387,7 @@ function renderLeaderboard() {
   _sortRows(guestRows);
 
   const anyLive = allRows.some(r =>
-    r.rounds.some(rd => rd.scoredHoles > 0 && rd.scoredHoles < 18)
+    r.rounds.some(rd => rd.scoredHoles > 0 && rd.scoredHoles < rd.playable)
   );
 
   const head = document.getElementById('lbHead');
@@ -3386,7 +3424,7 @@ function renderLeaderboard() {
 
     const roundCells = ROUND_DATES.map((d, ri) => {
       const r = row.rounds[ri] || {};
-      if (r.scoredHoles === 18) {
+      if (r.playable > 0 && r.scoredHoles === r.playable) {
         const vpStr = vpLabel(r.vsPar);
         const nettoStr = r.vsHcp !== null ? vpLabel(r.vsHcp) : '–';
         const nettoCls = r.vsHcp === null ? 'lb-dash' : vpCls(r.vsHcp);
@@ -3538,8 +3576,9 @@ function getDefaultRoundIdxForPlayer(playerKey) {
 
   for (let i = 0; i < ROUND_DATES.length; i++) {
     const holes = scorecardCache[playerKey + '__' + ROUND_DATES[i]] || [];
-    const scored = holes.filter(h => h?.strokes).length;
-    if (scored > 0 && scored < 18) return i;
+    const skip = unplayableSet(ROUND_DATES[i]);
+    const scored = holes.filter((h, hi) => !skip.has(hi) && h?.strokes).length;
+    if (scored > 0 && scored < playableHoleCount(ROUND_DATES[i])) return i;
   }
 
   const todayIdx = ROUND_DATES.indexOf(today);
@@ -3595,9 +3634,12 @@ function renderScorecardOverlay() {
 
   const cacheKey = scPlayerKey + '__' + date;
   const holes = scorecardCache[cacheKey] || [];
+  const skip = unplayableSet(date);
+  const playable = playableHoleCount(date);
 
   let totalStrokes = 0, totalPutts = 0, totalLost = 0, playedCount = 0, runningPar = 0;
   holes.forEach((h, i) => {
+    if (skip.has(i)) return;
     if (h?.strokes) {
       totalStrokes += h.strokes;
       playedCount++;
@@ -3619,6 +3661,7 @@ function renderScorecardOverlay() {
   const hcpExtra = hcp % 18;
   let hcpReceived = 0;
   holes.forEach((h, i) => {
+    if (skip.has(i)) return;
     if (!h?.strokes) return;
     const si = course?.holes[i]?.si || 18;
     hcpReceived += hcpBase + (si <= hcpExtra ? 1 : 0);
@@ -3634,7 +3677,7 @@ function renderScorecardOverlay() {
     <div class="sc-stat-item"><div class="sc-stat-num ${hCls}">${hLabel}</div><div class="sc-stat-lbl">Netto (HCP ${hcp})</div></div>
     <div class="sc-stat-item"><div class="sc-stat-num">${playedCount > 0 ? totalPutts : '–'}</div><div class="sc-stat-lbl">Putts</div></div>
     <div class="sc-stat-item"><div class="sc-stat-num">${totalLost > 0 ? totalLost : '–'}</div><div class="sc-stat-lbl">💧 Lost</div></div>
-    <div class="sc-stat-item"><div class="sc-stat-num">${playedCount}/18</div><div class="sc-stat-lbl">Löcher</div></div>
+    <div class="sc-stat-item"><div class="sc-stat-num">${playedCount}/${playable}</div><div class="sc-stat-lbl">Löcher</div></div>
   `;
 
   if (!course) {
@@ -3643,7 +3686,7 @@ function renderScorecardOverlay() {
   }
 
   if (scView === 'card') {
-    document.getElementById('scTable').innerHTML = renderScorecardTable(course, holes);
+    document.getElementById('scTable').innerHTML = renderScorecardTable(course, holes, skip);
     return;
   }
 
@@ -3657,6 +3700,13 @@ function renderScorecardOverlay() {
       <span style="text-align:center">GIR</span>
     </div>
     ${course.holes.map((h, i) => {
+      if (skip.has(i)) {
+        return `<div class="sc-hole-row sc-hole-unplayable">
+          <span class="sc-h-num">${h.hole}</span>
+          <span class="sc-h-par">${h.par}</span>
+          <span class="sc-h-score" style="grid-column: span 4; text-align:center; color:var(--muted)">🚫 unspielbar</span>
+        </div>`;
+      }
       const hd = holes[i];
       const strokes = hd?.strokes ?? null;
       const putts = hd?.putts ?? null;
@@ -3698,7 +3748,8 @@ function renderScorecardOverlay() {
   `;
 }
 
-function renderScorecardTable(course, holes) {
+function renderScorecardTable(course, holes, skip) {
+  skip = skip || new Set();
   function nineHtml(startIdx, endLabel) {
     const nine = course.holes.slice(startIdx, startIdx + 9);
     const nineHoles = holes.slice(startIdx, startIdx + 9);
@@ -3712,6 +3763,11 @@ function renderScorecardTable(course, holes) {
       rowH   += `<th>${h.hole}</th>`;
       rowSI  += `<td>${h.si ?? ''}</td>`;
       rowLen += `<td>${h.length ?? ''}</td>`;
+      if (skip.has(startIdx + i)) {
+        rowPar += '<td style="color:var(--muted)">–</td>';
+        rowSc  += '<td><span style="color:var(--muted)" title="unspielbar">🚫</span></td>';
+        return;
+      }
       rowPar += `<td>${h.par}</td>`;
       parSum += h.par;
       const hd = nineHoles[i];
@@ -3737,9 +3793,9 @@ function renderScorecardTable(course, holes) {
     rowSc  += `<td class="sc-card-total">${scored ? scoreSum : '–'}</td></tr>`;
     return rowH + rowSI + rowLen + rowPar + rowSc;
   }
-  const totalPar = course.holes.reduce((s, h) => s + h.par, 0);
+  const totalPar = course.holes.reduce((s, h, i) => skip.has(i) ? s : s + h.par, 0);
   let totalScore = 0, anyScored = false;
-  holes.forEach((hd, i) => { if (hd?.strokes) { totalScore += hd.strokes; anyScored = true; } });
+  holes.forEach((hd, i) => { if (!skip.has(i) && hd?.strokes) { totalScore += hd.strokes; anyScored = true; } });
   const totalsRow = `
     <table class="sc-card-9" style="margin-top:8px;">
       <tr>
@@ -3764,8 +3820,9 @@ function _vpStr(vp) {
 }
 
 function openHoleSheet(holeIdx) {
-  scHoleIdx = holeIdx;
   const date = ROUND_DATES[scRoundIdx];
+  if (unplayableSet(date).has(holeIdx)) { toast('Loch ist als unspielbar markiert'); return; }
+  scHoleIdx = holeIdx;
   const sched = SCHEDULE[date];
   const course = COURSES.find(c => c.id === sched.course);
   const hole = course?.holes[holeIdx];
@@ -4660,8 +4717,10 @@ function calcStats(playerKey, dates) {
     const holes = scorecardCache[playerKey + '__' + date] || [];
     const course = COURSES.find(c => c.id === SCHEDULE[date]?.course);
     if (!course) return;
+    const skip = unplayableSet(date);
     let rStrokes = 0, rHoles = 0;
     holes.forEach((h, i) => {
+      if (skip.has(i)) return;
       if (!h || !h.strokes) return;
       const par = course.holes[i]?.par || 4;
       const s = h.strokes;
@@ -4729,23 +4788,23 @@ function calcStats(playerKey, dates) {
 }
 
 function cumulativeNettoAfterRound(playerKey, hcp, maxRoundIdx) {
-  let totalStrokes = 0, rounds = 0;
+  let totalStrokes = 0, totalPar = 0, rounds = 0;
   for (let i = 0; i <= maxRoundIdx; i++) {
     const v = CLOUD_STATS[playerKey + '__score__' + ROUND_DATES[i]];
-    if (v !== undefined && v !== '') { totalStrokes += parseInt(v, 10); rounds++; }
+    if (v !== undefined && v !== '') { totalStrokes += parseInt(v, 10); totalPar += playedRoundPar(ROUND_DATES[i]); rounds++; }
   }
   if (rounds === 0) return null;
-  return totalStrokes - rounds * ROUND_PAR - hcp * rounds;
+  return totalStrokes - totalPar - hcp * rounds;
 }
 
 function cumulativeBruttoAfterRound(playerKey, maxRoundIdx) {
-  let totalStrokes = 0, rounds = 0;
+  let totalStrokes = 0, totalPar = 0, rounds = 0;
   for (let i = 0; i <= maxRoundIdx; i++) {
     const v = CLOUD_STATS[playerKey + '__score__' + ROUND_DATES[i]];
-    if (v !== undefined && v !== '') { totalStrokes += parseInt(v, 10); rounds++; }
+    if (v !== undefined && v !== '') { totalStrokes += parseInt(v, 10); totalPar += playedRoundPar(ROUND_DATES[i]); rounds++; }
   }
   if (rounds === 0) return null;
-  return totalStrokes - rounds * ROUND_PAR;
+  return totalStrokes - totalPar;
 }
 
 function _sfmt(val, dec = 0) {
@@ -5303,9 +5362,11 @@ function _renderStatsCharts(players, dates, statsMap) {
     const holeDiffs = new Array(18).fill(0);
     const holeCounts = new Array(18).fill(0);
     datesForCourse.forEach(d => {
+      const skip = unplayableSet(d);
       players.forEach(p => {
         const holes = scorecardCache[p.key + '__' + d] || [];
         holes.forEach((h, i) => {
+          if (skip.has(i)) return;
           if (!h?.strokes) return;
           const par = course.holes[i]?.par || 4;
           holeDiffs[i] += h.strokes - par;
@@ -5626,6 +5687,13 @@ function renderSettingsSchedule() {
     const flights = Array.isArray(sched.flights) && sched.flights.length
       ? sched.flights
       : [{ teeTime: sched.teeTime || '', players: PLAYERS.map(p => p.key) }];
+    const selCourse = COURSES.find(c => c.id === sched.course);
+    const unplayable = new Set(Array.isArray(sched.unplayableHoles) ? sched.unplayableHoles : []);
+    const holeToggles = selCourse
+      ? selCourse.holes.map((h, i) =>
+          `<button type="button" class="unplayable-toggle${unplayable.has(i) ? ' active' : ''}" data-hole="${i}" onclick="this.classList.toggle('active')">${h.hole}</button>`
+        ).join('')
+      : '<span class="small" style="color:var(--muted)">Erst Platz wählen</span>';
     return `
     <div class="set-sched-row" data-date="${d}">
       <div class="set-sched-head">
@@ -5634,10 +5702,14 @@ function renderSettingsSchedule() {
       </div>
       <div class="set-field">
         <label>Platz</label>
-        <select class="settings-input" data-field="course">
+        <select class="settings-input" data-field="course" onchange="_rerenderScheduleForDate('${d}')">
           <option value="">– wählen –</option>
           ${courseOptions}
         </select>
+      </div>
+      <div class="set-field">
+        <label>Unspielbare Löcher</label>
+        <div class="unplayable-wrap" data-date="${d}">${holeToggles}</div>
       </div>
       <div class="set-field">
         <label>Flights &amp; Tee-Times</label>
@@ -5686,7 +5758,9 @@ function _readScheduleFromUI() {
       const players = Array.from(fb.querySelectorAll('.flight-chip')).map(c => c.dataset.pk);
       return { teeTime, players };
     });
-    out[d] = { course, format, flights };
+    const unplayableHoles = Array.from(row.querySelectorAll('.unplayable-toggle.active'))
+      .map(b => parseInt(b.dataset.hole, 10));
+    out[d] = { course, format, flights, unplayableHoles };
   });
   return out;
 }
