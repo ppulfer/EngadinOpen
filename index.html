@@ -5494,7 +5494,7 @@ async function bootApp() {
   initTabs();
   initSettingsSubtabs();
   renderYearBanner();
-  loadPlayers();
+  await loadPlayers();
   initPlayerCards();
   initStats();
   initCourses();
@@ -5529,7 +5529,7 @@ async function switchYear(year) {
     if (_c) CLOUD_STATS = JSON.parse(_c);
   } catch (_) {}
   renderYearBanner();
-  loadPlayers();
+  await loadPlayers();
   initPlayerCards();
   initStats();
   initCourses();
