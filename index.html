@@ -4650,10 +4650,7 @@ function calcStats(playerKey, dates) {
   let front9s = 0, front9p = 0, front9n = 0, back9s = 0, back9p = 0, back9n = 0;
   let hcpReceived = 0;
 
-  // "Gewähltes HCP": use the tournament HCP from the year's data (matches Excel),
-  // not the live/editable roster HCP from KV (/api/players).
-  const player = (APP_STATE.event?.players || []).find(p => p.key === playerKey)
-              || PLAYERS.find(p => p.key === playerKey);
+  const player = PLAYERS.find(p => p.key === playerKey);
   const hcp = player?.hcp || 0;
   const hcpBase = Math.floor(hcp / 18);
   const hcpExtra = hcp % 18;
