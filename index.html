@@ -2287,13 +2287,9 @@ select.settings-input option { background: #0b1f3a; color: #f0ede3; }
   background: rgba(0,0,0,0.25); color: var(--text); border: 1px solid rgba(255,255,255,0.15);
   border-radius: 4px; padding: 3px 2px;
 }
-.hole-cfg-par:disabled { opacity: 0.4; }
-.hole-cfg-x {
-  background: transparent; border: none; cursor: pointer; font-size: 12px;
-  line-height: 1; padding: 1px 4px; border-radius: 4px; color: #4db36a;
-}
 .hole-cfg.unpl { background: rgba(224,68,74,0.14); border-color: #e0444a; }
 .hole-cfg.unpl .hole-cfg-num { color: #e0444a; }
+.hole-cfg.unpl .hole-cfg-par { border-color: #e0444a; }
 .sc-hole-unplayable { opacity: 0.55; cursor: default; }
 .sc-par-mod { color: var(--gold); font-weight: 700; }
 
@@ -5717,11 +5713,11 @@ function renderSettingsSchedule() {
           const isUn = unplayable.has(i);
           const par = parOv[i] ?? h.par;
           const parVals = [...new Set([3, 4, 5, 6, par])].sort((a, b) => a - b);
-          const parOpts = parVals.map(pv => `<option value="${pv}"${pv === par ? ' selected' : ''}>${pv}</option>`).join('');
+          const parOpts = parVals.map(pv => `<option value="${pv}"${!isUn && pv === par ? ' selected' : ''}>${pv}</option>`).join('')
+            + `<option value="x"${isUn ? ' selected' : ''}>🚫</option>`;
           return `<div class="hole-cfg${isUn ? ' unpl' : ''}" data-hole="${i}" data-defpar="${h.par}">
             <span class="hole-cfg-num">${h.hole}</span>
-            <select class="hole-cfg-par"${isUn ? ' disabled' : ''}>${parOpts}</select>
-            <button type="button" class="hole-cfg-x" title="unspielbar umschalten" onclick="_toggleUnplayableCell(this)">${isUn ? '🚫' : '✓'}</button>
+            <select class="hole-cfg-par" title="Par wählen oder unspielbar (🚫)" onchange="this.closest('.hole-cfg').classList.toggle('unpl', this.value==='x')">${parOpts}</select>
           </div>`;
         }).join('')
       : '<span class="small" style="color:var(--muted)">Erst Platz wählen</span>';
@@ -5793,9 +5789,10 @@ function _readScheduleFromUI() {
     const parOverrides = {};
     row.querySelectorAll('.hole-cfg').forEach(cell => {
       const idx = parseInt(cell.dataset.hole, 10);
-      if (cell.classList.contains('unpl')) { unplayableHoles.push(idx); return; }
+      const v = cell.querySelector('.hole-cfg-par')?.value;
+      if (v === 'x') { unplayableHoles.push(idx); return; }
       const def = parseInt(cell.dataset.defpar, 10);
-      const val = parseInt(cell.querySelector('.hole-cfg-par')?.value, 10);
+      const val = parseInt(v, 10);
       if (!isNaN(val) && val !== def) parOverrides[idx] = val;
     });
     out[d] = { course, format, flights, unplayableHoles, parOverrides };
@@ -5807,15 +5804,6 @@ function _rerenderScheduleForDate(date) {
   const updatedSched = _readScheduleFromUI();
   SCHEDULE = updatedSched;
   renderSettingsSchedule();
-}
-
-function _toggleUnplayableCell(btn) {
-  const cell = btn.closest('.hole-cfg');
-  if (!cell) return;
-  const un = cell.classList.toggle('unpl');
-  btn.textContent = un ? '🚫' : '✓';
-  const inp = cell.querySelector('.hole-cfg-par');
-  if (inp) inp.disabled = un;
 }
 
 function settingsAddFlight(date) {
