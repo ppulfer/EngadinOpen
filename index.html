@@ -2781,6 +2781,8 @@ async function loadPlayers() {
       initPlayerCards();
       initStats();
       renderSettingsPlayers();
+      renderSchedule();
+      _refreshSettingsScheduleUI();
     }
   } catch (e) { /* keep defaults */ }
 }
