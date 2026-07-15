@@ -5043,6 +5043,26 @@ function _renderStatsCharts(players, dates, statsMap) {
     <div class="stats-chart-desc">Durchschnittliche Abweichung zum Par, aufgeteilt nach Loch-Länge. Zeigt Stärken/Schwächen pro Loch-Typ.</div>
     <canvas id="chartPar" height="160"></canvas>
   </div>`;
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Bad Scoring</div>
+    <div class="stats-chart-desc">Ø Bogeys und Ø Double Bogeys+ pro Runde. Niedriger = weniger schlechte Löcher.</div>
+    <canvas id="chartBadScoring" height="160"></canvas>
+  </div>`;
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Good Scoring</div>
+    <div class="stats-chart-desc">Ø Birdies und Ø Pars pro Runde. Höher = mehr gute Löcher.</div>
+    <canvas id="chartGoodScoring" height="160"></canvas>
+  </div>`;
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Generelle Spielqualität</div>
+    <div class="stats-chart-desc">Ø GIR (Grüns) und Ø Scramble pro Runde. Höher = mehr Grüns getroffen bzw. gerettet.</div>
+    <canvas id="chartQuality" height="160"></canvas>
+  </div>`;
+  html += `<div class="stats-chart-wrap">
+    <div class="stats-chart-title">Kurzspiel</div>
+    <div class="stats-chart-desc">Ø Unnötige Putts & Ø Chip in pro Runde (linke Achse) und Ø Putts pro Loch (rechte Achse).</div>
+    <canvas id="chartShortGame" height="160"></canvas>
+  </div>`;
 
   const coursesInScope = [];
   const seenCourses = new Set();
@@ -5183,10 +5203,12 @@ function _renderStatsCharts(players, dates, statsMap) {
     options: { ...baseOpts, scales: { x: { ...baseOpts.scales.x, stacked: true }, y: { ...baseOpts.scales.y, stacked: true } } }
   });
 
-  const parPlayers = players.slice().sort((a, b) => (statsMap[a.key]?.rang ?? 99) - (statsMap[b.key]?.rang ?? 99));
-  const parColors = ['#5b9bd5', '#e0444a', '#e8b13d'];
-  const parValueLabels = {
-    id: 'parValueLabels',
+  // Players ordered by tournament rank (like the Excel "... nach 4 Tagen" charts).
+  const rankedPlayers = players.slice().sort((a, b) => (statsMap[a.key]?.rang ?? 99) - (statsMap[b.key]?.rang ?? 99));
+  const perRound = (s, key) => (s && s.numRounds ? s[key] / s.numRounds : null);
+
+  const valueLabelsPlugin = {
+    id: 'lineValueLabels',
     afterDatasetsDraw(chart) {
       const ctx = chart.ctx;
       chart.data.datasets.forEach((ds, di) => {
@@ -5217,29 +5239,61 @@ function _renderStatsCharts(players, dates, statsMap) {
       });
     }
   };
-  _statsCharts.par = new Chart(document.getElementById('chartPar'), {
-    type: 'line',
-    plugins: [parValueLabels],
-    data: {
-      labels: parPlayers.map(p => p.nickname),
-      datasets: [
-        { label: 'Par 3', data: parPlayers.map(p => statsMap[p.key]?.par3avg ?? null) },
-        { label: 'Par 4', data: parPlayers.map(p => statsMap[p.key]?.par4avg ?? null) },
-        { label: 'Par 5', data: parPlayers.map(p => statsMap[p.key]?.par5avg ?? null) },
-      ].map((d, i) => ({
-        ...d, borderColor: parColors[i], backgroundColor: parColors[i], pointBackgroundColor: parColors[i],
-        tension: 0, borderWidth: 2, pointRadius: 4, pointHoverRadius: 5, spanGaps: true,
-      }))
-    },
-    options: {
-      ...baseOpts,
-      layout: { padding: { top: 18, bottom: 4 } },
-      plugins: { ...baseOpts.plugins, legend: { ...baseOpts.plugins.legend, position: 'bottom' } },
-      scales: {
-        x: { ...baseOpts.scales.x },
-        y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Schläge über Par', color: '#8fa0b8' } },
+
+  function buildPlayerLineChart(canvasId, series, yScales) {
+    const el = document.getElementById(canvasId);
+    if (!el) return null;
+    return new Chart(el, {
+      type: 'line',
+      plugins: [valueLabelsPlugin],
+      data: {
+        labels: rankedPlayers.map(p => p.nickname),
+        datasets: series.map(s => ({
+          label: s.label, data: rankedPlayers.map(p => s.value(statsMap[p.key])),
+          borderColor: s.color, backgroundColor: s.color, pointBackgroundColor: s.color,
+          yAxisID: s.yAxisID, tension: 0, borderWidth: 2, pointRadius: 4, pointHoverRadius: 5, spanGaps: true,
+        }))
+      },
+      options: {
+        ...baseOpts,
+        layout: { padding: { top: 18, bottom: 4 } },
+        plugins: { ...baseOpts.plugins, legend: { ...baseOpts.plugins.legend, position: 'bottom' } },
+        scales: yScales,
       }
-    }
+    });
+  }
+
+  const yAxis = (text, max) => ({ ...baseOpts.scales.y, beginAtZero: true, suggestedMax: max, title: { display: true, text, color: '#8fa0b8' } });
+
+  _statsCharts.par = buildPlayerLineChart('chartPar', [
+    { label: 'Par 3', color: '#5b9bd5', value: s => s?.par3avg ?? null },
+    { label: 'Par 4', color: '#e0444a', value: s => s?.par4avg ?? null },
+    { label: 'Par 5', color: '#e8b13d', value: s => s?.par5avg ?? null },
+  ], { x: { ...baseOpts.scales.x }, y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Schläge über Par', color: '#8fa0b8' } } });
+
+  _statsCharts.badScoring = buildPlayerLineChart('chartBadScoring', [
+    { label: 'Ø Bogeys / Runde', color: '#5b9bd5', value: s => perRound(s, 'bogeys') },
+    { label: 'Ø Double Bogey+ / Runde', color: '#e0444a', value: s => perRound(s, 'doubleBogeyPlus') },
+  ], { x: { ...baseOpts.scales.x }, y: yAxis('Ø pro Runde', 10) });
+
+  _statsCharts.goodScoring = buildPlayerLineChart('chartGoodScoring', [
+    { label: 'Ø Birdies / Runde', color: '#5b9bd5', value: s => perRound(s, 'birdieOrBetter') },
+    { label: 'Ø Pars / Runde', color: '#e0444a', value: s => perRound(s, 'pars') },
+  ], { x: { ...baseOpts.scales.x }, y: yAxis('Ø pro Runde', 10) });
+
+  _statsCharts.quality = buildPlayerLineChart('chartQuality', [
+    { label: 'Ø GIR / Runde', color: '#5b9bd5', value: s => perRound(s, 'girCount') },
+    { label: 'Ø Scramble / Runde', color: '#e0444a', value: s => perRound(s, 'scrambleCount') },
+  ], { x: { ...baseOpts.scales.x }, y: yAxis('Ø pro Runde', 8) });
+
+  _statsCharts.shortGame = buildPlayerLineChart('chartShortGame', [
+    { label: 'Ø Unnötige Putts / Runde', color: '#e0444a', value: s => perRound(s, 'unnoetigePutts'), yAxisID: 'y' },
+    { label: 'Ø Putts / Loch', color: '#5b9bd5', value: s => s?.avgPutts ?? null, yAxisID: 'y1' },
+    { label: 'Ø Chip in / Runde', color: '#e8b13d', value: s => perRound(s, 'chipIns'), yAxisID: 'y' },
+  ], {
+    x: { ...baseOpts.scales.x },
+    y: { ...baseOpts.scales.y, position: 'left', beginAtZero: true, suggestedMax: 15, title: { display: true, text: 'Unnötige Putts', color: '#8fa0b8' } },
+    y1: { ...baseOpts.scales.y, position: 'right', beginAtZero: true, suggestedMax: 2.5, grid: { drawOnChartArea: false }, title: { display: true, text: 'Ø Putts', color: '#8fa0b8' } },
   });
 
   coursesInScope.forEach(cid => {
