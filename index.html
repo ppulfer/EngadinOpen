@@ -4976,13 +4976,6 @@ function _linReg(points) {
   return { slope, intercept };
 }
 
-function _stdDev(values) {
-  if (values.length < 2) return null;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length;
-  return Math.sqrt(variance);
-}
-
 function _buildRankingChart(canvasId, players, roundsWithScores, _passthrough, scoreFn) {
   const finalRoundIdx = ROUND_DATES.indexOf(roundsWithScores[roundsWithScores.length - 1]);
   const finalScores = {};
@@ -5104,11 +5097,6 @@ function _renderStatsCharts(players, dates, statsMap) {
     <div class="stats-chart-title">Form-Trend</div>
     <div class="stats-chart-desc">Lineare Trendlinie pro Spieler über alle gespielten Runden. Slope-Wert in Klammern: negativ = Form verbessert sich (weniger Schläge), positiv = Form verschlechtert sich.</div>
     <canvas id="chartTrend" height="180"></canvas>
-  </div>`;
-  if (hasMultiRound) html += `<div class="stats-chart-wrap">
-    <div class="stats-chart-title">Konsistenz</div>
-    <div class="stats-chart-desc">Standardabweichung der Rundenscores (Brutto vs Par). Niedrigerer Wert = stabilere Leistung über alle Runden.</div>
-    <canvas id="chartConsistency" height="140"></canvas>
   </div>`;
   html += `<div class="stats-chart-wrap">
     <div class="stats-chart-title">Scoring-Verteilung</div>
@@ -5246,23 +5234,6 @@ function _renderStatsCharts(players, dates, statsMap) {
           }
         }
       }
-    });
-
-    const stdDevs = players.map((p, pi) => {
-      const vals = perPlayerRoundScores[pi].filter(v => v !== null);
-      return _stdDev(vals);
-    });
-    _statsCharts.consistency = new Chart(document.getElementById('chartConsistency'), {
-      type: 'bar',
-      data: {
-        labels: pNames,
-        datasets: [{
-          label: 'σ Brutto vs Par',
-          data: stdDevs.map(v => v !== null ? +v.toFixed(2) : null),
-          backgroundColor: pColors,
-        }]
-      },
-      options: { ...baseOpts, plugins: { legend: { display: false } } }
     });
   }
 
