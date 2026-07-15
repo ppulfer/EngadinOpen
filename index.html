@@ -5633,6 +5633,7 @@ async function settingsSavePlayer(key) {
     _setPlayersStatus('✓ Gespeichert', '#4db36a');
     await loadPlayers();
     renderSettingsPlayers();
+    _refreshSettingsScheduleUI();
     initPlayerCards();
     renderLeaderboard();
   } catch (e) { _setPlayersStatus('Fehler: ' + e.message, '#c5634d'); }
@@ -5648,6 +5649,7 @@ async function settingsDeletePlayer(key, name) {
     _setPlayersStatus('✓ Gelöscht', '#4db36a');
     await loadPlayers();
     renderSettingsPlayers();
+    _refreshSettingsScheduleUI();
     initPlayerCards();
     renderLeaderboard();
   } catch (e) { _setPlayersStatus('Fehler: ' + e.message, '#c5634d'); }
@@ -5673,6 +5675,7 @@ async function settingsAddPlayer() {
     _setPlayersStatus('✓ Hinzugefügt', '#4db36a');
     await loadPlayers();
     renderSettingsPlayers();
+    _refreshSettingsScheduleUI();
     initPlayerCards();
     renderLeaderboard();
   } catch (e) { _setPlayersStatus('Fehler: ' + e.message, '#c5634d'); }
@@ -5803,6 +5806,11 @@ function _readScheduleFromUI() {
 function _rerenderScheduleForDate(date) {
   const updatedSched = _readScheduleFromUI();
   SCHEDULE = updatedSched;
+  renderSettingsSchedule();
+}
+
+function _refreshSettingsScheduleUI() {
+  if (document.querySelector('.set-sched-row')) SCHEDULE = _readScheduleFromUI();
   renderSettingsSchedule();
 }
 
