@@ -13,14 +13,14 @@
   },
   "winner": "Köbi",
   "players": [
-    { "key": "hartmann",    "name": "Manuel Hartmann",    "hcp": 0, "nickname": "Manu",  "feature": "Hole in One Genius" },
-    { "key": "laenzlinger", "name": "Fabian Länzlinger",  "hcp": 0, "nickname": "Länz",  "feature": "Weit, aber out" },
-    { "key": "koelbener",   "name": "Roman Kölbener",     "hcp": 0, "nickname": "Köbi",  "feature": "Schlägt weiter als er puttet" },
-    { "key": "isaak",       "name": "Michael Isaak",      "hcp": 0, "nickname": "Isaak", "feature": "Birdie oder Bogey" },
-    { "key": "mansour",     "name": "Jens-Malek Mansour", "hcp": 0, "nickname": "Jens",  "feature": "Mehr Birdies auf dem Hemd" },
-    { "key": "pulfer",      "name": "Patrick Pulfer",     "hcp": 0, "nickname": "Pulfer","feature": "OK und Organisator" },
-    { "key": "hodgskin",    "name": "Thomas Hodgskin",    "hcp": 0, "nickname": "Thöme", "feature": "Britischer Import" },
-    { "key": "parli",       "name": "Linard Parli",       "hcp": 0, "nickname": "Parli", "feature": "Hat für alle einen Rat" }
+    { "key": "hartmann",    "name": "Manuel Hartmann",    "hcp": 10, "nickname": "Manu",  "feature": "Hole in One Genius" },
+    { "key": "laenzlinger", "name": "Fabian Länzlinger",  "hcp": 15, "nickname": "Länz",  "feature": "Weit, aber out" },
+    { "key": "koelbener",   "name": "Roman Kölbener",     "hcp": 28, "nickname": "Köbi",  "feature": "Schlägt weiter als er puttet" },
+    { "key": "isaak",       "name": "Michael Isaak",      "hcp": 13, "nickname": "Isaak", "feature": "Birdie oder Bogey" },
+    { "key": "mansour",     "name": "Jens-Malek Mansour", "hcp": 17, "nickname": "Jens",  "feature": "Mehr Birdies auf dem Hemd" },
+    { "key": "pulfer",      "name": "Patrick Pulfer",     "hcp": 14, "nickname": "Pulfer","feature": "OK und Organisator" },
+    { "key": "hodgskin",    "name": "Thomas Hodgskin",    "hcp": 12, "nickname": "Thöme", "feature": "Britischer Import" },
+    { "key": "parli",       "name": "Linard Parli",       "hcp":  6, "nickname": "Parli", "feature": "Hat für alle einen Rat" }
   ],
   "statsColors": {
     "hartmann":    "#e8a838",
