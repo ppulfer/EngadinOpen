@@ -4702,12 +4702,10 @@ function calcStats(playerKey, dates) {
     holesPlayed, strokes, lostBalls, scoreToPar,
     hcpReceived, scoreToHcp: scoreToPar - hcpReceived,
     avgPutts: putts / holesPlayed,
-    girPct: Math.round(gir / holesPlayed * 100),
-    scramblingPct: scramblingChances > 0 ? Math.round(scramblingSaves / scramblingChances * 100) : null,
-    onePuttPct:        puttsCounted > 0 ? Math.round(onePutts       / puttsCounted * 100) : null,
-    twoPuttPct:        puttsCounted > 0 ? Math.round(twoPutts       / puttsCounted * 100) : null,
-    threePuttPct:      puttsCounted > 0 ? Math.round(threePutts     / puttsCounted * 100) : null,
-    fourPuttPlusPct:   puttsCounted > 0 ? Math.round(fourPuttsPlus  / puttsCounted * 100) : null,
+    girCount: gir,
+    girRatio: puttsCounted > 0 ? `${gir} / ${puttsCounted}` : null,
+    scramblingRatio: scramblingChances > 0 ? `${scramblingSaves} / ${scramblingChances}` : null,
+    onePutts, twoPutts, threePutts, fourPuttsPlus,
     unnoetigePutts:    puttsCounted > 0 ? putts - (0.45 * gir + 22.5 * holesPlayed / 18) : null,
     birdieOrBetter, pars, bogeys, doubles, triplesPlus,
     par3avg: par3n > 0 ? par3diff / par3n : null,
@@ -4822,15 +4820,15 @@ function renderStats() {
     ]},
     { title: 'Putting', rows: [
       { label: 'Ø Putts / Loch',    key: 'avgPutts',       fmt: v => _sfmt(v, 2),    cls: v => _scls(v) },
-      { label: '1-Putt %',          key: 'onePuttPct',     fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
-      { label: '2-Putt %',          key: 'twoPuttPct',     fmt: v => _sfmt(v) + '%', cls: () => '' },
-      { label: '3-Putt %',          key: 'threePuttPct',   fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
-      { label: '4-Putt+ %',         key: 'fourPuttPlusPct',fmt: v => _sfmt(v) + '%', cls: v => _scls(v) },
+      { label: '1-Putts',           key: 'onePutts',       fmt: v => _sfmt(v),       cls: () => '' },
+      { label: '2-Putts',           key: 'twoPutts',       fmt: v => _sfmt(v),       cls: () => '' },
+      { label: '3-Putts',           key: 'threePutts',     fmt: v => _sfmt(v),       cls: () => '' },
+      { label: '4-Putts+',          key: 'fourPuttsPlus',  fmt: v => _sfmt(v),       cls: () => '' },
       { label: 'Unnötige Putts',    key: 'unnoetigePutts', fmt: v => _sparfmt(v, 1), cls: v => _scls(v) },
     ]},
     { title: 'GIR', rows: [
-      { label: 'GIR %',             key: 'girPct',         fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
-      { label: 'Scrambling %',      key: 'scramblingPct',  fmt: v => _sfmt(v) + '%', cls: v => _scls(v, false) },
+      { label: 'GIR (Grüns)',       key: 'girRatio',       fmt: v => v ?? '–',       cls: () => '' },
+      { label: 'Scrambling',        key: 'scramblingRatio',fmt: v => v ?? '–',       cls: () => '' },
     ]},
     { title: 'Verlorene Bälle', rows: [
       { label: '💧 Total',          key: 'lostBalls',      fmt: v => _sfmt(v),       cls: v => _scls(v) },
@@ -5038,8 +5036,8 @@ function _renderStatsCharts(players, dates, statsMap) {
     </div>`;
   });
   html += `<div class="stats-chart-wrap">
-    <div class="stats-chart-title">GIR %</div>
-    <div class="stats-chart-desc">Greens in Regulation: Anteil der Löcher, bei denen das Grün in Par-minus-2 Schlägen erreicht wurde.</div>
+    <div class="stats-chart-title">GIR (Grüns)</div>
+    <div class="stats-chart-desc">Greens in Regulation: Anzahl der Löcher, bei denen das Grün in Par-minus-2 Schlägen erreicht wurde.</div>
     <canvas id="chartGir" height="120"></canvas>
   </div>`;
   html += `<div class="stats-chart-wrap">
@@ -5250,7 +5248,7 @@ function _renderStatsCharts(players, dates, statsMap) {
     type: 'bar',
     data: {
       labels: pNames,
-      datasets: [{ label: 'GIR %', data: players.map(p => statsMap[p.key]?.girPct ?? null), backgroundColor: pColors }]
+      datasets: [{ label: 'GIR (Grüns)', data: players.map(p => statsMap[p.key]?.girCount ?? null), backgroundColor: pColors }]
     },
     options: { ...baseOpts, plugins: { legend: { display: false } } }
   });
