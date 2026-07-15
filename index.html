@@ -5866,11 +5866,16 @@ async function saveSettingsSchedule() {
   const status = document.getElementById('settingsScheduleStatus');
   status.textContent = 'Speichern…'; status.style.color = 'var(--muted)';
   const newSchedule = _readScheduleFromUI();
+  if (!Object.keys(newSchedule).length) {
+    status.textContent = 'Fehler: Spielplan nicht geladen – nichts gespeichert.'; status.style.color = '#c5634d';
+    return;
+  }
   try {
-    await fetch(apiUrl('/api/event-overrides'), {
+    const res = await fetch(apiUrl('/api/event-overrides'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ schedule: newSchedule }),
     });
+    if (!res.ok) throw new Error('Server ' + res.status);
     SCHEDULE = newSchedule;
     APP_STATE.event.schedule = newSchedule;
     renderSchedule();
@@ -5982,10 +5987,11 @@ async function saveSettingsCourse(cid) {
   };
   const newCourses = COURSES.map(c => c.id === cid ? updated : c);
   try {
-    await fetch(apiUrl('/api/event-overrides'), {
+    const res = await fetch(apiUrl('/api/event-overrides'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ courses: newCourses }),
     });
+    if (!res.ok) throw new Error('Server ' + res.status);
     COURSES = newCourses;
     APP_STATE.event.courses = newCourses;
     initCourses();
