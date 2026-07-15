@@ -5183,17 +5183,63 @@ function _renderStatsCharts(players, dates, statsMap) {
     options: { ...baseOpts, scales: { x: { ...baseOpts.scales.x, stacked: true }, y: { ...baseOpts.scales.y, stacked: true } } }
   });
 
+  const parPlayers = players.slice().sort((a, b) => (statsMap[a.key]?.rang ?? 99) - (statsMap[b.key]?.rang ?? 99));
+  const parColors = ['#5b9bd5', '#e0444a', '#e8b13d'];
+  const parValueLabels = {
+    id: 'parValueLabels',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      chart.data.datasets.forEach((ds, di) => {
+        const meta = chart.getDatasetMeta(di);
+        if (meta.hidden) return;
+        meta.data.forEach((pt, i) => {
+          const val = ds.data[i];
+          if (val == null) return;
+          const text = val.toFixed(2);
+          const y = di % 2 === 0 ? pt.y - 12 : pt.y + 12;
+          ctx.save();
+          ctx.font = '700 10px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const w = ctx.measureText(text).width + 8;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(pt.x - w / 2, y - 8, w, 16, 3);
+          else ctx.rect(pt.x - w / 2, y - 8, w, 16);
+          ctx.fillStyle = 'rgba(11,31,58,0.85)';
+          ctx.fill();
+          ctx.strokeStyle = ds.borderColor;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.fillStyle = ds.borderColor;
+          ctx.fillText(text, pt.x, y);
+          ctx.restore();
+        });
+      });
+    }
+  };
   _statsCharts.par = new Chart(document.getElementById('chartPar'), {
-    type: 'bar',
+    type: 'line',
+    plugins: [parValueLabels],
     data: {
-      labels: ['Par 3', 'Par 4', 'Par 5'],
-      datasets: players.map((p, pi) => ({
-        label: p.nickname,
-        data: [statsMap[p.key]?.par3avg ?? null, statsMap[p.key]?.par4avg ?? null, statsMap[p.key]?.par5avg ?? null],
-        backgroundColor: pColors[pi] + 'bb', borderColor: pColors[pi], borderWidth: 1,
+      labels: parPlayers.map(p => p.nickname),
+      datasets: [
+        { label: 'Par 3', data: parPlayers.map(p => statsMap[p.key]?.par3avg ?? null) },
+        { label: 'Par 4', data: parPlayers.map(p => statsMap[p.key]?.par4avg ?? null) },
+        { label: 'Par 5', data: parPlayers.map(p => statsMap[p.key]?.par5avg ?? null) },
+      ].map((d, i) => ({
+        ...d, borderColor: parColors[i], backgroundColor: parColors[i], pointBackgroundColor: parColors[i],
+        tension: 0, borderWidth: 2, pointRadius: 4, pointHoverRadius: 5, spanGaps: true,
       }))
     },
-    options: { ...baseOpts }
+    options: {
+      ...baseOpts,
+      layout: { padding: { top: 18, bottom: 4 } },
+      plugins: { ...baseOpts.plugins, legend: { ...baseOpts.plugins.legend, position: 'bottom' } },
+      scales: {
+        x: { ...baseOpts.scales.x },
+        y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Schläge über Par', color: '#8fa0b8' } },
+      }
+    }
   });
 
   coursesInScope.forEach(cid => {
