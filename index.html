@@ -2279,13 +2279,13 @@ select.settings-input option { background: #0b1f3a; color: #f0ede3; }
 .hole-cfg {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px; padding: 5px 4px; width: 48px;
+  border-radius: 6px; padding: 5px 4px; width: 52px;
 }
 .hole-cfg-num { font-size: 11px; font-weight: 700; color: var(--muted); }
 .hole-cfg-par {
-  width: 38px; text-align: center; font-size: 13px; font-family: inherit;
+  width: 44px; font-size: 13px; font-family: inherit; text-align: center; text-align-last: center;
   background: rgba(0,0,0,0.25); color: var(--text); border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 4px; padding: 2px 0;
+  border-radius: 4px; padding: 3px 2px;
 }
 .hole-cfg-par:disabled { opacity: 0.4; }
 .hole-cfg-x {
@@ -5716,9 +5716,11 @@ function renderSettingsSchedule() {
       ? selCourse.holes.map((h, i) => {
           const isUn = unplayable.has(i);
           const par = parOv[i] ?? h.par;
+          const parVals = [...new Set([3, 4, 5, 6, par])].sort((a, b) => a - b);
+          const parOpts = parVals.map(pv => `<option value="${pv}"${pv === par ? ' selected' : ''}>${pv}</option>`).join('');
           return `<div class="hole-cfg${isUn ? ' unpl' : ''}" data-hole="${i}" data-defpar="${h.par}">
             <span class="hole-cfg-num">${h.hole}</span>
-            <input class="hole-cfg-par" type="number" min="3" max="6" value="${par}"${isUn ? ' disabled' : ''}>
+            <select class="hole-cfg-par"${isUn ? ' disabled' : ''}>${parOpts}</select>
             <button type="button" class="hole-cfg-x" title="unspielbar umschalten" onclick="_toggleUnplayableCell(this)">${isUn ? '🚫' : '✓'}</button>
           </div>`;
         }).join('')
