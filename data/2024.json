@@ -6,20 +6,20 @@
   "roundDates": ["2024-07-18", "2024-07-19", "2024-07-20", "2024-07-21"],
   "roundLabels": ["R1", "R2", "R3", "R4"],
   "schedule": {
-    "2024-07-18": { "course": "zuoz", "format": "Strokeplay" },
-    "2024-07-19": { "course": "samedan", "format": "Strokeplay" },
+    "2024-07-18": { "course": "samedan", "format": "Strokeplay" },
+    "2024-07-19": { "course": "zuoz", "format": "Strokeplay" },
     "2024-07-20": { "course": "samedan", "format": "Strokeplay" },
     "2024-07-21": { "course": "zuoz", "format": "Strokeplay Finals 🏆" }
   },
   "winner": "Isaak",
   "players": [
-    { "key": "laenzlinger", "name": "Fabian Länzlinger",  "hcp": 16, "nickname": "Länz",   "feature": "Weit, aber out" },
+    { "key": "laenzlinger", "name": "Fabian Länzlinger",  "hcp": 15, "nickname": "Länz",   "feature": "Weit, aber out" },
     { "key": "mansour",     "name": "Jens-Malek Mansour", "hcp": 18, "nickname": "Jens",   "feature": "Mehr Birdies auf dem Hemd" },
-    { "key": "koelbener",   "name": "Roman Kölbener",     "hcp": 21, "nickname": "Köbi",   "feature": "Schlägt weiter als er puttet" },
+    { "key": "koelbener",   "name": "Roman Kölbener",     "hcp": 28, "nickname": "Köbi",   "feature": "Schlägt weiter als er puttet" },
     { "key": "hartmann",    "name": "Manuel Hartmann",    "hcp": 10, "nickname": "Manu",   "feature": "Hole in One Genius" },
-    { "key": "isaak",       "name": "Michael Isaak",      "hcp": 13, "nickname": "Isaak",  "feature": "Birdie oder Bogey" },
-    { "key": "hodgskin",    "name": "Thomas Hodgskin",    "hcp": 12, "nickname": "T.Hodg", "feature": "Britischer Import" },
-    { "key": "pulfer",      "name": "Patrick Pulfer",     "hcp": 14, "nickname": "Pulfer", "feature": "OK und Organisator" }
+    { "key": "isaak",       "name": "Michael Isaak",      "hcp": 14, "nickname": "Isaak",  "feature": "Birdie oder Bogey" },
+    { "key": "hodgskin",    "name": "Thomas Hodgskin",    "hcp": 11, "nickname": "T.Hodg", "feature": "Britischer Import" },
+    { "key": "pulfer",      "name": "Patrick Pulfer",     "hcp": 15, "nickname": "Pulfer", "feature": "OK und Organisator" }
   ],
   "statsColors": {
     "hartmann":    "#e8a838",

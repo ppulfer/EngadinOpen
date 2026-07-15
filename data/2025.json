@@ -11,15 +11,16 @@
     "2025-07-19": { "course": "samedan", "format": "Strokeplay" },
     "2025-07-20": { "course": "zuoz", "format": "Strokeplay Finals 🏆" }
   },
-  "winner": "Isaak",
+  "winner": "Köbi",
   "players": [
     { "key": "hartmann",    "name": "Manuel Hartmann",    "hcp": 10, "nickname": "Manu",  "feature": "Hole in One Genius" },
     { "key": "laenzlinger", "name": "Fabian Länzlinger",  "hcp": 15, "nickname": "Länz",  "feature": "Weit, aber out" },
     { "key": "koelbener",   "name": "Roman Kölbener",     "hcp": 28, "nickname": "Köbi",  "feature": "Schlägt weiter als er puttet" },
-    { "key": "isaak",       "name": "Michael Isaak",      "hcp": 14, "nickname": "Isaak", "feature": "Birdie oder Bogey" },
-    { "key": "mansour",     "name": "Jens-Malek Mansour", "hcp": 18, "nickname": "Jens",  "feature": "Mehr Birdies auf dem Hemd" },
-    { "key": "pulfer",      "name": "Patrick Pulfer",     "hcp": 15, "nickname": "Pulfer","feature": "OK und Organisator" },
-    { "key": "hodgskin",    "name": "Thomas Hodgskin",    "hcp": 11, "nickname": "Thöme", "feature": "Britischer Import" }
+    { "key": "isaak",       "name": "Michael Isaak",      "hcp": 13, "nickname": "Isaak", "feature": "Birdie oder Bogey" },
+    { "key": "mansour",     "name": "Jens-Malek Mansour", "hcp": 17, "nickname": "Jens",  "feature": "Mehr Birdies auf dem Hemd" },
+    { "key": "pulfer",      "name": "Patrick Pulfer",     "hcp": 14, "nickname": "Pulfer","feature": "OK und Organisator" },
+    { "key": "hodgskin",    "name": "Thomas Hodgskin",    "hcp": 12, "nickname": "Thöme", "feature": "Britischer Import" },
+    { "key": "parli",       "name": "Linard Parli",       "hcp":  6, "nickname": "Parli", "feature": "Hat für alle einen Rat" }
   ],
   "statsColors": {
     "hartmann":    "#e8a838",
@@ -28,7 +29,8 @@
     "isaak":       "#4eb87a",
     "mansour":     "#b07dd5",
     "pulfer":      "#cc8855",
-    "hodgskin":    "#5bbccc"
+    "hodgskin":    "#5bbccc",
+    "parli":       "#7ab07a"
   },
   "courses": [
     {
