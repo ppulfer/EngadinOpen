@@ -3906,10 +3906,16 @@ function openHoleSheet(holeIdx) {
   const hole = course?.holes[holeIdx];
   const cacheKey = scPlayerKey + '__' + date;
   const hd = (scorecardCache[cacheKey] || [])[holeIdx];
-  _sheetStrokes = hd?.strokes || 0;
-  _sheetPutts = hd?.putts || 0;
-  _sheetLost = hd?.lostBalls || 0;
   _sheetPar = holePar(date, holeIdx, course);
+  if (!hd) {
+    _sheetStrokes = _sheetPar || hole?.par || 4;
+    _sheetPutts = 2;
+    _sheetLost = 0;
+  } else {
+    _sheetStrokes = hd.strokes || 0;
+    _sheetPutts = hd.putts || 0;
+    _sheetLost = hd.lostBalls || 0;
+  }
   const parStr = _sheetPar !== (hole?.par ?? _sheetPar) ? `${_sheetPar} (orig. ${hole?.par})` : (_sheetPar || '?');
   document.getElementById('sheetHoleLabel').textContent = `Loch ${hole?.hole || holeIdx + 1} · Par ${parStr}`;
   document.getElementById('sheetStrokes').textContent = _sheetStrokes || '–';
