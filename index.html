@@ -2120,17 +2120,28 @@ body.detail-open .notification-center {
 }
 .stats-filter-btn:hover { color: var(--gold); border-color: var(--gold); }
 .stats-filter-btn.active { background: rgba(201,162,39,0.15); color: var(--gold); border-color: var(--gold); }
-.stats-table-wrap { overflow-x: auto; margin-bottom: 24px; -webkit-overflow-scrolling: touch; }
-.stats-table { border-collapse: collapse; font-size: 13px; min-width: 100%; }
+.stats-table-wrap {
+  overflow: auto; margin-bottom: 24px; -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - 140px);
+}
+.stats-table { border-collapse: separate; border-spacing: 0; font-size: 13px; min-width: 100%; }
 .stats-table th {
   padding: 8px 12px; background: #163258; font-size: 11px;
   text-transform: uppercase; letter-spacing: 1px; text-align: center; white-space: nowrap;
+  position: sticky; top: 0; z-index: 2;
 }
-.stats-table th:first-child { text-align: left; min-width: 140px; }
+.stats-table th:first-child { text-align: left; min-width: 140px; left: 0; z-index: 3; }
 .stats-table td { padding: 7px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; white-space: nowrap; }
-.stats-table td:first-child { text-align: left; color: var(--muted); font-size: 12px; }
+.stats-table td:first-child {
+  text-align: left; color: var(--muted); font-size: 12px;
+  position: sticky; left: 0; z-index: 1; background: var(--bg);
+  box-shadow: 1px 0 0 rgba(255,255,255,0.05);
+}
 .stats-table tr:hover td { background: rgba(255,255,255,0.02); }
-.stats-table .stat-section td { background: rgba(22,50,88,0.6); color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 5px 12px; }
+.stats-table tr:hover td:first-child { background: var(--bg-soft); }
+.stats-table .stat-section td { background: #14304f; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 5px 12px; }
+.stats-table .stat-section td:first-child { position: static; box-shadow: none; }
+.stats-table .stat-section span { position: sticky; left: 12px; display: inline-block; }
 .stat-good { color: #4db36a; font-weight: 700; }
 .stat-bad { color: #c5634d; font-weight: 700; }
 .stats-chart-wrap { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
@@ -4953,7 +4964,7 @@ function renderStats() {
   });
   html += '</tr></thead><tbody>';
   sections.forEach(sec => {
-    html += `<tr class="stat-section"><td colspan="${players.length + 1}">${sec.title}</td></tr>`;
+    html += `<tr class="stat-section"><td colspan="${players.length + 1}"><span>${sec.title}</span></td></tr>`;
     sec.rows.forEach(row => {
       html += `<tr><td>${row.label}</td>`;
       players.forEach(p => {
