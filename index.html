@@ -2125,9 +2125,8 @@ body.detail-open .notification-center {
 .stats-table th {
   padding: 8px 12px; background: #163258; font-size: 11px;
   text-transform: uppercase; letter-spacing: 1px; text-align: center; white-space: nowrap;
-  position: relative; z-index: 2;
 }
-.stats-table th:first-child { text-align: left; min-width: 140px; position: sticky; left: 0; z-index: 3; }
+.stats-table th:first-child { text-align: left; min-width: 140px; position: sticky; left: 0; z-index: 2; }
 .stats-table td { padding: 7px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; white-space: nowrap; }
 .stats-table td:first-child {
   text-align: left; color: var(--muted); font-size: 12px;
@@ -2136,7 +2135,7 @@ body.detail-open .notification-center {
 }
 .stats-table tr:hover td { background: rgba(255,255,255,0.02); }
 .stats-table tr:hover td:first-child { background: var(--bg-soft); }
-.stats-table .stat-section td { background: #14304f; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 5px 12px; }
+.stats-table .stat-section td { background: rgba(22,50,88,0.6); color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 5px 12px; }
 .stats-table .stat-section td:first-child { position: static; box-shadow: none; }
 .stats-table .stat-section span { position: sticky; left: 12px; display: inline-block; }
 .stat-good { color: #4db36a; font-weight: 700; }
@@ -2858,7 +2857,6 @@ function activateTab(name, scroll) {
     if (tabsWrap) window.scrollTo({ top: tabsWrap.offsetTop, behavior: 'smooth' });
   }
   if (name === 'weather') loadWeather(true);
-  if (name === 'stats') _updateStatsHeaderPin();
   if (name === 'info' || name === 'trackers') {
     fetchCloudStats().then(() => refreshAllStatsUI());
   }
@@ -4977,38 +4975,7 @@ function renderStats() {
   html += '</tbody></table></div>';
   tableWrap.innerHTML = html;
 
-  _bindStatsHeaderPin();
-  _updateStatsHeaderPin();
   _renderStatsCharts(players, dates, statsMap);
-}
-
-// Die Kopfzeile kann nicht per CSS sticky an der Seite kleben, weil der
-// horizontal scrollende Wrapper selbst zum Bezugspunkt für sticky wird.
-function _updateStatsHeaderPin() {
-  const table = document.querySelector('.stats-table');
-  if (!table || !table.offsetParent) return;
-  const ths = table.querySelectorAll('thead th');
-  if (!ths.length) return;
-  const tabs = document.querySelector('.tabs-wrap');
-  const navH = tabs ? tabs.offsetHeight : 0;
-  const headH = ths[0].offsetHeight;
-  const maxY = table.offsetHeight - headH;
-  const y = Math.max(0, Math.min(navH - table.getBoundingClientRect().top, maxY));
-  ths.forEach(th => { th.style.transform = y ? `translateY(${y}px)` : ''; });
-}
-
-let _statsPinBound = false;
-function _bindStatsHeaderPin() {
-  if (_statsPinBound) return;
-  _statsPinBound = true;
-  let ticking = false;
-  const onScroll = () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => { ticking = false; _updateStatsHeaderPin(); });
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
 }
 
 function _destroyChart(id) {
