@@ -2143,6 +2143,50 @@ body.detail-open .notification-center {
 .stats-chart-wrap { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
 .stats-chart-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
 .stats-chart-desc { font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.4; }
+.stats-table-head { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.stats-fs-open {
+  background: transparent; color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+  padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+  touch-action: manipulation; -webkit-tap-highlight-color: rgba(201,162,39,0.3);
+}
+.stats-fs-open:hover { color: var(--gold); border-color: var(--gold); }
+
+/* === STATS VOLLBILD-OVERLAY === */
+.stats-fs-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.stats-fs-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.stats-fs-close {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.stats-fs-title { font-weight: 700; font-size: 16px; flex: 1; }
+/* Einziger Scrollbereich der View: dadurch klebt thead nativ am Viewport. */
+.stats-fs-body { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; }
+.stats-fs-body .stats-table-wrap { overflow: visible; margin-bottom: 0; }
+.stats-fs-body .stats-table th { position: sticky; top: 0; z-index: 3; }
+.stats-fs-body .stats-table th:first-child { z-index: 4; }
 
 /* Settings tab */
 .settings-input {
@@ -2504,6 +2548,15 @@ select.settings-input option { background: #0b1f3a; color: #f0ede3; }
   </div>
   <div class="flight-detail-holes" id="flightDetailHoles"></div>
   <div class="quick-form" id="flightDetailQuick" style="display:none;"></div>
+</div>
+
+<!-- Stats Vollbild-Overlay -->
+<div class="stats-fs-overlay" id="statsFsOverlay" style="display:none;">
+  <div class="stats-fs-header">
+    <button class="stats-fs-close" onclick="closeStatsFullscreen()">×</button>
+    <div class="stats-fs-title" id="statsFsTitle">Statistik</div>
+  </div>
+  <div class="stats-fs-body" id="statsFsBody"></div>
 </div>
 
 <section id="faq">
@@ -4895,10 +4948,7 @@ function initStats() {
   renderStats();
 }
 
-function renderStats() {
-  const tableWrap = document.getElementById('statsTableWrap');
-  if (!tableWrap) return;
-
+function _statsData() {
   const dates = statsRound === 'all' ? ROUND_DATES : [ROUND_DATES[parseInt(statsRound)]];
   const players = statsPlayer === 'all' ? PLAYERS : PLAYERS.filter(p => p.key === statsPlayer);
 
@@ -4909,6 +4959,10 @@ function renderStats() {
     .sort((a, b) => statsMap[a.key].scoreToHcp - statsMap[b.key].scoreToHcp);
   ranked.forEach((p, i) => { statsMap[p.key].rang = i + 1; });
 
+  return { dates, players, statsMap };
+}
+
+function _statsTableHtml(players, statsMap) {
   const sections = [
     { title: 'Netto', rows: [
       { label: 'Rang',              key: 'rang',           fmt: v => _sfmt(v),       cls: () => '' },
@@ -4973,9 +5027,42 @@ function renderStats() {
     });
   });
   html += '</tbody></table></div>';
-  tableWrap.innerHTML = html;
+  return html;
+}
+
+function renderStats() {
+  const tableWrap = document.getElementById('statsTableWrap');
+  if (!tableWrap) return;
+
+  const { dates, players, statsMap } = _statsData();
+
+  tableWrap.innerHTML = '<div class="stats-table-head">'
+    + '<button class="stats-fs-open" onclick="openStatsFullscreen()">⛶ Vollbild</button>'
+    + '</div>'
+    + _statsTableHtml(players, statsMap);
 
   _renderStatsCharts(players, dates, statsMap);
+
+  if (document.getElementById('statsFsOverlay')?.style.display === 'flex') renderStatsFullscreen();
+}
+
+function renderStatsFullscreen() {
+  const { players, statsMap } = _statsData();
+  const roundLabel = statsRound === 'all' ? 'Alle Runden' : ROUND_LABELS[parseInt(statsRound)].split(' ')[0];
+  document.getElementById('statsFsTitle').textContent = 'Statistik · ' + roundLabel;
+  document.getElementById('statsFsBody').innerHTML = _statsTableHtml(players, statsMap);
+}
+
+function openStatsFullscreen() {
+  renderStatsFullscreen();
+  document.getElementById('statsFsBody').scrollTop = 0;
+  document.getElementById('statsFsOverlay').style.display = 'flex';
+  lockBodyScroll();
+}
+
+function closeStatsFullscreen() {
+  document.getElementById('statsFsOverlay').style.display = 'none';
+  unlockBodyScroll();
 }
 
 function _destroyChart(id) {
@@ -6047,7 +6134,8 @@ setInterval(() => {
   function _overlayOpen() {
     return document.body.classList.contains('detail-open')
       || document.getElementById('scOverlay')?.style.display === 'flex'
-      || document.getElementById('scHoleSheet')?.style.display === 'flex';
+      || document.getElementById('scHoleSheet')?.style.display === 'flex'
+      || document.getElementById('statsFsOverlay')?.style.display === 'flex';
   }
 
   document.addEventListener('touchstart', (e) => {
