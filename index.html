@@ -911,32 +911,33 @@ audio::-webkit-media-controls-panel {
   box-sizing: border-box;
   position: relative;
 }
-.sc-par-score { color: var(--gold); }
-/* Birdie: single circle */
+/* Par: grün */
+.sc-par-score { color: #5cc47a; }
+/* Birdie: single circle, hellblau */
 .sc-birdie {
-  color: #4db36a;
-  border: 2px solid #4db36a;
+  color: #5ab8f0;
+  border: 2px solid #5ab8f0;
   border-radius: 50%;
 }
-/* Eagle/Albatross: double circle */
+/* Eagle/Albatross: double circle, hellblau */
 .sc-eagle {
-  color: #4db36a;
-  border: 2px solid #4db36a;
+  color: #5ab8f0;
+  border: 2px solid #5ab8f0;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px #4db36a;
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px #5ab8f0;
 }
-/* Bogey: single square */
+/* Bogey: single square, orange */
 .sc-bogey {
-  color: #d46a5a;
-  border: 2px solid #d46a5a;
+  color: #e8943a;
+  border: 2px solid #e8943a;
   border-radius: 3px;
 }
-/* Double+ : double square */
+/* Double+ : double square, rot */
 .sc-double {
-  color: #d46a5a;
-  border: 2px solid #d46a5a;
+  color: #e0574a;
+  border: 2px solid #e0574a;
   border-radius: 3px;
-  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px #d46a5a;
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px #e0574a;
 }
 .sc-empty { color: var(--muted); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 3px 8px; font-size: 12px; display: inline-block; min-width: 28px; text-align: center; }
 .sc-hole-sheet {
@@ -2582,19 +2583,19 @@ select.settings-input option { background: #0b1f3a; color: #f0ede3; }
   <div class="card">
     <div class="faq-sym">
       <span class="sc-score-pill sc-eagle">3</span>
-      <div><b>Eagle / Albatross</b> — 2+ unter Par. Doppelter grüner Kreis.</div>
+      <div><b>Eagle / Albatross</b> — 2+ unter Par. Doppelter hellblauer Kreis.</div>
     </div>
     <div class="faq-sym">
       <span class="sc-score-pill sc-birdie">3</span>
-      <div><b>Birdie</b> — 1 unter Par. Grüner Kreis.</div>
+      <div><b>Birdie</b> — 1 unter Par. Hellblauer Kreis.</div>
     </div>
     <div class="faq-sym">
       <span class="sc-score-pill sc-par-score">4</span>
-      <div><b>Par</b> — gleich Par. Goldene Zahl, keine Umrandung.</div>
+      <div><b>Par</b> — gleich Par. Grüne Zahl, keine Umrandung.</div>
     </div>
     <div class="faq-sym">
       <span class="sc-score-pill sc-bogey">5</span>
-      <div><b>Bogey</b> — 1 über Par. Rotes Quadrat.</div>
+      <div><b>Bogey</b> — 1 über Par. Oranges Quadrat.</div>
     </div>
     <div class="faq-sym">
       <span class="sc-score-pill sc-double">6</span>
@@ -3978,6 +3979,12 @@ function updateSheetResult(hole) {
   const lostStr = _sheetLost > 0 ? ` · 💧${_sheetLost}` : '';
   const sign = vp > 0 ? '+' : '';
   el.textContent = `${label} (${vp === 0 ? 'E' : sign + vp})${girStr}${lostStr}`;
+  let color;
+  if (vp < 0) color = '#5ab8f0';
+  else if (vp === 0) color = '#5cc47a';
+  else if (vp === 1) color = '#e8943a';
+  else color = '#e0574a';
+  el.style.color = color;
 }
 
 async function saveHoleSheet() {
